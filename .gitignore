@@ -12,3 +12,4 @@ example/bin
 CMakeFiles/
 CMakeCache.txt
 .#*
+*.pdf
