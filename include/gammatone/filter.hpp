@@ -30,28 +30,28 @@ namespace gammatone
   /*!
     \class filter
 
-    This class specializes the interface for a single gammatone
-    filter. Processing is delegated to a specific core.
+    This class models a single gammatone filter. Processing is
+    delegated to a specific core and bandwidth computation is
+    specified by policy.
 
     \tparam Scalar  Type of the scalars.
     \tparam Core    Type of the processing core.
     \tparam BandwidthPolicy  Policy for computing filter bandwidth.
   */
   template<class Scalar,
-	   class Core = core::cooke1993<Scalar>,
-	   class BandwidthPolicy = policy::bandwidth::glasberg1990<Scalar> >
+           class Core = core::cooke1993<Scalar>,
+           class BandwidthPolicy = policy::bandwidth::glasberg1990<Scalar> >
   class filter : public interface<Scalar,Scalar>
   {
   public:
+    //! Creates a gammatone filter from explicit parameters.
     /*!
-      Creates a gammatone filter from explicit parameters.
-
       \param sample_frequency The sample frequency of the input signal
       (Hz). Must be positive.
 
       \param center_frequency The center frequency of the filter
       (Hz). Must be positive. Practically, this is a non-sense to have
-      fc > fs/2.
+      \f$f_c > f_s/2\f$.
     */
     filter(const Scalar& sample_frequency, const Scalar& center_frequency);
 
@@ -64,9 +64,8 @@ namespace gammatone
     //! Destructor
     virtual ~filter();
 
+    //! Compute a output state from a scalar input.
     /*!
-      Compute a output state from a scalar input.
-
       \tparam PostProcessingPolicy Type of policy for output
       postprocessing. Default is to do nothing.
 
@@ -75,6 +74,8 @@ namespace gammatone
     template<class PostProcessingPolicy = policy::postprocessing::off<Scalar> >
     inline Scalar compute(const Scalar& input);
 
+    
+    //! Compute preallocated output from a range of scalar inputs.
     /*!
       Sequentially computes a range of input values and stores the
       result in an output range.
@@ -94,19 +95,36 @@ namespace gammatone
              class InputIterator, class OutputIterator>
     void compute(const InputIterator& first, const InputIterator& last, const OutputIterator& result);
 
-    // implemented from interface
+    
+    //! Compute output from a range of scalar inputs.
+    /*!
+      Sequentially computes a range of input values and returns the result.
+
+      \tparam PostProcessingPolicy  Type of policy for output
+      postprocessing. Default is to do nothing.
+      \tparam Container  Type of the result container.
+
+      \param input The input signal to be processed
+      \return The output processed signal
+    */
+    template<class PostProcessingPolicy = policy::postprocessing::off<Scalar>,
+	     class Container = std::vector<Scalar> >
+    Container compute(const Container& input);
+
+
+    // methods inherited from interface
     inline Scalar sample_frequency() const;
     inline Scalar center_frequency() const;
     inline Scalar bandwidth() const;
     inline Scalar gain() const;
     virtual inline void reset();
 
-  private:
+  protected:
 
     //! Sample frequency of the filter (Hz)
     const Scalar m_sample_frequency;
 
-    //! Center frequency of the filter (Hz)
+    //! center frequency of the filter (Hz)
     const Scalar m_center_frequency;
 
     //! Bandwidth of the filter (Hz)
@@ -119,16 +137,18 @@ namespace gammatone
 
 
 template<class Scalar, class Core, class BandwidthPolicy>
-gammatone::filter<Scalar,Core,BandwidthPolicy>::filter(const Scalar& sample_frequency,
-                                       const Scalar& center_frequency)
+gammatone::filter<Scalar,Core,BandwidthPolicy>::
+filter(const Scalar& sample_frequency,
+       const Scalar& center_frequency)
   : m_sample_frequency( sample_frequency ),
     m_center_frequency( center_frequency ),
     m_bandwidth( BandwidthPolicy::bandwidth(center_frequency) ),
-    m_core(sample_frequency,center_frequency,m_bandwidth)
+    m_core( m_sample_frequency, m_center_frequency, m_bandwidth )
 {}
 
 template<class Scalar, class Core, class BandwidthPolicy>
-gammatone::filter<Scalar,Core,BandwidthPolicy>::filter(const gammatone::filter<Scalar,Core,BandwidthPolicy>& other)
+gammatone::filter<Scalar,Core,BandwidthPolicy>::
+filter(const gammatone::filter<Scalar,Core,BandwidthPolicy>& other)
   : m_sample_frequency( other.m_sample_frequency ),
     m_center_frequency( other.m_center_frequency ),
     m_bandwidth( other.m_bandwidth ),
@@ -136,7 +156,8 @@ gammatone::filter<Scalar,Core,BandwidthPolicy>::filter(const gammatone::filter<S
 {}
 
 template<class Scalar, class Core, class BandwidthPolicy>
-gammatone::filter<Scalar,Core,BandwidthPolicy>& gammatone::filter<Scalar,Core,BandwidthPolicy>::operator=(const gammatone::filter<Scalar,Core,BandwidthPolicy>& other)
+gammatone::filter<Scalar,Core,BandwidthPolicy>& gammatone::filter<Scalar,Core,BandwidthPolicy>::
+operator=(const gammatone::filter<Scalar,Core,BandwidthPolicy>& other)
 {
   gammatone::filter<Scalar,Core,BandwidthPolicy> tmp(other);
 
@@ -183,17 +204,30 @@ void gammatone::filter<Scalar,Core,BandwidthPolicy>::reset()
   m_core.reset();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy> template<class PostProcessingPolicy>
-Scalar gammatone::filter<Scalar,Core,BandwidthPolicy>::compute(const Scalar& input)
+template<class Scalar, class Core, class BandwidthPolicy>
+template<class PostProcessingPolicy>
+Scalar gammatone::filter<Scalar,Core,BandwidthPolicy>::
+compute(const Scalar& input)
 {
   return PostProcessingPolicy::process(m_core.compute(input));
 }
 
 template<class Scalar, class Core, class BandwidthPolicy>
-template <class P, class I1, class I2>
-void gammatone::filter<Scalar,Core,BandwidthPolicy>::compute(const I1& first, const I1& last, const I2& result)
+template <class PostProcessingPolicy, class InputIterator, class OutputIterator>
+void gammatone::filter<Scalar,Core,BandwidthPolicy>::
+compute(const InputIterator& first, const InputIterator& last, const OutputIterator& result)
 {
-  std::transform(first,last,result,[&](const auto& x){return this->compute<P>(x);});
+  std::transform(first,last,result,[&](const auto& x){return this->compute<PostProcessingPolicy>(x);});
+}
+
+template<class Scalar, class Core, class BandwidthPolicy>
+template<class PostProcessingPolicy, class Container>
+Container gammatone::filter<Scalar,Core,BandwidthPolicy>::
+compute(const Container& input)
+{
+  Container out(input.size());
+  this->compute<PostProcessingPolicy>(input.begin(),input.end(),out.begin());
+  return std::move(out);
 }
 
 #endif // GAMMATONE_FILTER_HPP

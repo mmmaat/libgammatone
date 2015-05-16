@@ -19,6 +19,8 @@
 #ifndef GAMMATONE_POLICY_CLIPPING_HPP
 #define GAMMATONE_POLICY_CLIPPING_HPP
 
+#include <complex>
+
 namespace gammatone
 {
   namespace policy
@@ -32,7 +34,7 @@ namespace gammatone
       happen if the input signal contains many zeros.
 
       - The clipping policy is build on the classes clipping::on and
-        clipping::off implementing a clip method
+      clipping::off implementing a clip method
 
       ~~~
       using namespace gammatone;
@@ -47,42 +49,54 @@ namespace gammatone
       ~~~
 
       \see This solution have been proposed by \cite Ma2006
+      \todo Let the user change the small value -> no magic number.
+      \todo Is it really usefull? Prove it on a test.
     */
     namespace clipping
     {
-      //! Clipping activated
+      //! Clipping enabled
       class on
       {
       public:
-	//! Clip very small input to zero
-	/*!
-	  \param x  The input value to clip
-	  \return 0 if x<1e-200, x else
-	 */
-        template<class Scalar>
-        static inline Scalar clip(const Scalar& x)
-        {
-	  static const Scalar small = 1e-200;
-          if(x<small) return 0;
-          else return x;
-        }
+        //! Clip very small input to zero
+        /*!
+          \param x  The input value to clip
+          \return 0 if |x| < 1e-200, x else
+        */
+	template<class Scalar>
+        static inline Scalar clip(const Scalar& x);
       };
 
       //! Clipping disabled
       class off
       {
       public:
-	//! Do nothing
-	/*!
-	  \param x The input value
-	  \return x
-	 */
+        //! Do nothing
+        /*!
+          \param x The input value
+          \return x
+        */
         template<class Scalar>
-        static inline Scalar clip(const Scalar& x)
-        {return x;}
+        static inline Scalar clip(const Scalar& x);
       };
     }
   }
 }
+
+template<class Scalar>
+Scalar gammatone::policy::clipping::on::clip(const Scalar& x)
+{
+  static const typename Scalar::value_type small = 1e-200;
+  if(std::abs(x)<small) return static_cast<Scalar>(0);
+  else return x;
+}
+
+template<class Scalar>
+Scalar gammatone::policy::clipping::off::clip(const Scalar& x)
+{
+  return x;
+}
+
+
 
 #endif // GAMMATONE_POLICY_CLIPPING_HPP

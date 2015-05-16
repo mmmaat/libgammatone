@@ -1,10 +1,5 @@
-/*!
-  \file   ir_comparison.cpp
-
-  \brief Comparison of the different impulse response avalaible in
-  libgammatone. Compare both theorical and implemented cores IRs.
-
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+/*
+   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,12 +15,16 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+//!   \brief Comparison of the different impulse response avalaible in
+//!   libgammatone. Compare both theorical and implemented cores IRs.
+
+
 #include <gammatone/impulse_response.hpp>
 #include <gammatone/filter.hpp>
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
-#include <gammatone/core/holdsworth.hpp>
-#include <utils.hpp>
+#include <gammatone/core/convolution.hpp>
+#include <utils/utils.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 #include <vector>
@@ -36,14 +35,12 @@ using namespace std;
 typedef double T;
 typedef gammatone::filter<T,gammatone::core::cooke1993<T> >   filter1;
 typedef gammatone::filter<T,gammatone::core::slaney1993<T> > filter2;
-//typedef gammatone::filter<T,gammatone::core::holdsworth<T> > filter3;
-
+typedef gammatone::filter<T,gammatone::core::convolution<T> > filter3;
 
 const T sample_frequency = 44100; // Hz
 const T center_frequency = 1000;  // Hz
 const T duration = 0.01;           // s
-const string gpsetup = "/home/mathieu/dev/gammatone/test/data/setup.gp";
-
+const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 template<class F, class C>
 inline string tostring(const F& f, const C& ir)
@@ -80,20 +77,21 @@ int main(int argc, char** argv)
   // creation of Ma and Flax gammatone filters
   filter1 f1(sample_frequency,center_frequency);
   filter2 f2(sample_frequency,center_frequency);
-  //  filter3 f3(sample_frequency,center_frequency);
+  filter3 f3(sample_frequency,center_frequency);
 
   // impulse responses computation
-  const auto t = gammatone::impulse_response::time(f1,duration);
-  vector<pair<vector<T>,string> > ir_data =
-    {make_pair(gammatone::impulse_response::theorical(  f1,t.begin(),t.end()), "theorical"),
-     make_pair(gammatone::impulse_response::implemented(f1,t.begin(),t.end()), "ma"),
-     make_pair(gammatone::impulse_response::implemented(f2,t.begin(),t.end()), "flax")};//,
-  //     make_pair(gammatone::impulse_response::implemented(f3,t.begin(),t.end()), "holdsworth")};
+  const auto t = gammatone::impulse_response::time(f1.sample_frequency(),duration);
 
-  cout << "        ma : " << tostring(f1, ir_data[1].first) << endl;
-  cout << "      flax : " << tostring(f2, ir_data[2].first) << endl;
-  //  cout << "holdsworth : " << tostring(f3, ir_data[3].first) << endl;
-  cout << "                                            "
+  vector<pair<vector<T>,string> > ir_data;
+  ir_data.push_back(make_pair(gammatone::impulse_response::theorical(  f1,t.begin(),t.end()), "theorical"));
+  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f1,t.begin(),t.end()), "ma"));
+  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f2,t.begin(),t.end()), "flax"));
+  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f3,t.begin(),t.end()), "convolution"));
+
+  cout << "  ma : " << tostring(f1, ir_data[1].first) << endl;
+  cout << "flax : " << tostring(f2, ir_data[2].first) << endl;
+  cout << "conv : " << tostring(f3, ir_data[3].first) << endl;
+  cout << "                             "
        << "Theorical max = " << utils::absmax(ir_data[0].first.begin(),ir_data[0].first.end()) << endl;
 
 
@@ -102,7 +100,7 @@ int main(int argc, char** argv)
   if(norm) for(auto& d:ir_data) utils::normalize(d.first.begin(),d.first.end());
 
   // Compute MSE on normalized data
-  const auto mse = compute_mse(ir_data, true);
+  //const auto mse = compute_mse(ir_data, true);
 
   // generate gnuplot command
   stringstream cmd;

@@ -1,6 +1,6 @@
 #include <gammatone/filter.hpp>
 #include <gammatone/impulse_response.hpp>
-#include <utils.hpp>
+#include <utils/utils.hpp>
 #include <gnuplot-iostream.h>
 #include <fstream>
 
@@ -31,6 +31,8 @@ static inline std::complex<T> formula_tf_approx
 typedef double T;
 typedef gammatone::filter<T> filter;
 
+const std::string gpsetup = "/home/mathieu/dev/libgammatone/test/data/setup.gp";
+
 int main()
 {
   const T fs = 44100;
@@ -49,7 +51,7 @@ int main()
                  [&](auto& x){auto tmp = formula_tf_approx(f,x);return std::make_pair(std::abs(tmp),std::arg(tmp));});
 
   Gnuplot gp_gain;
-  gp_gain << std::ifstream("setup.gp").rdbuf() << std::endl
+  gp_gain << std::ifstream(gpsetup).rdbuf() << std::endl
           << "set xlabel 'frequency (Hz)'" << std::endl
           << "set ylabel 'gain'" << std::endl
           << "plot '-' u 1:2 w l ls 11 lw 2, '-' u 1:2 w l ls 12" << std::endl;
@@ -57,13 +59,14 @@ int main()
   gp_gain.send1d(std::make_pair(freq,tf_aprox));
 
   Gnuplot gp_phase;
-  gp_phase << std::ifstream("setup.gp").rdbuf() << std::endl
+  gp_phase << std::ifstream(gpsetup).rdbuf() << std::endl
            << "set xlabel 'frequency (Hz)'" << std::endl
-           << "set ylabel 'gain'" << std::endl
+           << "set ylabel 'phase'" << std::endl
            << "plot '-' u 1:3 w l ls 11 lw 2, '-' u 1:3 w l ls 12" << std::endl;
   gp_phase.send1d(std::make_pair(freq,tf));
   gp_phase.send1d(std::make_pair(freq,tf_aprox));
 
-
+  std::cout << freq.size() << " " << tf.size() << std::endl;
+  
   return 0;
 }

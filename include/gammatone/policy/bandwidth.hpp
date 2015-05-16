@@ -31,16 +31,16 @@ namespace gammatone
 
       This namespace provides 3 sets of parameters for computing the
       bandwidth of a gammatone filter, given its center frequency
-      \cite Slaney1993
+      \cite Slaney1993 .
 
-      According to Slaney1993, a general form for the bandwidth \f$ b
-      \f$ of a cochlear channel as a function of its center frequency
-      \f$ f_c \f$ is given as : \f[ b(f_c) = ((\frac{f_c}{Q})^n +
-      b_m^n)^{1/n},\f] where \f$ Q \f$ is the asymptotic filter
-      quality at large frequencies (refered as earq in code and
-      Slaney1993), \f$ b_m \f$ is the minimal bandwidth at low
-      frequencies (refered as minbw) and \f$ n \f$ is the bandwidth
-      order (refered as order).
+      According to Slaney \cite Slaney1993 , a general form for the
+      bandwidth \f$ b \f$ of a cochlear channel as a function of its
+      center frequency \f$ f_c \f$ is given as : \f[ b(f_c) =
+      ((\frac{f_c}{Q})^n + b_m^n)^{1/n},\f] where \f$ Q \f$ is the
+      asymptotic filter quality at large frequencies (refered as earq
+      in code and Slaney1993), \f$ b_m \f$ is the minimal bandwidth at
+      low frequencies (refered as minbw) and \f$ n \f$ is the
+      bandwidth order (refered as order).
     */
     namespace bandwidth
     {
@@ -48,6 +48,10 @@ namespace gammatone
       template<class Scalar>
       class base
       {
+      public:
+        //! Bandwidth correction factor. \see Holdsworth1988 .
+        static const Scalar bw_correction;
+
       protected:
         //! Returns the bandwidth of a filter from explicit parameters
         /*!
@@ -61,15 +65,9 @@ namespace gammatone
                                        const Scalar& earq,
                                        const Scalar& minbw,
                                        const std::size_t& order);
-
-	//virtual Scalar bandwidth(const Scalar& center_frequency) = 0;
-	
-      private:
-        //! Bandwidth correction factor
-        static const Scalar bw_correction;
       };
 
-      //! Bandwidth parameters from \cite Glasberg1990
+      //! Bandwidth parameters from \cite Glasberg1990 .
       template<class Scalar>
       class glasberg1990 : public base<Scalar>
       {
@@ -80,7 +78,7 @@ namespace gammatone
         static const std::size_t order;
       };
 
-      //! Bandwidth parameters from \cite Slaney1988
+      //! Bandwidth parameters from \cite Slaney1988 .
       template<class Scalar>
       class slaney1988 : public base<Scalar>
       {
@@ -91,7 +89,7 @@ namespace gammatone
         static const std::size_t order;
       };
 
-      //! Bandwidth parameters from \cite Greenwood1990
+      //! Bandwidth parameters from \cite Greenwood1990 .
       template<class Scalar>
       class greenwood1990 : public base<Scalar>
       {

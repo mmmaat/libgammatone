@@ -1,6 +1,7 @@
-#include <gammatone/policy/spacing.hpp>
+#include <gammatone/policy/channels.hpp>
 #include <gammatone/policy/bandwidth.hpp>
-#include <utils.hpp>
+//#include <utils/utils.hpp>
+#include <utils/range.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 using namespace std;
@@ -13,15 +14,17 @@ const T step_factor = 0.25;
 
 int main()
 {
-  //  typename gammatone::policy::bandwidth::glasberg1990<T> B;
-  const auto cf1 = gammatone::policy::spacing::fixed_overlap<T>::center_frequency(fl,fh,step_factor);
-  const auto cf2 = gammatone::policy::spacing::fixed_size<T>::center_frequency(fl,fh,cf1.size());
-  const auto cf3 = gammatone::policy::spacing::fixed_size<T>::center_frequency(fl,fh,30);
+  using namespace gammatone::policy;
+  typedef bandwidth::glasberg1990<T> B;
+  
+  const auto cf1 = channels::fixed_overlap<T>::template center_frequency<B>(fl,fh,step_factor);
+  const auto cf2 = channels::fixed_size<T>::center_frequency<B>(fl,fh,cf1.size());
+  const auto cf3 = channels::fixed_size<T>::center_frequency<B>(fl,fh,30);
 
   Gnuplot gp;
-  gp << "plot '-' u 1:2 w l t 'cf1', "
-     << "     '-' u 1:2 w l t 'cf2', "
-     << "     '-' u 1:2 w l t 'cf3'  "
+  gp << "plot '-' u 1:2 w l lw 2 t 'cf1', "
+     << "     '-' u 1:2 w l lw 1.5 t 'cf2', "
+     << "     '-' u 1:2 w l lw 1 t 'cf3'  "
      << endl;
   gp.send1d(make_pair(cf1,utils::range<int>(1,cf1.size())));
   gp.send1d(make_pair(cf2,utils::range<int>(1,cf2.size())));

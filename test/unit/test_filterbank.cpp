@@ -1,23 +1,27 @@
-#include <gammatone/filterbank.hpp>
-#include <gtest/gtest.h>
+#include <filterbank_types.h>
+#include <utils/utils.hpp>
+using namespace gammatone;
+
 
 typedef double T;
 
+template<class Filterbank>
 class filterbank_test : public testing::Test
 {
 protected:
 
   const T m_sample_frequency = 44100;
-  const T m_nb_channels = 20;
   const T m_low = 500, m_high = 8000;
 };
 
-TEST_F( filterbank_test, accessors_works )
-{
-  gammatone::filterbank<T> m_filterbank( m_sample_frequency,m_low,m_high,m_nb_channels);
+TYPED_TEST_CASE(filterbank_test, filterbank_types);
 
-  EXPECT_EQ( m_sample_frequency, m_filterbank.sample_frequency() );
-  EXPECT_EQ( m_nb_channels, m_filterbank.nb_channels() );
+TYPED_TEST( filterbank_test, accessors_works )
+{
+  using namespace gammatone;
+  TypeParam m_filterbank( this->m_sample_frequency,this->m_low,this->m_high );
+
+  EXPECT_EQ( this->m_sample_frequency, m_filterbank.sample_frequency() );
 
   size_t i=0;
   for(const auto& f:m_filterbank)
@@ -28,22 +32,28 @@ TEST_F( filterbank_test, accessors_works )
       EXPECT_EQ( m_filterbank.center_frequency()[i], f.center_frequency() );
       EXPECT_EQ( m_filterbank.bandwidth()[i], f.bandwidth() );
       EXPECT_EQ( m_filterbank.gain()[i], f.gain() );
-      i++;      
+      i++;
     }
 }
 
 
-TEST_F( filterbank_test, center_frequency_works )
+TEST( filterbank_test, center_frequency_works )
 {
-  using namespace gammatone;
-  typedef filterbank<T,core::cooke1993<T>,policy::channels::increasing> increasing;
-  typedef filterbank<T,core::cooke1993<T>,policy::channels::decreasing> decreasing;
+  const T m_sample_frequency = 44100;
+  //  const T m_nb_channels = 20;
+  const T m_low = 500, m_high = 8000;
 
-  increasing fi(m_sample_frequency,m_low,m_high,m_nb_channels);
+  using namespace gammatone;
+  typedef core::cooke1993<T> core;
+  typedef policy::bandwidth::glasberg1990<T> bandwidth;
+  typedef filterbank<T,core,bandwidth,policy::channels::fixed_size<T,policy::order::increasing> > increasing;
+  typedef filterbank<T,core,bandwidth,policy::channels::fixed_size<T,policy::order::decreasing> > decreasing;
+
+  increasing fi(m_sample_frequency,m_low,m_high);
   EXPECT_LE( m_low, fi.begin()->center_frequency() );
   EXPECT_EQ( m_high, fi.rbegin()->center_frequency() );
 
-  decreasing fd(m_sample_frequency,m_low,m_high,m_nb_channels);
+  decreasing fd(m_sample_frequency,m_low,m_high);
   EXPECT_EQ( m_high, fd.begin()->center_frequency() );
   EXPECT_LE( m_low, fd.rbegin()->center_frequency() );
 

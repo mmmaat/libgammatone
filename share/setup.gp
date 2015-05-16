@@ -1,5 +1,5 @@
 
-load '/home/mathieu/dev/gammatone/test/data/parula.pal'
+load '/home/mathieu/dev/libgammatone/share/parula.pal'
 set style line 101 lc rgb '#808080' lt 1
 set border 3 back ls 101
 set tics nomirror out scale 0.75

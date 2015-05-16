@@ -34,13 +34,13 @@ const T duration = 0.005;
 const T sample_frequency = 96000;
 const size_t nb_channels = 5;
 const T low_cf = 500, high_cf = 8000;
-const string gpsetup = "/home/mathieu/dev/gammatone/test/data/setup.gp";
+const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 int main(int argc, char** argv)
 {
   filterbank bank(sample_frequency, low_cf, high_cf, nb_channels);
   
-  auto t = gammatone::impulse_response::time(*bank.begin(), duration);
+  auto t = gammatone::impulse_response::time(bank.begin()->sample_frequency(), duration);
 
   vector<vector<T> > ir(bank.nb_channels());
   transform(bank.begin(),bank.end(),ir.begin(),
