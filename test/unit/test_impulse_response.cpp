@@ -12,6 +12,7 @@ protected:
   const T m_sample_frequency = 44100;
   const T m_center_frequency = 2000;
   const T m_duration = 0.01;
+  const T m_attenuation = -60;
   Filter m_filter;
 };
 
@@ -35,16 +36,43 @@ TYPED_TEST( impulse_response_test, theorical_works )
 {
   const auto ir = impulse_response::theorical(this->m_filter,this->m_duration);
 
+  EXPECT_NE( (int)ir.size() , 0);
   EXPECT_NE( utils::absmax(ir.cbegin(),ir.cend()), 0.0);
   EXPECT_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
   EXPECT_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
 }
 
+TYPED_TEST( impulse_response_test, attenuation_works )
+{
+  const auto ir = impulse_response::theorical_attenuate(this->m_filter.center_frequency(),
+                                                        this->m_filter.bandwidth(),
+                                                        this->m_filter.sample_frequency(),
+                                                        -60);
+
+  EXPECT_NE( (int)ir.size() , 0);
+  EXPECT_NE( utils::absmax(ir.cbegin(),ir.cend()), 0.0);
+  EXPECT_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
+  EXPECT_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
+}
+
+TEST( impulse_response_test, max_duration_works )
+{
+  // test 1s
+  std::size_t size = 44100+1;
+  auto ir = impulse_response::theorical_attenuate<T>(5000,200,44100,1);
+  EXPECT_EQ(size, ir.size());
+
+  // test 2s
+  size = 2*44100+1;
+  ir = impulse_response::theorical_attenuate<T>(5000,200,44100,1,2);
+  EXPECT_EQ(size, ir.size());
+}
 
 TYPED_TEST( impulse_response_test, implemented_works )
 {
   const auto ir = impulse_response::implemented(this->m_filter,this->m_duration);
 
+  EXPECT_NE( (int)ir.size() , 0);
   EXPECT_NE( utils::absmax(ir.cbegin(),ir.cend()), 0.0);
   EXPECT_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
   EXPECT_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
