@@ -1,43 +1,38 @@
-#include <gammatone/filter.hpp>
-#include <gammatone/core/slaney1993.hpp>
-#include <gammatone/core/holdsworth.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/gammatone.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
+#include <string>
 
 using namespace std;
+const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 typedef double T;
 const T sample_frequency = 44100;
 const T center_frequency = 1000;
-const T duration = 0.001;
+const T duration = 0.1;
 
 void test_slaney1993(const T& fs, const T& fc, const T& d);
+void test_convolution(const T& fs, const T& fc, const T& d);
+
 // void test_holdsworth(const T& fs, const T& fc, const T& d);
 // void test_holdsworth_rir(const T& fs, const T& fc, const T& d);
+
 template<class T> void plot(const T& data, const string& name);
+
+
 
 
 
 int main()
 {
-  test_slaney1993(sample_frequency, center_frequency, duration);
+  test_convolution(sample_frequency,center_frequency,duration);
+  //    test_slaney1993(sample_frequency, center_frequency, duration);
   //test_holdsworth_rir(sample_frequency, center_frequency, duration);
-  
+
   return 0;
 }
 
 
-
-
-template<class T>
-void plot(const T& data, const string& name)
-{
-  Gnuplot gp;
-  gp << ifstream("setup.gp").rdbuf() << endl
-     << "plot '-' u 1:2 w l ls 11 lw 1.5 t '"<<name<<"'"<< endl;
-  gp.send1d(data);
-}
 
 
 void test_slaney1993(const T& fs, const T& fc, const T& d)
@@ -45,6 +40,59 @@ void test_slaney1993(const T& fs, const T& fc, const T& d)
   gammatone::filter<T,gammatone::core::slaney1993<T> > f(fs, fc);
   plot(gammatone::impulse_response::implemented(f, d), "slaney1993");
 }
+
+
+
+class my_convolution : public gammatone::core::convolution<T>
+{
+public:
+  my_convolution(const T& fs, const T& fc)
+    : convolution<T>( fs,fc,gammatone::policy::bandwidth::glasberg1990<T>::bandwidth(fc) ),
+    m_time( gammatone::impulse_response::time(fs,(T)(m_ir.size()-1)/fs) )
+  {}
+
+  virtual ~my_convolution()
+  {}
+
+  const std::vector<T>& ir() const
+  { return m_ir; }
+
+  const std::vector<T>& time() const
+  { return m_time; }
+  
+private:
+  vector<T> m_time;
+};
+
+
+void test_convolution(const T& fs, const T& fc, const T& d)
+{
+  my_convolution core(fs,fc);
+  cout << "gain = " << core.gain() << endl
+       << "size = " << core.ir().size() << endl
+       << "time = " << core.time().size() << endl;
+  
+  plot(make_pair(core.time(), core.ir()), "convolution the");
+
+  gammatone::filter<T,gammatone::core::convolution<T> > f(fs, fc);
+  plot(make_pair(gammatone::impulse_response::time(fs,d),
+		 gammatone::impulse_response::implemented(f, d))
+       , "convolution imp");
+}
+
+
+
+template<class T>
+void plot(const T& data, const string& name)
+{
+  Gnuplot gp;
+  gp << ifstream(gpsetup).rdbuf() << endl
+     << "plot '-' u 1:2 w l ls 11 lw 1.5 t '"<<name<<"'"<< endl;
+  gp.send1d(data);
+}
+
+
+
 
 // void test_holdsworth(const T& fs, const T& fc, const T& d)
 // {
@@ -100,4 +148,3 @@ void test_slaney1993(const T& fs, const T& fc, const T& d)
 
 //   //plot(ir, "holdsworth rir");
 // }
-

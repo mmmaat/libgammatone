@@ -1,4 +1,4 @@
-/*!
+/*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@ namespace gammatone
 {
   namespace policy
   {
-    //! Policies for gammatone filter postprocessing.
+    //! Policies for gammatone filter postprocessing
     /*!
       \namespace gammatone::policy::postprocessing
 
@@ -34,9 +34,9 @@ namespace gammatone
     */
     namespace postprocessing
     {
+      //! Postprocessing disabled
       /*!
-        \class off. Postprocessing disabled.
-
+        \class off.
         \tparam Scalar  Type of scalar values.
       */
       template<class Scalar> class off
@@ -46,9 +46,9 @@ namespace gammatone
         static inline Scalar process(const Scalar& x);
       };
 
+      //! Half-wave rectification
       /*!
-        \class hwr. Half-wave rectification.
-
+        \class hwr
         \tparam Scalar  Type of scalar values
       */
       template<class Scalar> class hwr
@@ -70,7 +70,7 @@ Scalar gammatone::policy::postprocessing::off<Scalar>::process(const Scalar& x)
 template<class Scalar>
 Scalar gammatone::policy::postprocessing::hwr<Scalar>::process(const Scalar& x)
 {
-  return std::max(0,x);
+  return std::max(static_cast<Scalar>(0),x);
 }
   
 #endif // GAMMATONE_POLICY_POSTPROCESSING_HPP

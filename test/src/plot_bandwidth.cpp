@@ -18,7 +18,8 @@
 */
 
 #include <gammatone/policy/bandwidth.hpp>
-#include <utils.hpp>
+//#include <utils/utils.hpp>
+#include <utils/range.hpp>
 #include <gnuplot-iostream.h>
 #include <algorithm>
 #include <functional>
@@ -27,7 +28,7 @@
 
 typedef double Scalar;
 
-const std::string gpsetup = "/home/mathieu/dev/gammatone/test/data/setup.gp";
+const std::string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 template<class T>
 void plot(const std::string& setup,const T& f, const T& d1, const T& d2, const T& d3);

@@ -19,19 +19,6 @@
 #ifndef GAMMATONE_INTERFACE_HPP
 #define GAMMATONE_INTERFACE_HPP
 
-//! Root namespace of the libgammatone library
-/*!
-  \namespace gammatone
-
-  The gammatone namespace is the root namespace of libgammatone. The
-  main classes of this namespace are gammatone::filter and
-  gammatone::filterbank, wich define respectively single and multi
-  channels gammatone filters. In order to be instanciated, a filter
-  (or filterbank) must be associated to one of the proposed processing
-  cores. A gammatone::core contains a concrete implementation of the
-  gammatone filter. Moreover, a set of gammatone::policy classes
-  allows the static customization of the filters.
-*/
 namespace gammatone
 {
   //! Generic interface for both gammatone filters and filterbanks
