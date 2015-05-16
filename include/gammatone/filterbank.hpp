@@ -34,8 +34,8 @@ namespace gammatone
 
     Implementation of a gammatone filterbank.
 
-    \tparam Scalar  Type of scalar values.
-    \tparam Core    Type of the filter core. See gammatone::core.
+    \tparam Scalar           Type of scalar values.
+    \tparam Core             Type of the filter core. See gammatone::core.
     \tparam BandwidthPolicy  Policy for computing filters bandwidth. See policy::bandwidth.
     \tparam ChannelsPolicy   Policy for computing center frequencies. See policy::channels.
   */
@@ -56,7 +56,6 @@ namespace gammatone
     //! Type of the underlying bank of filters
     typedef std::list<filter_type> bank_type;
 
-
     //! Const iterator on filters
     typedef typename bank_type::const_iterator const_iterator;
 
@@ -69,6 +68,8 @@ namespace gammatone
     //! Reverse iterator on filters
     typedef typename bank_type::reverse_iterator reverse_iterator;
 
+
+    
     //! Create a gammatone filterbank from explicit parameters.
     /*!
       \param sample_frequency    The sample frequency of the input signal (Hz)

@@ -34,9 +34,9 @@ namespace gammatone
     delegated to a specific core and bandwidth computation is
     specified by policy.
 
-    \tparam Scalar  Type of the scalars.
-    \tparam Core    Type of the processing core.
-    \tparam BandwidthPolicy  Policy for computing filter bandwidth.
+    \tparam Scalar           Type of scalar values.
+    \tparam Core             Type of the filter core. See gammatone::core.
+    \tparam BandwidthPolicy  Policy for computing filter bandwidth. See policy::bandwidth.
   */
   template<class Scalar,
            class Core = core::cooke1993<Scalar>,
@@ -44,6 +44,7 @@ namespace gammatone
   class filter : public interface<Scalar,Scalar>
   {
   public:
+    
     //! Creates a gammatone filter from explicit parameters.
     /*!
       \param sample_frequency The sample frequency of the input signal
@@ -64,6 +65,7 @@ namespace gammatone
     //! Destructor
     virtual ~filter();
 
+    
     //! Compute a output state from a scalar input.
     /*!
       \tparam PostProcessingPolicy Type of policy for output
