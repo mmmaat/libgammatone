@@ -20,7 +20,6 @@
 
 #include <gammatone/filter.hpp>
 #include <gammatone/impulse_response.hpp>
-#include <utils/utils.hpp>
 #include <algorithm>
 #include <numeric>
 #include <memory>
@@ -103,10 +102,8 @@ convolution(const Scalar& sample_frequency,
             const Scalar& bandwidth)
 {
   // compute 1s theorical impulse response
-  m_ir = gammatone::impulse_response::theorical(center_frequency,bandwidth,sample_frequency,1.0);
-
-  // shrink to 60dB attenuation
-  utils::shrink_to_attenuation(m_ir, -60);
+  //! \todo remove -60db magic number !
+  m_ir = gammatone::impulse_response::theorical_attenuate(center_frequency,bandwidth,sample_frequency,-60.0);
   
   // find gain as absmax !!
   //! \todo fixme !
@@ -166,6 +163,5 @@ Scalar gammatone::core::convolution<Scalar>::compute(const Scalar& input)
 
   return std::inner_product(m_input.begin(), m_input.end(), m_ir.rbegin(), 0.0);
 }
-
 
 #endif // GAMMATONE_CORE_CONVOLUTION_HPP

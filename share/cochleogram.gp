@@ -1,6 +1,5 @@
 load '/home/mathieu/dev/libgammatone/share/parula.pal'
 set term pdfcairo enhanced color dashed font ",10"
-set output 'cochleo.pdf'
 
 set style line 101 lc rgb '#808080' lt 1
 set border 3 back ls 101

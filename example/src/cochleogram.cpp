@@ -22,11 +22,16 @@ typedef gammatone::filterbank<T, core, bandwidth, channels>  filterbank;
 //! We use Half-wave rectification postprocessing
 typedef gammatone::policy::postprocessing::hwr<T> hwr;
 
+
+
 //! Gnuplot script file
 string gnuplot_script = "/home/mathieu/dev/libgammatone/share/cochleogram.gp";
 
 //! Input audio file name
 string input_file;
+
+//! Output PDF file
+string output_file = "output.pdf";
 
 //! Name of this program executable
 string program_name;
@@ -34,19 +39,17 @@ string program_name;
 //! Verbose flag
 bool verb = false;
 
+//! Normalization flag
+bool normalize = false;
+
 
 
 //! Parse command line parameters
 int parse_parameters(int argc, char** argv);
 
-//! Compute a cochleogram given an audio buffer and a
-//! filterbank, return a gnuplot-compliant data format.
-template<class T, class U, class V>
-V compute_cochleogram(T& filterbank, const U& audio_data);
-
-//! Send a given cochleogram to gnuplot
+//! Normalize each channel of the cochleogramm within [-1,1]
 template<class T>
-inline void send_gnuplot(const T& cochleogram);
+void normalization(T& data);
 
 
 
@@ -56,7 +59,6 @@ int main(int argc, char** argv)
   // exit if fails parsing the parameters
   if(parse_parameters(argc,argv))
     return -1;
-
 
   // open audio file
   vector<double> audio_data;
@@ -96,7 +98,15 @@ int main(int argc, char** argv)
     }
 
   // processing
-  const auto cochleogram = fb.compute<hwr>(audio_data);
+  auto cochleogram = fb.compute<hwr>(audio_data);
+
+  // normalization
+  if(normalize)
+    {
+      if(verb) cout << "   normalization..." << endl;
+      normalization(cochleogram);
+    }
+
 
   if(verb)
     {
@@ -108,11 +118,9 @@ int main(int argc, char** argv)
 
   // xaxis is time (in s)
   const auto xaxis = utils::linspace(0.0, duration, audio_data.size());
-  const auto xlimits = minmax_element( xaxis.begin(), xaxis.end() );
 
   // yaxis are center frequencies (in Hz)
   const auto yaxis = fb.center_frequency();
-  const auto ylimits = minmax_element( yaxis.begin(), yaxis.end() );
 
   // reshape data in a gnuplot compliant format (see gnuplot splot data-file)
   typedef vector<vector<array<double,3> > > data_type;
@@ -132,9 +140,13 @@ int main(int argc, char** argv)
     }
 
   // write gnuplot script and send data
+
+  const auto xlimits = minmax_element( xaxis.begin(), xaxis.end() );
+  //const auto ylimits = minmax_element( yaxis.begin(), yaxis.end() );
   Gnuplot gp;
   gp << std::ifstream(gnuplot_script).rdbuf() << std::endl
-    //     << "set xrange [" << *xlimits.first << " : " << *xlimits.second << "]" << endl
+     << "set output '" << output_file << "'" << std::endl
+     << "set xrange [" << *xlimits.first << " : " << *xlimits.second << "]" << endl
     //     << "set yrange [" << *ylimits.first << " : " << *ylimits.second << "]" << endl
      << "splot '-'" << endl
      << endl;
@@ -144,7 +156,9 @@ int main(int argc, char** argv)
   if(verb)
     {
       chrono.stop();
-      cout << " took " << chrono.count()/1000 << " s." << endl;
+
+      cout << " took " << chrono.count()/1000 << " s." << endl
+           << "Writing " << output_file << endl;
     }
 
   return 0;
@@ -163,8 +177,10 @@ int parse_parameters(int argc, char** argv)
   desc.add_options()
     ( "help,h", "produce help message" )
     ( "verbose,v", "enable verbosity" )
+    ( "normalize,n", "normalize output" )
     ( "gnuplot-script,g", po::value<string>(), "path to the Gnuplot script" )
-    ( "input-file", po::value<string>(), "input audio file to process" )
+    ( "output-file,o", po::value<string>(), "output PDF file to write" )
+    ( "input-file", po::value<string>(), "input audio file to read" )
     ;
 
   po::positional_options_description p;
@@ -190,6 +206,12 @@ int parse_parameters(int argc, char** argv)
       if(vm.count("verbose"))
         verb = true;
 
+      if(vm.count("normalize"))
+        normalize = true;
+
+      if(vm.count("output-file"))
+        output_file = vm["output-file"].as<string>();
+
       if(vm.count("input-file"))
         input_file = fs::canonical(vm["input-file"].as<string>()).string();
       else
@@ -201,9 +223,38 @@ int parse_parameters(int argc, char** argv)
     }
   catch(const std::exception& e)
     {
-      std::cerr <<  e.what() << std::endl;
+      std::cerr << e.what() << std::endl;
       return -1;
     }
 
   return 0;
 }
+
+
+template<class T>
+void normalization(T& data)
+{
+  typedef typename T::value_type::value_type Scalar;
+  
+  // time axis
+  const size_t xsize = data.size();
+
+  // frequency axis
+  const size_t ysize = data.begin()->size();
+
+  // for each frequency channel
+  for(size_t y=0; y<ysize; y++)
+    {
+      // 1st pass: find the absolute max
+      Scalar absmax = 0;
+      for(size_t x=0; x<xsize; x++)
+	absmax = max(absmax, abs(data[x][y]));
+      
+      const Scalar factor = 1.0/absmax;
+      
+      // 2nd pass: normalization
+      for(size_t x=0; x<xsize; x++)
+	data[x][y] *= factor;
+    }
+}
+
