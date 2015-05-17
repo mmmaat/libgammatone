@@ -18,6 +18,8 @@
 #ifndef GAMMATONE_POLICY_GAIN_HPP
 #define GAMMATONE_POLICY_GAIN_HPP
 
+#include <cmath>
+
 namespace gammatone
 {
   namespace policy
@@ -31,9 +33,22 @@ namespace gammatone
     */
     namespace gain
     {
+      //! Old cooke1993 gain implementation
+      class old_cooke1993
+      {
+      public:
+        template<class Scalar>
+        static inline Scalar gain(const Scalar& input,
+                                  const Scalar& sample_frequency,
+                                  const Scalar& center_frequency,
+                                  const std::size_t& order);
+      };
+
+
       //! Disable gain policy
       class off
       {
+      public:
         template<class Scalar>
         static inline Scalar gain(const Scalar& input,
                                   const Scalar& sample_frequency,
@@ -44,6 +59,7 @@ namespace gammatone
       //! 0dB gain for all channels
       class forall_0dB
       {
+      public:
         template<class Scalar>
         static inline Scalar gain(const Scalar& input,
                                   const Scalar& sample_frequency,
@@ -54,6 +70,7 @@ namespace gammatone
       //! Gain falling by 6dB gain per octave
       class peroctave_6dB
       {
+      public:
         template<class Scalar>
         static inline Scalar gain(const Scalar& input,
                                   const Scalar& sample_frequency,
@@ -70,6 +87,15 @@ gain(const Scalar& input,
      const Scalar&, const Scalar&, const std::size_t&)
 {
   return input;
+}
+
+template<class Scalar>
+Scalar gammatone::policy::gain::old_cooke1993::
+gain(const Scalar& input,
+     const Scalar&, const Scalar&,
+     const std::size_t& order)
+{
+  return std::pow(input,order) / 3.0;
 }
 
 template<class Scalar>

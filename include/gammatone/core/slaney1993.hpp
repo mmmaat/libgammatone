@@ -64,7 +64,7 @@ namespace gammatone
       void reset();
 
       //! Return the core internal gain
-      Scalar gain() const { return m_gain; }
+      Scalar gain() const;
 
       inline Scalar compute(const Scalar& input);
 
@@ -191,6 +191,13 @@ void gammatone::core::slaney1993<Scalar>::reset()
 {
   for(auto& f:m_filter) f.reset();
 }
+
+template<class Scalar>
+Scalar gammatone::core::slaney1993<Scalar>::gain() const
+{
+  return 1.0 / m_gain;
+}
+
 
 template<class Scalar>
 Scalar gammatone::core::slaney1993<Scalar>::compute(const Scalar& input)

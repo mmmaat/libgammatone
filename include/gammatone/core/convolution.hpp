@@ -108,7 +108,8 @@ convolution(const Scalar& sample_frequency,
   // shrink to 60dB attenuation
   utils::shrink_to_attenuation(m_ir, -60);
   
-  // find gain as absmax
+  // find gain as absmax !!
+  //! \todo fixme !
   m_gain = utils::absmax(m_ir.begin(), m_ir.end());
 
   // allocate input buffer

@@ -12,9 +12,9 @@
 using namespace std;
 
 typedef double T;
-typedef gammatone::core::slaney1993<T>                        core;
-typedef gammatone::policy::bandwidth::glasberg1990<T>        bandwidth;
-typedef gammatone::policy::channels::fixed_size<T>           channels;
+typedef gammatone::core::cooke1993<T,gammatone::policy::gain::peroctave_6dB>  core;
+typedef gammatone::policy::bandwidth::glasberg1990<T>  bandwidth;
+typedef gammatone::policy::channels::fixed_size<T>     channels;
 
 //! The type of filterbank we are using
 typedef gammatone::filterbank<T, core, bandwidth, channels>  filterbank;
@@ -89,9 +89,9 @@ int main(int argc, char** argv)
   if( verb )
     {
       cout << "Gammatone processing:" << endl
-	   << "   " << fb.nb_channels() << " channels from "
-	   << (int)fb.begin()->center_frequency() << "Hz to "
-	   << (int)fb.rbegin()->center_frequency() << "Hz." << endl;      
+           << "   " << fb.nb_channels() << " channels from "
+           << (int)fb.begin()->center_frequency() << "Hz to "
+           << (int)fb.rbegin()->center_frequency() << "Hz." << endl;
       chrono.start();
     }
 
@@ -129,8 +129,8 @@ int main(int argc, char** argv)
           tmp.push_back(a);
         }
       data.push_back(tmp);
-    }  
-  
+    }
+
   // write gnuplot script and send data
   Gnuplot gp;
   gp << std::ifstream(gnuplot_script).rdbuf() << std::endl
@@ -144,20 +144,10 @@ int main(int argc, char** argv)
   if(verb)
     {
       chrono.stop();
-      cout << " took " << chrono.count()/1000 << " s." << endl;      
+      cout << " took " << chrono.count()/1000 << " s." << endl;
     }
-  
-  return 0;
 
-  // // plot input signal
-  // Gnuplot gp;
-  // gp << std::ifstream(gnuplot_script).rdbuf() << std::endl
-  //    << "set xlabel 'time (s)'" << std::endl
-  //    << "set ylabel 'amplitude'" << std::endl
-  //    << "set xrange [0:"<<duration<<"]" << std::endl
-  //    << "plot '-' u 1:2 w l ls 11 t '"<<boost::filesystem::basename(input_file)<<"'"
-  //    << endl;
-  // gp.send1d(make_pair(time,audio_data));
+  return 0;
 }
 
 

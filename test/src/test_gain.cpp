@@ -6,61 +6,74 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <gnuplot-iostream.h>
 
 
 // filterbank types
 typedef double T;
-typedef gammatone::filterbank<T,gammatone::core::cooke1993<T> >   filterbank1;
+typedef gammatone::filterbank<T,gammatone::core::convolution<T> > filterbank1;
 typedef gammatone::filterbank<T,gammatone::core::slaney1993<T> >  filterbank2;
-typedef gammatone::filterbank<T,gammatone::core::convolution<T> > filterbank3;
 
+typedef gammatone::policy::gain::old_cooke1993  gain1;
+typedef gammatone::policy::gain::forall_0dB     gain2;
+typedef gammatone::policy::gain::peroctave_6dB  gain3;
+typedef gammatone::policy::gain::off  gain4;
+typedef gammatone::filterbank<T,gammatone::core::cooke1993<T, gain1> >   filterbank31;
+typedef gammatone::filterbank<T,gammatone::core::cooke1993<T, gain2> >   filterbank32;
+typedef gammatone::filterbank<T,gammatone::core::cooke1993<T, gain3> >   filterbank33;
+typedef gammatone::filterbank<T,gammatone::core::cooke1993<T, gain4> >   filterbank34;
 
 // filterbank parameters
 const T fs = 44100;           // Hz
-const T lf = 100, hf = 20000; // Hz
+const T lf = 1000, hf = 5000; // Hz
 const T duration = 0.01;      // s
 
 
 // for plotting
 const std::string gnuplot_setup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
-template<class T> void plot(const T& t1, const T& t2, const T& t3)
+template<class DataType> void plot(std::vector<T> fc, std::vector<DataType> data)
 {
   Gnuplot gp;
   gp << std::ifstream(gnuplot_setup).rdbuf() << std::endl
      << "set xlabel 'frequency (Hz)'" << std::endl
      << "set ylabel 'normalized gain (dB)'" << std::endl
-     << "set key bottom right" << std::endl
-     << "plot '-' u 1:2 w l ls 11 t '"<<std::get<2>(t1)<<"', "
-     << "     '-' u 1:2 w l ls 12 t '"<<std::get<2>(t2)<<"', "
-     << "     '-' u 1:2 w l ls 13 t '"<<std::get<2>(t3)<<"', "<< std::endl;
-  gp.send1d(std::make_pair(std::get<0>(t1),std::get<1>(t1)));
-  gp.send1d(std::make_pair(std::get<0>(t2),std::get<1>(t2)));
-  gp.send1d(std::make_pair(std::get<0>(t3),std::get<1>(t3)));
+     << "set key top right" << std::endl
+     << "plot ";
+
+  std::stringstream cmd;
+  unsigned color = 0;
+  for(const auto& t:data)
+    cmd << "'-' u 1:2 w l ls "<<11+color++<<" t '"<<std::get<1>(t)<<"', ";
+  gp << cmd.str().substr(0,cmd.str().size()-2) << std::endl; // rm the last 2 characters (= ' ,')
+
+  for(const auto& t:data)
+    gp.send1d(std::make_pair(fc,std::get<0>(t)));
 }
 
 int main()
 {
+  // center frequencies
+  const auto fc = filterbank1(fs,lf,hf).center_frequency();
+
   // gain of each filterbank type
-  const auto fb1 = filterbank1(fs,lf,hf);
-  const auto f1 = fb1.center_frequency();
-  auto g1 = fb1.gain();
-  utils::decibel(g1.begin(), g1.end());
+  typedef std::tuple<std::vector<T>,const std::string> DataType;
+  std::vector<DataType> data_base;
+  data_base.push_back(make_tuple(filterbank1(fs,lf,hf).gain(), "convolution"));
+  data_base.push_back(make_tuple(filterbank2(fs,lf,hf).gain(), "slaney"));
+  //  data_base.push_back(make_tuple(filterbank31(fs,lf,hf).gain(), "cooke old"));
+  data_base.push_back(make_tuple(filterbank32(fs,lf,hf).gain(), "cooke 0dB"));
+  data_base.push_back(make_tuple(filterbank33(fs,lf,hf).gain(), "cooke 6dB"));
+  //  data_base.push_back(make_tuple(filterbank34(fs,lf,hf).gain(), "cooke off"));
+
+  for(auto& data:data_base)
+    {
+      auto& d = std::get<0>(data);
+      utils::decibel(d.begin(),d.end());
+    }
   
-  const auto fb2 = filterbank2(fs,lf,hf);
-  const auto f2 = fb2.center_frequency();
-  auto g2 = fb2.gain();
-  utils::decibel(g2.begin(), g2.end());
-  
-  const auto fb3 = filterbank3(fs,lf,hf);
-  const auto f3 = fb3.center_frequency();
-  auto g3 = fb3.gain();
-  utils::decibel(g3.begin(), g3.end());
-  
-  plot(make_tuple(f1,g1, "cooke"),
-       make_tuple(f2,g2, "slaney"),
-       make_tuple(f3,g3, "convolution"));
+  plot(fc, data_base);
 
   return 0;
 }
