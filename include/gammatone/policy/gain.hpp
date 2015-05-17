@@ -35,17 +35,62 @@ namespace gammatone
       class off
       {
         template<class Scalar>
-        static inline Scalar gain(){ return static_cast<Scalar>(1);}
+        static inline Scalar gain(const Scalar& input,
+                                  const Scalar& sample_frequency,
+                                  const Scalar& center_frequency,
+                                  const std::size_t& order);
       };
 
-      //! Unitary gain for all channels
-      class one
+      //! 0dB gain for all channels
+      class forall_0dB
       {
         template<class Scalar>
-        static inline Scalar gain(){ return static_cast<Scalar>(1);}
+        static inline Scalar gain(const Scalar& input,
+                                  const Scalar& sample_frequency,
+                                  const Scalar& center_frequency,
+                                  const std::size_t& order);
+      };
+
+      //! Gain falling by 6dB gain per octave
+      class peroctave_6dB
+      {
+        template<class Scalar>
+        static inline Scalar gain(const Scalar& input,
+                                  const Scalar& sample_frequency,
+                                  const Scalar& center_frequency,
+                                  const std::size_t& order);
       };
     }
   }
 }
+
+template<class Scalar>
+Scalar gammatone::policy::gain::off::
+gain(const Scalar& input,
+     const Scalar&, const Scalar&, const std::size_t&)
+{
+  return input;
+}
+
+template<class Scalar>
+Scalar gammatone::policy::gain::forall_0dB::
+gain(const Scalar& input,
+     const Scalar&, const Scalar&,
+     const std::size_t& order)
+{
+  return std::pow(input,order);
+}
+
+template<class Scalar>
+Scalar gammatone::policy::gain::peroctave_6dB::
+gain(const Scalar& input,
+     const Scalar& sample_frequency,
+     const Scalar& center_frequency,
+     const std::size_t& order)
+{
+  return gammatone::policy::gain::forall_0dB::gain(input,sample_frequency,center_frequency,order) *
+    sample_frequency / (order * center_frequency);
+}
+
 
 #endif // GAMMATONE_POLICY_GAIN_HPP
