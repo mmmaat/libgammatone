@@ -18,13 +18,10 @@
 #ifndef GAMMATONE_CORE_COOKE1993_HPP
 #define GAMMATONE_CORE_COOKE1993_HPP
 
-#include <gammatone/policy/gain.hpp>
+#include <gammatone/core/base.hpp>
 #include <gammatone/policy/clipping.hpp>
-#include <boost/math/constants/constants.hpp> // for pi
-#include <utility>
-#include <cmath>
 #include <array>
-#include <complex>
+
 
 namespace gammatone
 {
@@ -51,57 +48,30 @@ namespace gammatone
     template<class Scalar,
              class GainPolicy = policy::gain::forall_0dB,
              class ClippingPolicy = policy::clipping::off>
-    class cooke1993
+    class cooke1993 : public base<Scalar,GainPolicy>
     {
     public:
-      //! Explicit constructor
-      /*!
-        Creates a core from explicit parameters.
-
-        \param sample_frequency  The sample frequency (Hz).
-        \param center_frequency  The core center frequency (Hz).
-        \param bandwidth         The core bandwidth (Hz).
-      */
       cooke1993(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
-
-      //! Copy constructor
-      /*!
-        \param other The core to copy.
-      */
       cooke1993(const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);
-
-      //! Assignment operator
-      /*!
-        \param other The core to copy.
-        \return A reference to a new copied core.
-      */
-      cooke1993<Scalar, GainPolicy, ClippingPolicy>& operator=
-      (const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);
-
-      //! Destructor
       virtual ~cooke1993();
-
-      //! Set the core at its initial state
+      
+      cooke1993<Scalar, GainPolicy, ClippingPolicy>& operator=
+      (const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);    
+      
       inline void reset();
-
-      //! Return the core internal gain
-      inline Scalar gain() const;
-
-      //! Compute an output from an input value
       inline Scalar compute(const Scalar& input);
 
     private:
-      //! 2*pi/sample_frequency()
-      const Scalar m_tpt;
 
-      //! m_tpt*bandwidth()
-      const Scalar m_tptbw;
+      // inline Scalar find_factor(const Scalar& sample_frequency,
+      //                           const Scalar& center_frequency,
+      // 				const Scalar& bandwidth);
 
-      //! Gain of the filter
-      const Scalar m_gain;
+        // Filter coefficients
 
-      // Internal cooking
-      std::complex<Scalar> c, u, q;
+      //! \f$ c = e^{2i\pi f_c/f_s} \f$
+      const std::complex<Scalar> c;
+      std::complex<Scalar> u, q;
       std::array<Scalar,5> a;
       std::array<std::complex<Scalar>,5> p;
     };
@@ -114,13 +84,11 @@ gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 cooke1993(const Scalar& sample_frequency,
           const Scalar& center_frequency,
           const Scalar& bandwidth)
-  : m_tpt( 2.0*boost::math::constants::pi<Scalar>() / sample_frequency ),
-    m_tptbw( m_tpt * bandwidth ),
-    //    m_gain( pow(m_tptbw,4) / 3.0 ),
-    m_gain( GainPolicy::gain(m_tptbw,sample_frequency,center_frequency,4) ),
-    c( std::complex<Scalar>(cos(m_tpt*center_frequency), sin(m_tpt*center_frequency)))
+  : base<Scalar,GainPolicy>(sample_frequency, center_frequency, bandwidth),
+  c( std::complex<Scalar>(cos(base<Scalar,GainPolicy>::m_tau*center_frequency),
+			  sin(base<Scalar,GainPolicy>::m_tau*center_frequency)))
 {
-  const Scalar a0 = exp (-m_tptbw);
+  const Scalar a0 = exp (-this->m_tau*bandwidth);
   a[0] = 4.0*a0;
   a[1] = -6.0*pow(a0,2);
   a[2] = 4.0*pow(a0,3);
@@ -133,9 +101,7 @@ cooke1993(const Scalar& sample_frequency,
 template<class Scalar, class GainPolicy, class ClippingPolicy>
 gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 cooke1993(const cooke1993<Scalar,GainPolicy,ClippingPolicy>& other)
-  : m_tpt(other.m_tpt),
-    m_tptbw(other.m_tptbw),
-    m_gain(other.m_gain),
+  : base<Scalar,GainPolicy>(other),
     c(other.c),
     u(other.u),
     q(other.q),
@@ -148,11 +114,8 @@ gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>&
 gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 operator=(const cooke1993<Scalar,GainPolicy,ClippingPolicy>& other)
 {
-  gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy> tmp(other);
-
-  std::swap(m_tpt, other.m_tpt);
-  std::swap(m_tptbw, other.m_tptbw);
-  std::swap(m_gain, other.m_gain);
+  cooke1993<Scalar,GainPolicy,ClippingPolicy> tmp(other);
+  base<Scalar,GainPolicy>::operator=(tmp);
   std::swap(c, other.c);
   std::swap(u, other.u);
   std::swap(q, other.q);
@@ -167,6 +130,7 @@ gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 ~cooke1993()
 {}
 
+
 template<class Scalar, class GainPolicy, class ClippingPolicy>
 void gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 reset()
@@ -175,23 +139,20 @@ reset()
   q = std::complex<Scalar>(1,0);
 }
 
-template<class Scalar, class GainPolicy, class ClippingPolicy>
-Scalar gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
-gain() const
-{
-  return 1.0 / m_gain;
-}
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
 Scalar gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 compute(const Scalar& input)
 {
+  // update p and u
   p[0] = ClippingPolicy::clip(q*input + a[0]*p[1] + a[1]*p[2] + a[2]*p[3] + a[3]*p[4]);
-
   u = p[0] + a[0]*p[1] + a[4]*p[2];
   p[4] = p[3]; p[3] = p[2]; p[2] = p[1]; p[1] = p[0];
 
-  Scalar output = m_gain * ( u.real()*q.real() + u.imag()*q.imag() );
+  // compute result
+  Scalar output = this->m_factor * ( u.real()*q.real() + u.imag()*q.imag() );
+
+  // update q
   std::complex<Scalar> tmp(c.real()*q.real() + c.imag()*q.imag(),
                            c.real()*q.imag() - c.imag()*q.real() );
   std::swap(q,tmp);

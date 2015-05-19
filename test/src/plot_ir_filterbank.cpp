@@ -17,8 +17,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gammatone/filterbank.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/gammatone.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 #include <fstream>
@@ -27,11 +26,11 @@
 using namespace std;
 
 typedef double T;
-typedef gammatone::core::cooke1993<T> core;
+typedef gammatone::core::convolution<T,gammatone::policy::gain::forall_0dB> core;
 typedef gammatone::filterbank<T, core> filterbank;
 
-const T duration = 0.005;
-const T sample_frequency = 96000;
+const T duration = 0.02;
+const T sample_frequency = 44100;
 const size_t nb_channels = 5;
 const T low_cf = 500, high_cf = 8000;
 const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
