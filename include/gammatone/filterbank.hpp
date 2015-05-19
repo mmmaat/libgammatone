@@ -358,14 +358,12 @@ gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::end()
   return m_bank.end();
 }
 
-
 template<class Scalar,class Core,class BandwidthPolicy, class ChannelsPolicy>
 typename gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::reverse_iterator
 gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::rbegin()
 {
   return m_bank.rbegin();
 }
-
 
 template<class Scalar,class Core,class BandwidthPolicy, class ChannelsPolicy>
 typename gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::reverse_iterator
@@ -374,9 +372,8 @@ gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::rend()
   return m_bank.rend();
 }
 
-
-
-template<class Scalar,class Core,class BandwidthPolicy, class ChannelsPolicy> template<class PostProcessingPolicy>
+template<class Scalar,class Core,class BandwidthPolicy, class ChannelsPolicy>
+template<class PostProcessingPolicy>
 std::vector<Scalar> gammatone::filterbank<Scalar,Core,BandwidthPolicy,ChannelsPolicy>::
 compute(const Scalar& input)
 {
@@ -384,7 +381,6 @@ compute(const Scalar& input)
   std::transform(begin(),end(),out.begin(),[&](auto& f){return f.template compute<PostProcessingPolicy>(input);});
   return std::move(out);
 }
-
 
 template<class Scalar,class Core,class BandwidthPolicy, class ChannelsPolicy>
 template<class PostProcessingPolicy, class InputIterator, class OutputIterator>
@@ -406,6 +402,5 @@ compute(const typename NestedContainer::value_type& input)
   this->compute<PostProcessingPolicy>(input.begin(),input.end(),out.begin());
   return std::move(out);
 }
-
 
 #endif // GAMMATONE_FILTERBANK_HPP
