@@ -1,6 +1,6 @@
 # Build the exeamples provided with libgammatone. Requires boost, libgnuplot-iostream-dev, libsndfile-dev
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/example/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/exemple/bin)
 
 add_executable(minimal src/minimal.cpp)
 
