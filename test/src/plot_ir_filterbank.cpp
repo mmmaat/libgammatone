@@ -17,7 +17,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gammatone/filterbank.hpp>
+#include <gammatone/filterbank/concrete.hpp>
 #include <gammatone/impulse_response.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
@@ -28,7 +28,7 @@ using namespace std;
 
 typedef double T;
 typedef gammatone::core::cooke1993<T> core;
-typedef gammatone::filterbank<T, core> filterbank;
+typedef gammatone::filterbank::concrete<T, core> filterbank;
 
 const T duration = 0.005;
 const T sample_frequency = 96000;

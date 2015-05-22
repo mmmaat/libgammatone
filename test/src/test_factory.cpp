@@ -6,7 +6,7 @@ const T fc = 2000;
 
 int main()
 {
-  auto filter = gammatone::factory::filter<T>(fs,fc);
+  //  auto filter = gammatone::factory<T>::create(fs,fc, "core=convolution, order=decreasing");
   
   return 0;
 }

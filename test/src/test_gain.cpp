@@ -1,4 +1,4 @@
-#include <gammatone/filterbank.hpp>
+#include <gammatone/filterbank/concrete.hpp>
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
 #include <utils/range.hpp>
@@ -11,9 +11,9 @@
 
 // filterbank types
 typedef double T;
-typedef gammatone::filterbank<T,gammatone::core::cooke1993<T> >   filterbank1;
-typedef gammatone::filterbank<T,gammatone::core::slaney1993<T> >  filterbank2;
-typedef gammatone::filterbank<T,gammatone::core::convolution<T> > filterbank3;
+typedef gammatone::filterbank::concrete<T,gammatone::core::cooke1993<T> >   filterbank1;
+typedef gammatone::filterbank::concrete<T,gammatone::core::slaney1993<T> >  filterbank2;
+typedef gammatone::filterbank::concrete<T,gammatone::core::convolution<T> > filterbank3;
 
 
 // filterbank parameters

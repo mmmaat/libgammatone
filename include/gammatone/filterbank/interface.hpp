@@ -15,10 +15,20 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_FILTERBANK_HPP
-#define GAMMATONE_FILTERBANK_HPP
+#ifndef GAMMATONE_FILTERBANK_INTERFACE_HPP
+#define GAMMATONE_FILTERBANK_INTERFACE_HPP
 
-#include <gammatone/filterbank/concrete.hpp>
-//#include <gammatone/filterbank/holder.hpp>
+#include <gammatone/interface.hpp>
+#include <vector>
 
-#endif // GAMMATONE_FILTERBANK_HPP
+namespace gammatone
+{
+  namespace filterbank
+  {
+    template<class Scalar>
+    class interface : public ::gammatone::interface<Scalar, std::vector<Scalar> >
+    {};
+  }
+}
+
+#endif // GAMMATONE_FILTERBANK_INTERFACE_HPP

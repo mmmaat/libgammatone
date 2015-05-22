@@ -1,5 +1,5 @@
 #include <gammatone/policy/channels.hpp>
-#include <gammatone/filterbank.hpp>
+#include <gammatone/filterbank/concrete.hpp>
 //#include <utils/utils.hpp>
 #include <utils/range.hpp>
 #include <gtest/gtest.h>
@@ -44,8 +44,8 @@ TEST(policy_channels_test, filterbank_works)
   namespace gpo = gammatone::policy::order;
   typedef gammatone::core::cooke1993<T> core;
   typedef gammatone::policy::bandwidth::glasberg1990<T> bandwidth;
-  typedef gammatone::filterbank<T,core,bandwidth,gpc::fixed_size<T,gpo::increasing> > increasing_fb;
-  typedef gammatone::filterbank<T,core,bandwidth,gpc::fixed_size<T,gpo::decreasing> > decreasing_fb;
+  typedef gammatone::filterbank::concrete<T,core,bandwidth,gpc::fixed_size<T,gpo::increasing> > increasing_fb;
+  typedef gammatone::filterbank::concrete<T,core,bandwidth,gpc::fixed_size<T,gpo::decreasing> > decreasing_fb;
 
   const T fs = 44100, lf = 500, hf = 8000, nbc = 10;
   increasing_fb fi(fs,lf,hf,nbc);

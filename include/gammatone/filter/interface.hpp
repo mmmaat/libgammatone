@@ -15,10 +15,24 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_FILTERBANK_HPP
-#define GAMMATONE_FILTERBANK_HPP
+#ifndef GAMMATONE_FILTER_INTERFACE_HPP
+#define GAMMATONE_FILTER_INTERFACE_HPP
 
-#include <gammatone/filterbank/concrete.hpp>
-//#include <gammatone/filterbank/holder.hpp>
+#include <gammatone/interface.hpp>
 
-#endif // GAMMATONE_FILTERBANK_HPP
+namespace gammatone
+{
+  namespace filter
+  {
+    //! Interface for gammatone filters
+    /*!
+      \class interface
+      \tparam Scalar  Type of the scalar values
+    */
+    template<class Scalar>
+    class interface : public ::gammatone::interface<Scalar,Scalar>
+    {};
+  }
+}
+
+#endif // GAMMATONE_FILTER_INTERFACE_HPP

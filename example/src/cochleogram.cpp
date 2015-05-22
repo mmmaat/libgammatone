@@ -1,5 +1,5 @@
-#include <gammatone/gammatone.hpp>
-#include <utils/utils.hpp>
+#include <gammatone/filterbank/concrete.hpp>
+#include <utils/range.hpp>
 #include <utils/wav.hpp>
 #include <utils/chrono.hpp>
 #include <boost/program_options.hpp>
@@ -12,17 +12,17 @@
 using namespace std;
 
 typedef double T;
+
+// The type of filterbank we are using...
 typedef gammatone::core::cooke1993<T>                        core;
 typedef gammatone::policy::bandwidth::glasberg1990<T>        bandwidth;
 typedef gammatone::policy::channels::fixed_size<T>           channels;
+typedef gammatone::policy::postprocessing::hwr<T>            postprocessing;
+typedef gammatone::filterbank::concrete<T,core,bandwidth,channels,postprocessing> filterbank;
 
-//! The type of filterbank we are using
-typedef gammatone::filterbank<T, core, bandwidth, channels>  filterbank;
-
-//! We use Half-wave rectification postprocessing
-typedef gammatone::policy::postprocessing::hwr<T> hwr;
-
-
+// WILL BE
+//typedef gammatone::filterbank::holder<T> filterbank;
+//filterbank fb(fs,fl,fh,"--core cooke1993 --bandwidth glasberg1990 --channels fixed --postprocessing hwr");
 
 //! Gnuplot script file
 string gnuplot_script = "/home/mathieu/dev/libgammatone/share/cochleogram.gp";
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
          << endl;
 
   // filter input signal
-  filterbank fb(sample_frequency,100,10000);
+  filterbank fb(sample_frequency,100,10000); 
 
   utils::chrono chrono;
   if( verb )
@@ -98,8 +98,9 @@ int main(int argc, char** argv)
     }
 
   // processing
-  auto cochleogram = fb.compute<hwr>(audio_data);
-
+  vector<vector<double> > cochleogram(audio_data.size(),vector<double>(fb.nb_channels()));
+  fb.compute(audio_data.begin(),audio_data.end(),cochleogram.begin());
+  
   // normalization
   if(normalize)
     {

@@ -37,7 +37,7 @@ int main()
 
 void test_slaney1993(const T& fs, const T& fc, const T& d)
 {
-  gammatone::filter<T,gammatone::core::slaney1993<T> > f(fs, fc);
+  gammatone::filter::concrete<T,gammatone::core::slaney1993<T> > f(fs, fc);
   plot(gammatone::impulse_response::implemented(f, d), "slaney1993");
 }
 
@@ -74,7 +74,7 @@ void test_convolution(const T& fs, const T& fc, const T& d)
   
   plot(make_pair(core.time(), core.ir()), "convolution the");
 
-  gammatone::filter<T,gammatone::core::convolution<T> > f(fs, fc);
+  gammatone::filter::concrete<T,gammatone::core::convolution<T> > f(fs, fc);
   plot(make_pair(gammatone::impulse_response::time(fs,d),
 		 gammatone::impulse_response::implemented(f, d))
        , "convolution imp");

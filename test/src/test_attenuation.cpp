@@ -1,4 +1,6 @@
-#include <gammatone/gammatone.hpp>
+//#include <gammatone/gammatone.hpp>
+#include <gammatone/filter/concrete.hpp>
+#include <gammatone/impulse_response.hpp>
 #include <gnuplot-iostream.h>
 #include <string>
 #include <iostream>
@@ -38,7 +40,7 @@ void plot(const Filter& f, const Container& ref, const IRBase& base, const Conta
 int main()
 {
   // the gammatone filter
-  const gammatone::filter<double> f(44100, 1000);
+  const gammatone::filter::concrete<double> f(44100, 1000);
 
   // the reference impulse response (0.1 second long)
   const double max_duration = 0.1;

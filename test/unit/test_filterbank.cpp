@@ -43,11 +43,12 @@ TEST( filterbank_test, center_frequency_works )
   //  const T m_nb_channels = 20;
   const T m_low = 500, m_high = 8000;
 
-  using namespace gammatone;
-  typedef core::cooke1993<T> core;
-  typedef policy::bandwidth::glasberg1990<T> bandwidth;
-  typedef filterbank<T,core,bandwidth,policy::channels::fixed_size<T,policy::order::increasing> > increasing;
-  typedef filterbank<T,core,bandwidth,policy::channels::fixed_size<T,policy::order::decreasing> > decreasing;
+  using namespace gammatone::filterbank;
+  using namespace gammatone::policy;
+  typedef gammatone::core::cooke1993<T> core;
+  typedef bandwidth::glasberg1990<T> bandwidth;
+  typedef concrete<T,core,bandwidth,channels::fixed_size<T,order::increasing> > increasing;
+  typedef concrete<T,core,bandwidth,channels::fixed_size<T,order::decreasing> > decreasing;
 
   increasing fi(m_sample_frequency,m_low,m_high);
   EXPECT_LE( m_low, fi.begin()->center_frequency() );

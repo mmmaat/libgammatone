@@ -19,6 +19,7 @@
 #define GAMMATONE_CORE_SLANEY1993_HPP
 
 #include <gammatone/core/slaney1993_iir.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <array>
 #include <complex>

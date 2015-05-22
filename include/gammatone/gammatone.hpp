@@ -19,16 +19,18 @@
 #define GAMMATONE_HPP
 
 
-// All libgammatone headers. Include this file if you are too lazy to
-// include each file individually.
+// All libgammatone public headers.
+// Include this if you are too lazy to include each file individually.
 
 #include <gammatone/filter.hpp>
 #include <gammatone/filterbank.hpp>
 #include <gammatone/impulse_response.hpp>
+
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
-//#include <gammatone/core/holdsworth.hpp>
 #include <gammatone/core/convolution.hpp>
+//#include <gammatone/core/holdsworth.hpp>
+
 #include <gammatone/policy/bandwidth.hpp>
 #include <gammatone/policy/order.hpp>
 #include <gammatone/policy/channels.hpp>
