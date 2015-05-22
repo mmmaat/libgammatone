@@ -1,7 +1,7 @@
 #include <gammatone/filterbank/concrete.hpp>
 #include <utils/range.hpp>
-#include <utils/wav.hpp>
-#include <utils/chrono.hpp>
+#include <wav.hpp>
+#include <chrono.hpp>
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
 #include <gnuplot-iostream.h>

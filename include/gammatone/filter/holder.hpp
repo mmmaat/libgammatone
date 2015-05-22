@@ -4,7 +4,6 @@
 #include <gammatone/filter/interface.hpp>
 #include <gammatone/filter/concrete.hpp>
 #include <gammatone/factory.hpp>
-#include <utils/singleton/holder.hpp>
 #include <string>
 
 namespace gammatone
@@ -34,9 +33,9 @@ namespace gammatone
       inline Scalar compute_internal(const Scalar& input);
       
       //! A pointer to the concrete filter
-      typename factory<Scalar>::return_type p_filter;
+      typename concrete_factory<Scalar>::return_type p_filter;
 
-      typename factory<Scalar>::key_type parse_key(const std::string& key);
+      //typename concrete_factory<Scalar>::key_type parse_key(const std::string& key);
       
     };
   }
@@ -47,8 +46,7 @@ gammatone::filter::holder<Scalar>::
 holder(const Scalar& sample_frequency,
        const Scalar& center_frequency,
        const std::string key)
-  : p_filter(utils::singleton::holder<gammatone::factory<Scalar> >::instance().
-	     create(sample_frequency,center_frequency,parse_key(key)))
+  : p_filter(factory<double>::create(sample_frequency,center_frequency,key))
 {}
 
 template<class Scalar>
@@ -108,15 +106,6 @@ Scalar gammatone::filter::holder<Scalar>::
 compute_internal(const Scalar& input)
 {
   return p_filter->compute(input);
-}
-
-template<class Scalar>
-typename gammatone::factory<Scalar>::key_type gammatone::filter::holder<Scalar>::
-parse_key(const std::string& key)
-{
-  if(key=="slaney1993")
-    return key;
-  return "cooke1993";
 }
 
 #endif // GAMMATONE_FILTER_HOLDER_HPP
