@@ -1,8 +1,10 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
-  Copyright (C) 1999 Matt R. Slaney1993 <core@corestudios.com>
+  Copyright (C) 1999 Matt R. Flax <https://tracker.debian.org/pkg/libgtfb>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -13,11 +15,11 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_CORE_IIR_HPP
-#define GAMMATONE_CORE_IIR_HPP
+#ifndef GAMMATONE_CORE_SLANEY1993_IIR_HPP
+#define GAMMATONE_CORE_SLANEY1993_IIR_HPP
 
 #include <utility>
 #include <array>
@@ -51,7 +53,8 @@ namespace gammatone
 }
 
 template<class Scalar>
-gammatone::core::slaney1993_iir<Scalar>::slaney1993_iir(const std::array<Scalar,3>& a, const std::array<Scalar,3>& b)
+gammatone::core::slaney1993_iir<Scalar>::
+slaney1993_iir(const std::array<Scalar,3>& a, const std::array<Scalar,3>& b)
   : m_a( a ),
     m_b( b )
 {
@@ -59,7 +62,8 @@ gammatone::core::slaney1993_iir<Scalar>::slaney1993_iir(const std::array<Scalar,
 }
 
 template<class Scalar>
-gammatone::core::slaney1993_iir<Scalar>::slaney1993_iir(const slaney1993_iir<Scalar>& other)
+gammatone::core::slaney1993_iir<Scalar>::
+slaney1993_iir(const slaney1993_iir<Scalar>& other)
   : m_a( other.m_a ),
     m_b( other.m_b ),
     m_z1( other.m_z1 ),
@@ -67,7 +71,8 @@ gammatone::core::slaney1993_iir<Scalar>::slaney1993_iir(const slaney1993_iir<Sca
 {}
 
 template<class Scalar>
-gammatone::core::slaney1993_iir<Scalar>& gammatone::core::slaney1993_iir<Scalar>::operator=(const slaney1993_iir<Scalar>& other)
+gammatone::core::slaney1993_iir<Scalar>& gammatone::core::slaney1993_iir<Scalar>::
+operator=(const slaney1993_iir<Scalar>& other)
 {
   gammatone::core::slaney1993_iir<Scalar> tmp(other);
 
@@ -80,18 +85,20 @@ gammatone::core::slaney1993_iir<Scalar>& gammatone::core::slaney1993_iir<Scalar>
 }
 
 template<class Scalar>
-gammatone::core::slaney1993_iir<Scalar>::~slaney1993_iir()
+gammatone::core::slaney1993_iir<Scalar>::
+~slaney1993_iir()
 {}
 
-
 template<class Scalar>
-void gammatone::core::slaney1993_iir<Scalar>::reset()
+void gammatone::core::slaney1993_iir<Scalar>::
+reset()
 {
   m_z1 = m_z2 = 0.0;
 }
 
 template<class Scalar>
-Scalar gammatone::core::slaney1993_iir<Scalar>::compute(const Scalar& input)
+Scalar gammatone::core::slaney1993_iir<Scalar>::
+compute(const Scalar& input)
 {
   Scalar out = m_a[0]*input + m_z1;
   m_z1 = m_a[1]*input - m_b[1]*out + m_z2;
@@ -100,7 +107,8 @@ Scalar gammatone::core::slaney1993_iir<Scalar>::compute(const Scalar& input)
 }
 
 template<class Scalar>
-Scalar gammatone::core::slaney1993_iir<Scalar>::compute(const Scalar& input, const Scalar& gain)
+Scalar gammatone::core::slaney1993_iir<Scalar>::
+compute(const Scalar& input, const Scalar& gain)
 {
   return compute(input/gain);
 }

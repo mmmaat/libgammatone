@@ -1,6 +1,6 @@
 #include <gammatone/filter.hpp>
-#include <gammatone/impulse_response.hpp>
-#include <utils/utils.hpp>
+#include <gammatone/detail/impulse_response.hpp>
+#include <gammatone/detail/utils.hpp>
 #include <gnuplot-iostream.h>
 #include <fstream>
 
@@ -40,8 +40,7 @@ int main()
   const std::size_t size = 5000;
 
   filter f(fs, fc);
-  const auto freq = utils::linspace(0.0,2.0*fc,size);
-  //  const auto freq = utils::linspace(-fs/2,fs/2,size);
+  const auto freq = gammatone::detail::linspace(0.0,2.0*fc,size);
 
   std::vector<std::pair<T,T> > tf(size), tf_aprox(size);
   std::transform(freq.begin(),freq.end(),tf.begin(),

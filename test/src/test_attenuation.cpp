@@ -1,6 +1,6 @@
 //#include <gammatone/gammatone.hpp>
 #include <gammatone/filter/concrete.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/detail/impulse_response.hpp>
 #include <gnuplot-iostream.h>
 #include <string>
 #include <iostream>

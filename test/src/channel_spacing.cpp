@@ -1,7 +1,8 @@
 #include <gammatone/policy/channels.hpp>
 #include <gammatone/policy/bandwidth.hpp>
-//#include <utils/utils.hpp>
-#include <utils/range.hpp>
+#include <gammatone/detail/utils.hpp>
+
+#include <test_utils.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 using namespace std;
@@ -26,9 +27,10 @@ int main()
      << "     '-' u 1:2 w l lw 1.5 t 'cf2', "
      << "     '-' u 1:2 w l lw 1 t 'cf3'  "
      << endl;
-  gp.send1d(make_pair(cf1,utils::range<int>(1,cf1.size())));
-  gp.send1d(make_pair(cf2,utils::range<int>(1,cf2.size())));
-  gp.send1d(make_pair(cf3,utils::range<int>(1,cf3.size())));
+  
+  gp.send1d(make_pair(cf1,range<int>(1,cf1.size())));
+  gp.send1d(make_pair(cf2,range<int>(1,cf2.size())));
+  gp.send1d(make_pair(cf3,range<int>(1,cf3.size())));
 
   return 0;
 }

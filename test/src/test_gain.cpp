@@ -1,8 +1,7 @@
 #include <gammatone/filterbank/concrete.hpp>
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
-#include <utils/range.hpp>
-#include <utils/utils.hpp>
+#include <gammatone/detail/utils.hpp>
 
 #include <fstream>
 #include <string>
@@ -46,17 +45,17 @@ int main()
   const auto fb1 = filterbank1(fs,lf,hf);
   const auto f1 = fb1.center_frequency();
   auto g1 = fb1.gain();
-  utils::decibel(g1.begin(), g1.end());
+  gammatone::detail::decibel(g1.begin(), g1.end());
   
   const auto fb2 = filterbank2(fs,lf,hf);
   const auto f2 = fb2.center_frequency();
   auto g2 = fb2.gain();
-  utils::decibel(g2.begin(), g2.end());
+  gammatone::detail::decibel(g2.begin(), g2.end());
   
   const auto fb3 = filterbank3(fs,lf,hf);
   const auto f3 = fb3.center_frequency();
   auto g3 = fb3.gain();
-  utils::decibel(g3.begin(), g3.end());
+  gammatone::detail::decibel(g3.begin(), g3.end());
   
   plot(make_tuple(f1,g1, "cooke"),
        make_tuple(f2,g2, "slaney"),

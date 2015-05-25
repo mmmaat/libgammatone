@@ -4,6 +4,7 @@ TODO
 doc/html/
 doc/auto/
 doc/*.db
+doc/exemple/bin
 test/old/
 test/bin
 test/DoxygenLayout.xml

@@ -1,7 +1,9 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,14 +14,14 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GAMMATONE_IMPULSE_RESPONSE_H
 #define GAMMATONE_IMPULSE_RESPONSE_H
 
-#include <utils/range.hpp>
-#include <utils/utils.hpp>
+#include <gammatone/detail/utils.hpp>
+#include <gammatone/detail/decibel.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <algorithm>
 #include <vector>
@@ -264,7 +266,7 @@ theorical_attenuate(const Scalar& center_frequency,
   Container t = time(sample_frequency, max_duration);
 
   auto ir = theorical(center_frequency,bandwidth,t.cbegin(),t.cend());
-  utils::shrink_to_attenuation(ir, static_cast<Scalar>(attenuation));
+  gammatone::detail::shrink_to_attenuation(ir, static_cast<Scalar>(attenuation));
 
   return std::move(ir);
 }
@@ -366,7 +368,7 @@ Container gammatone::impulse_response::
 time(const Scalar& sample_frequency,
      const Scalar& duration)
 {
-  return std::move(utils::linspace(0.0,duration, static_cast<std::size_t>(sample_frequency*duration+1)));
+  return std::move(gammatone::detail::linspace(0.0,duration, static_cast<std::size_t>(sample_frequency*duration+1)));
 }
 
 

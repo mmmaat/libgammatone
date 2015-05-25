@@ -1,7 +1,9 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,7 +14,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GAMMATONE_FILTER_CONCRETE_HPP
@@ -31,15 +33,14 @@ namespace gammatone
     /*!
       \class concrete
 
-      This class models a single gammatone filter. Processing is
-      delegated to a specific core and bandwidth computation is
-      specified by policy.
+      This class models a single gammatone filter. Processing core,
+      bandwidth computation and postprocessing are specified by
+      template policies.
 
-      \tparam Scalar  Type of the scalars.
-      \tparam Core    Type of the processing core.
-      \tparam BandwidthPolicy  Policy for computing filter bandwidth.
-      \tparam PostProcessingPolicy  Type of policy for output
-      postprocessing. Default is to do nothing.
+      \tparam Scalar                Type of the scalars.
+      \tparam Core                  Type of the processing core.
+      \tparam BandwidthPolicy       Policy for computing filter bandwidth.
+      \tparam PostProcessingPolicy  Policy for output postprocessing.
     */
     template
     <
@@ -51,14 +52,11 @@ namespace gammatone
     class concrete : public ::gammatone::filter::interface<Scalar>
     {
     public:
-      //! Creates a gammatone filter from explicit parameters.
-      /*!
-        \param sample_frequency The sample frequency of the input signal
-        (Hz). Must be positive.
 
-        \param center_frequency The center frequency of the filter
-        (Hz). Must be positive. Practically, this is a non-sense to have
-        \f$f_c > f_s/2\f$.
+      //! Creates a gammatone filter from explicit parameters.
+      /*! 
+	\param sample_frequency The input signal sample frequency (Hz).
+        \param center_frequency The filter center frequency (Hz).
       */
       concrete(const Scalar& sample_frequency, const Scalar& center_frequency);
 
@@ -72,7 +70,7 @@ namespace gammatone
       //! Destructor
       virtual ~concrete();
 
-      // methods inherited from interface::filter
+      // Methods inherited from filter::interface
       inline Scalar sample_frequency() const;
       inline Scalar center_frequency() const;
       inline Scalar bandwidth() const;
@@ -81,12 +79,13 @@ namespace gammatone
 
     protected:
 
+      // Method inherited from filter::interface
       inline Scalar compute_internal(const Scalar& input);
       
       //! Sample frequency of the filter (Hz)
       const Scalar m_sample_frequency;
 
-      //! center frequency of the filter (Hz)
+      //! Center frequency of the filter (Hz)
       const Scalar m_center_frequency;
 
       //! Bandwidth of the filter (Hz)

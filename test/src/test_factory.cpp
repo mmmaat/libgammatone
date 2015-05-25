@@ -1,4 +1,4 @@
-#include <gammatone/factory.hpp>
+#include <gammatone/detail/factory.hpp>
 
 typedef double T;
 const T fs = 44100;

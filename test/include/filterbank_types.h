@@ -2,7 +2,7 @@
 #define GAMMATONE_TEST_FILTERBANK_TYPES_H
 
 #include <gammatone/gammatone.hpp>
-#include <gtest/gtest.h>
+#include <boost/mpl/list.hpp>
 
 typedef double T;
 
@@ -91,23 +91,21 @@ typedef gammatone::filterbank::concrete<T,c3,b3,n4> f334;
 typedef gammatone::filterbank::concrete<T,c4,b3,n4> f434;
 
 
-typedef ::testing::Types< f111,f211,f311,f411,
+typedef boost::mpl::list< f111,f211,f311,f411,
                           f121,f221,f321,f421,
-                          f131,f231,f331,f431,
+                          f131,f231,f331,f431
 
-                          f112,f212,f312,f412,
-                          f122,f222,f322,f422,
-                          f132,f232,f332,f432,
+                          // f112,f212,f312,f412,
+                          // f122,f222,f322,f422,
+                          // f132,f232,f332,f432,
 
-                          f113,f213,f313,f413,
-                          f123,f223,f323,f423,
-                          f133,f233,f333,f433,
+                          // f113,f213,f313,f413,
+                          // f123,f223,f323,f423,
+                          // f133,f233,f333,f433,
 
-                          f114,f214,f314,f414,
-                          f124,f224,f324,f424,
-                          f134,f234,f334,f434
+                          // f114,f214,f314,f414,
+                          // f124,f224,f324,f424,
+                          // f134,f234,f334,f434
                           > filterbank_types;
-
-
 
 #endif // GAMMATONE_TEST_FILTERBANK_TYPES_H

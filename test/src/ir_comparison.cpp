@@ -19,12 +19,12 @@
 //!   libgammatone. Compare both theorical and implemented cores IRs.
 
 
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/detail/impulse_response.hpp>
 #include <gammatone/filter/concrete.hpp>
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
-#include <utils/utils.hpp>
+#include <gammatone/detail/utils.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 #include <vector>
@@ -49,7 +49,7 @@ inline string tostring(const F& f, const C& ir)
   s << " cf = " << f.center_frequency()
     << " bw = " << f.bandwidth()
     << " g = " << f.gain()
-    << " max = " << utils::absmax(ir.begin(), ir.end());
+    << " max = " << gammatone::detail::absmax(ir.begin(), ir.end());
   return s.str();
 }
 
@@ -60,7 +60,7 @@ inline vector<pair<T,string> > compute_mse( const vector<pair<vector<T>,string> 
   for(auto it=ir_data.begin();it!=ir_data.end();it++)
     for(auto it2=it+1;it2!=ir_data.end();it2++)
       {
-        T mse = utils::mean_squared_error(it->first.begin(),it->first.end(),it2->first.begin());
+        T mse = mean_squared_error(it->first.begin(),it->first.end(),it2->first.begin());
         string name(it->second+" vs. "+it2->second);
         out.push_back(make_pair(mse, name));
       }
@@ -92,12 +92,12 @@ int main(int argc, char** argv)
   cout << "flax : " << tostring(f2, ir_data[2].first) << endl;
   cout << "conv : " << tostring(f3, ir_data[3].first) << endl;
   cout << "                             "
-       << "Theorical max = " << utils::absmax(ir_data[0].first.begin(),ir_data[0].first.end()) << endl;
+       << "Theorical max = " << gammatone::detail::absmax(ir_data[0].first.begin(),ir_data[0].first.end()) << endl;
 
 
   // IR normalization
   bool norm = true;
-  if(norm) for(auto& d:ir_data) utils::normalize(d.first.begin(),d.first.end());
+  if(norm) for(auto& d:ir_data) gammatone::detail::normalize(d.first.begin(),d.first.end());
 
   // Compute MSE on normalized data
   //const auto mse = compute_mse(ir_data, true);

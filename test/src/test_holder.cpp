@@ -1,5 +1,5 @@
 #include <gammatone/filter.hpp>
-#include <utils/range.hpp>
+#include <gammatone/detail/utils.hpp>
 #include <iostream>
 #include <vector>
 

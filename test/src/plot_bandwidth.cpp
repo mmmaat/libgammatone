@@ -18,8 +18,7 @@
 */
 
 #include <gammatone/policy/bandwidth.hpp>
-//#include <utils/utils.hpp>
-#include <utils/range.hpp>
+#include <gammatone/detail/utils.hpp>
 #include <gnuplot-iostream.h>
 #include <algorithm>
 #include <functional>
@@ -41,7 +40,7 @@ int main()
   // frequency axis
   const Scalar fl = 20, fh = 8000;
   const size_t n = 10000;
-  const auto freq = utils::linspace<Scalar>(fl,fh,n);
+  const auto freq = gammatone::detail::linspace<Scalar>(fl,fh,n);
 
   // Generation of bandwidths in function of frequency (first plot)
   using namespace gammatone::policy::bandwidth;

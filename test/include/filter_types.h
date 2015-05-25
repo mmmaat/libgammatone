@@ -2,7 +2,7 @@
 #define GAMMATONE_TEST_FILTER_TYPES_H
 
 #include <gammatone/gammatone.hpp>
-#include <gtest/gtest.h>
+#include <boost/mpl/list.hpp>
 
 typedef double T;
 
@@ -32,7 +32,7 @@ typedef gammatone::filter::concrete<T,c2,b3>  f23;
 typedef gammatone::filter::concrete<T,c3,b3>  f33;
 typedef gammatone::filter::concrete<T,c4,b3>  f43;
 
-typedef ::testing::Types< f11,f21,f31,f41,
+typedef boost::mpl::list< f11,f21,f31,f41,
                           f12,f22,f32,f42,
                           f13,f23,f33,f43
                           > filter_types;

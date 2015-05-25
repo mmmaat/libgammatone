@@ -18,7 +18,7 @@
 */
 
 #include <gammatone/filterbank/concrete.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/detail/impulse_response.hpp>
 #include <gnuplot-iostream.h>
 #include <iostream>
 #include <fstream>
@@ -34,7 +34,7 @@ const T duration = 0.005;
 const T sample_frequency = 96000;
 const size_t nb_channels = 5;
 const T low_cf = 500, high_cf = 8000;
-const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
+const string gpsetup = "/home/mathieu/dev/libgammatone/test/share/setup.gp";
 
 int main(int argc, char** argv)
 {
@@ -44,14 +44,14 @@ int main(int argc, char** argv)
 
   vector<vector<T> > ir(bank.nb_channels());
   transform(bank.begin(),bank.end(),ir.begin(),
-  	    [&](auto& x){return gammatone::impulse_response::implemented(x, t.begin(),t.end());});
+   	    [&](auto& x){return gammatone::impulse_response::implemented(x, t.begin(),t.end());});
  
   // initialize gnuplot
   Gnuplot gp;
   gp << ifstream(gpsetup).rdbuf() << endl
        << "set xlabel 'time (s)'" << endl
        << "set ylabel 'amplitude'" << endl;
-  
+
   // generate gnuplot command
   stringstream s; s << "plot ";
   for(size_t i=0;i<bank.nb_channels();i++)
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
   for(size_t i=0;i<bank.nb_channels();i++)
     gp.send1d(make_pair(t,ir[i]));
 
-  //  copy(t.begin(),t.end(),ostream_iterator<float>(cout, "\n" ));
+   //  copy(t.begin(),t.end(),ostream_iterator<float>(cout, "\n" ));
   
   return 0;
 }

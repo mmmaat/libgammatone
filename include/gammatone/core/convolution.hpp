@@ -1,7 +1,9 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,14 +14,15 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GAMMATONE_CORE_CONVOLUTION_HPP
 #define GAMMATONE_CORE_CONVOLUTION_HPP
 
 #include <gammatone/filter.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/detail/impulse_response.hpp>
+#include <gammatone/detail/utils.hpp>
 #include <algorithm>
 #include <numeric>
 #include <memory>
@@ -106,7 +109,7 @@ convolution(const Scalar& sample_frequency,
   m_ir = gammatone::impulse_response::theorical_attenuate(center_frequency,bandwidth,sample_frequency,-60.0);
   
   // find gain as absmax
-  m_gain = utils::absmax(m_ir.begin(), m_ir.end());
+  m_gain = detail::absmax(m_ir.begin(), m_ir.end());
 
   // allocate input buffer
   reset();

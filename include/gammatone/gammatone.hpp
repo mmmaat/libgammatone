@@ -1,7 +1,9 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,7 +14,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GAMMATONE_HPP
@@ -24,7 +26,7 @@
 
 #include <gammatone/filter.hpp>
 #include <gammatone/filterbank.hpp>
-#include <gammatone/impulse_response.hpp>
+#include <gammatone/detail/impulse_response.hpp>
 
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
@@ -38,10 +40,10 @@
 #include <gammatone/policy/postprocessing.hpp>
 
 
-// Above are some general comments on libgammatone for documentation
-// generation with Doxygen.
+// Above are some general comments on libgammatone for Doxygen doc
 
 /*!
+
   \mainpage libgammatone, a generic C++ implementation of gammatone auditory filters
 
   The C++ libgammatone library aims to be
@@ -142,13 +144,33 @@
 
 /*!
   \namespace gammatone::core
-  \brief Namespace containing gammatone filter implementations
+  
+  \brief Gammatone core processing implementations
+*/
+
+/*!  
+  \namespace gammatone::policy 
+  
+  \brief Policy classes for filter and filterbank
+  customization
 */
 
 /*!
-  \namespace gammatone::policy
-  \brief Namespace containing template policies for filter and filterbank customization
-*/
+  \namespace gammatone::filter
 
+  \brief Gammatone filter implementation (concrete or holder)
+ */
+
+/*!
+  \namespace gammatone::filterbank
+
+  \brief Gammatone filterbank implementation (concrete or holder)
+ */
+
+/*!
+  \namespace utils
+
+  \brief Utility classes and methods not related to gammatone
+ */
 
 #endif // GAMMATONE_HPP

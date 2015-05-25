@@ -1,7 +1,9 @@
 /*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,7 +14,7 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef GAMMATONE_FILTERBANK_CONCRETE_HPP
@@ -41,11 +43,12 @@ namespace gammatone
       \tparam ChannelsPolicy   Policy for computing center frequencies. See policy::channels.
       \tparam PostProcessingPolicy  Type of policy for output postprocessing. Default is to do nothing.
     */
-    template<
+    template
+    <
       class Scalar,
-      class Core = core::cooke1993<Scalar>,
-      class BandwidthPolicy = policy::bandwidth::glasberg1990<Scalar>,
-      class ChannelsPolicy = policy::channels::fixed_size<Scalar>,
+      class Core                 = core::cooke1993<Scalar>,
+      class BandwidthPolicy      = policy::bandwidth::glasberg1990<Scalar>,
+      class ChannelsPolicy       = policy::channels::fixed_size<Scalar>,
       class PostProcessingPolicy = policy::postprocessing::off<Scalar>
       >
     class concrete : public ::gammatone::filterbank::interface<Scalar>
