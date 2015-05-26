@@ -20,11 +20,9 @@
 #ifndef GAMMATONE_CORE_SLANEY1993_HPP
 #define GAMMATONE_CORE_SLANEY1993_HPP
 
+#include <gammatone/core/base.hpp>
 #include <gammatone/core/slaney1993_iir.hpp>
-#include <boost/math/constants/constants.hpp>
-#include <cmath>
 #include <array>
-#include <complex>
 
 namespace gammatone
 {
@@ -38,83 +36,111 @@ namespace gammatone
       \see Original code comes from libgtfb in the Debian packages. https://tracker.debian.org/pkg/libgtfb
 
       \tparam Scalar  Type of scalar values.
+      \tparam GainPolicy     Policy for gain computation, see policy::gain .
+
       \todo Describe the implementation in doc.
     */
-    template<class Scalar>
-    class slaney1993
+    template<class Scalar,
+             class GainPolicy = policy::gain::forall_0dB>
+    class slaney1993 : public base<Scalar,GainPolicy>
     {
     public:
-      //! Explicit constructor
-      /*!
-        Creates a core from explicit parameters.
-
-        \param sample_frequency  The sample frequency (Hz).
-        \param center_frequency  The core center frequency (Hz).
-        \param bandwidth         The core bandwidth (Hz).
-      */
       slaney1993(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
+      slaney1993(const slaney1993<Scalar,GainPolicy>& other);
+      virtual ~slaney1993();
 
-      //! Copy constructor
-      slaney1993(const slaney1993<Scalar>& other);
+      slaney1993<Scalar,GainPolicy>& operator=(const slaney1993<Scalar,GainPolicy>& other);
 
-      //! Assignment operator
-      slaney1993<Scalar>& operator=(const slaney1993<Scalar>& other);
-
-      //! Destructor
-      ~slaney1993();
-
-      //! Set the core at its initial state
-      void reset();
-
-      //! Return the core internal gain
-      Scalar gain() const { return m_gain; }
-
+      inline void reset();
       inline Scalar compute(const Scalar& input);
 
     private:
-      static Scalar find_gain(const Scalar& sample_frequency,
-                              const Scalar& center_frequency,
-                              const Scalar& tpt,
-                              const Scalar& tptbw);
 
-      static std::array<slaney1993_iir<Scalar>,4> find_filters(const Scalar& sample_frequency,
-                                                         const Scalar& center_frequency,
-                                                         const Scalar& tpt,
-                                                         const Scalar& tptbw);
-      //! 2*pi/sample_frequency()
-      const Scalar m_tpt;
-
-      //! m_tpt*bandwidth()
-      const Scalar m_tptbw;
-
-      //! Gain of the filter
-      const Scalar m_gain;
+      inline std::array<slaney1993_iir<Scalar>,4> find_filters(const Scalar& sample_frequency,
+                                                               const Scalar& center_frequency,
+							       const Scalar& bandwidth);
 
       std::array<slaney1993_iir<Scalar>,4> m_filter;
-      //std::array<Scalar,4> m_filter;
     };
   }
 }
 
-template<class Scalar>
-gammatone::core::slaney1993<Scalar>::slaney1993(const Scalar& sample_frequency,
-                                    const Scalar& center_frequency,
-                                    const Scalar& bandwidth)
-  : m_tpt( 2.0*boost::math::constants::pi<Scalar>() / sample_frequency ),
-    m_tptbw( m_tpt * bandwidth ),
-    m_gain( find_gain(sample_frequency, center_frequency, m_tpt, m_tptbw) ),
-    m_filter( find_filters(sample_frequency, center_frequency, m_tpt, m_tptbw) )
+template<class Scalar, class GainPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy>::
+slaney1993(const Scalar& sample_frequency,
+           const Scalar& center_frequency,
+           const Scalar& bandwidth)
+  : base<Scalar,GainPolicy>(sample_frequency, center_frequency, bandwidth),
+  m_filter(find_filters(sample_frequency, center_frequency, bandwidth))
+{
+  reset();
+}
+
+template<class Scalar, class GainPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy>::slaney1993(const slaney1993<Scalar,GainPolicy>& other)
+  : base<Scalar,GainPolicy>(other),
+    m_filter({other.m_filter[0],other.m_filter[1],other.m_filter[2],other.m_filter[3]})
 {}
 
-template<class Scalar>
-std::array<gammatone::core::slaney1993_iir<Scalar>,4> gammatone::core::slaney1993<Scalar>::
+template<class Scalar, class GainPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy>& gammatone::core::slaney1993<Scalar,GainPolicy>::
+operator=(const slaney1993<Scalar,GainPolicy>& other)
+{
+  gammatone::core::slaney1993<Scalar,GainPolicy> tmp(other);
+  
+  base<Scalar,GainPolicy>::operator=(tmp);
+  std::swap(m_filter, tmp.m_filter);
+
+  return *this;
+}
+
+template<class Scalar, class GainPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy>::~slaney1993()
+{}
+
+// template<class Scalar, class GainPolicy>
+// Scalar gammatone::core::slaney1993<Scalar,GainPolicy>::
+// find_gain(const Scalar& sample_frequency,
+//           const Scalar& center_frequency,
+//           const Scalar& tpt,
+//           const Scalar& tptbw)
+// {
+//   //  const Scalar period = 1.0/sample_frequency;
+//   const Scalar a = tpt * center_frequency;
+//   //  const Scalar b = pow(2.0,1.5);
+//   const std::complex<Scalar> e(0.0, a);
+
+//   //! \todo Factorize this code
+//   return /*abs((-2.0*exp(e) * period + 2.0*exp(-tptbw + e) * period * (cos(a) - sqrt(3 - b) * sin(a))) *
+//            (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) + sqrt(3 - b) * sin(a))) *
+//            (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) - sqrt(3 + b) * sin(a))) *
+//            (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) + sqrt(3 + b) * sin(a)))) /*/
+//     1.0/GainPolicy::gain(abs(2.0*(exp(2.0*(tptbw+e)) - (1.0 + exp(2.0*e))*exp(tptbw) -1.0)),
+//                          sample_frequency, center_frequency,4);
+// }
+
+template<class Scalar, class GainPolicy>
+void gammatone::core::slaney1993<Scalar,GainPolicy>::reset()
+{
+  for(auto& f:m_filter) f.reset();
+}
+
+template<class Scalar, class GainPolicy>
+Scalar gammatone::core::slaney1993<Scalar,GainPolicy>::compute(const Scalar& input)
+{
+  return m_filter[3].compute(m_filter[2].compute(m_filter[1].compute(m_filter[0].compute(input,this->m_factor))));
+}
+
+
+template<class Scalar, class GainPolicy>
+std::array<gammatone::core::slaney1993_iir<Scalar>,4> gammatone::core::slaney1993<Scalar,GainPolicy>::
 find_filters(const Scalar& sample_frequency,
              const Scalar& center_frequency,
-             const Scalar& tpt,
-             const Scalar& tptbw)
+	     const Scalar& bandwidth)
 {
   // tempory variables
-  const Scalar a = tpt * center_frequency;
+  const Scalar tptbw = this->m_tau * bandwidth;
+  const Scalar a = this->m_tau * center_frequency;
   const Scalar b = pow(2.0,1.5);
   const Scalar c = sin(a)  / (exp(tptbw)*sample_frequency);
   const Scalar d = cos(a)  / (exp(tptbw)*sample_frequency);
@@ -134,71 +160,14 @@ find_filters(const Scalar& sample_frequency,
   const std::array<Scalar,3> B = {B0,B1,B2};
 
   // filters initialisation
-  typedef gammatone::core::slaney1993_iir<Scalar> iir;
-  std::array<Scalar,3> a0 = {A0,A1[0],A2};
-  std::array<Scalar,3> a1 = {A0,A1[1],A2};
-  std::array<Scalar,3> a2 = {A0,A1[2],A2};
-  std::array<Scalar,3> a3 = {A0,A1[3],A2};
-  std::array<slaney1993_iir<Scalar>,4> filter = {iir(a0,B),iir(a1,B),iir(a2,B),iir(a3,B)};
+  typedef slaney1993_iir<Scalar> iir;
+  const std::array<Scalar,3> a0 = {A0,A1[0],A2};
+  const std::array<Scalar,3> a1 = {A0,A1[1],A2};
+  const std::array<Scalar,3> a2 = {A0,A1[2],A2};
+  const std::array<Scalar,3> a3 = {A0,A1[3],A2};
+  std::array<iir,4> filter = {iir(a0,B),iir(a1,B),iir(a2,B),iir(a3,B)};
 
   return std::move(filter);
-}
-
-
-template<class Scalar>
-gammatone::core::slaney1993<Scalar>::slaney1993(const slaney1993<Scalar>& other)
-  : m_tpt( other.m_tpt ),
-    m_tptbw( other.m_tptbw ),
-    m_gain( other.m_gain ),
-    m_filter({other.m_filter[0],other.m_filter[1],other.m_filter[2],other.m_filter[3]})
-{}
-
-template<class Scalar>
-gammatone::core::slaney1993<Scalar>& gammatone::core::slaney1993<Scalar>::operator=(const slaney1993<Scalar>& other)
-{
-  gammatone::core::slaney1993<Scalar> tmp(other);
-
-  std::swap( m_tpt, tmp.m_tpt );
-  std::swap( m_tptbw, tmp.m_tptbw );
-  std::swap( m_gain, tmp.m_gain );
-  std::swap( m_filter, tmp.m_filter );
-
-  return *this;
-}
-
-template<class Scalar>
-gammatone::core::slaney1993<Scalar>::~slaney1993()
-{}
-
-template<class Scalar>
-Scalar gammatone::core::slaney1993<Scalar>::find_gain(const Scalar& sample_frequency,
-                                                const Scalar& center_frequency,
-                                                const Scalar& tpt,
-                                                const Scalar& tptbw)
-{
-  const Scalar period = 1.0/sample_frequency;
-  const Scalar a = tpt * center_frequency;
-  const Scalar b = pow(2.0,1.5);
-  const std::complex<Scalar> e(0.0, a);
-
-  //! \todo Factorize this code
-  return abs((-2.0*exp(e) * period + 2.0*exp(-tptbw + e) * period * (cos(a) - sqrt(3 - b) * sin(a))) *
-             (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) + sqrt(3 - b) * sin(a))) *
-             (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) - sqrt(3 + b) * sin(a))) *
-             (-2.0*exp(2.0*e)*period + 2.0*exp(-tptbw + e) * period * (cos(a) + sqrt(3 + b) * sin(a))) /
-             pow(2.0*(exp(2.0*(tptbw+e)) - (1.0 + exp(2.0*e))*exp(tptbw) -1.0), 4));
-}
-
-template<class Scalar>
-void gammatone::core::slaney1993<Scalar>::reset()
-{
-  for(auto& f:m_filter) f.reset();
-}
-
-template<class Scalar>
-Scalar gammatone::core::slaney1993<Scalar>::compute(const Scalar& input)
-{
-  return m_filter[3].compute(m_filter[2].compute(m_filter[1].compute(m_filter[0].compute(input,m_gain))));
 }
 
 #endif // GAMMATONE_CORE_SLANEY1993_HPP

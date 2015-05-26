@@ -283,6 +283,14 @@ theorical_attenuate(const Filter& filter,
                                        attenuation, max_duration));
 }
 
+template<class Filter, class Iterator, class Container>
+Container gammatone::impulse_response::
+theorical(const Filter& filter,
+          const Iterator& first,
+          const Iterator& last)
+{
+  return std::move(theorical(filter.center_frequency(), filter.bandwidth(), first, last));
+}
 
 template<class Filter, class Container>
 Container gammatone::impulse_response::
@@ -293,14 +301,6 @@ theorical(const Filter& filter,
   return std::move(theorical(filter.center_frequency(),filter.bandwidth(),t.cbegin(),t.cend()));
 }
 
-template<class Filter, class Iterator, class Container>
-Container gammatone::impulse_response::
-theorical(const Filter& filter,
-          const Iterator& first,
-          const Iterator& last)
-{
-  return std::move(theorical(filter.center_frequency(), filter.bandwidth(), first, last));
-}
 
 template<class Scalar, class Iterator, class Container>
 Container gammatone::impulse_response::

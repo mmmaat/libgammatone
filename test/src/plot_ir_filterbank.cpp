@@ -18,6 +18,7 @@
 */
 
 #include <gammatone/filterbank/concrete.hpp>
+#include <gammatone/core/convolution.hpp>
 #include <gammatone/detail/impulse_response.hpp>
 
 #include <test_setup.hpp>
@@ -27,11 +28,11 @@
 using namespace std;
 
 typedef double T;
-typedef gammatone::core::cooke1993<T> core;
+typedef gammatone::core::convolution<T,gammatone::policy::gain::forall_0dB> core;
 typedef gammatone::filterbank::concrete<T, core> filterbank;
 
-const T duration = 0.005;
-const T sample_frequency = 96000;
+const T duration = 0.02;
+const T sample_frequency = 44100;
 const size_t nb_channels = 5;
 const T low_cf = 500, high_cf = 8000;
 

@@ -8,8 +8,10 @@ typedef double T;
 
 // enumeration of all possible filter types (core/policy combination)
 
-typedef gammatone::core::cooke1993<T, gammatone::policy::clipping::off> c1;
-typedef gammatone::core::cooke1993<T, gammatone::policy::clipping::on>  c2;
+typedef gammatone::policy::gain::old_cooke1993 g1;
+
+typedef gammatone::core::cooke1993<T, g1, gammatone::policy::clipping::off> c1;
+typedef gammatone::core::cooke1993<T, g1, gammatone::policy::clipping::on>  c2;
 typedef gammatone::core::slaney1993<T>                                  c3;
 typedef gammatone::core::convolution<T>                                 c4;
 

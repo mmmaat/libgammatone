@@ -42,8 +42,8 @@ template<class T> void plot(const T& data, const string& name);
 
 int main()
 {
-  test_convolution(sample_frequency,center_frequency,duration);
-  //    test_slaney1993(sample_frequency, center_frequency, duration);
+  //test_convolution(sample_frequency,center_frequency,duration);
+  test_slaney1993(sample_frequency, center_frequency, duration);
   //test_holdsworth_rir(sample_frequency, center_frequency, duration);
 
   return 0;
@@ -60,42 +60,42 @@ void test_slaney1993(const T& fs, const T& fc, const T& d)
 
 
 
-class my_convolution : public gammatone::core::convolution<T>
-{
-public:
-  my_convolution(const T& fs, const T& fc)
-    : convolution<T>( fs,fc,gammatone::policy::bandwidth::glasberg1990<T>::bandwidth(fc) ),
-    m_time( gammatone::impulse_response::time(fs,(T)(m_ir.size()-1)/fs) )
-  {}
+// class my_convolution : public gammatone::core::convolution<T>
+// {
+// public:
+//   my_convolution(const T& fs, const T& fc)
+//     : convolution<T>( fs,fc,gammatone::policy::bandwidth::glasberg1990<T>::bandwidth(fc) ),
+//     m_time( gammatone::impulse_response::time(fs,(T)(m_ir.size()-1)/fs) )
+//   {}
 
-  virtual ~my_convolution()
-  {}
+//   virtual ~my_convolution()
+//   {}
 
-  const std::vector<T>& ir() const
-  { return m_ir; }
+//   const std::vector<T>& ir() const
+//   { return m_ir; }
 
-  const std::vector<T>& time() const
-  { return m_time; }
+//   const std::vector<T>& time() const
+//   { return m_time; }
   
-private:
-  vector<T> m_time;
-};
+// private:
+//   vector<T> m_time;
+// };
 
 
-void test_convolution(const T& fs, const T& fc, const T& d)
-{
-  my_convolution core(fs,fc);
-  cout << "gain = " << core.gain() << endl
-       << "size = " << core.ir().size() << endl
-       << "time = " << core.time().size() << endl;
+// void test_convolution(const T& fs, const T& fc, const T& d)
+// {
+//   my_convolution core(fs,fc);
+//   cout << "gain = " << core.gain() << endl
+//        << "size = " << core.ir().size() << endl
+//        << "time = " << core.time().size() << endl;
   
-  plot(make_pair(core.time(), core.ir()), "convolution the");
+//   plot(make_pair(core.time(), core.ir()), "convolution the");
 
-  gammatone::filter::concrete<T,gammatone::core::convolution<T> > f(fs, fc);
-  plot(make_pair(gammatone::impulse_response::time(fs,d),
-		 gammatone::impulse_response::implemented(f, d))
-       , "convolution imp");
-}
+//   gammatone::filter<T,gammatone::core::convolution<T> > f(fs, fc);
+//   plot(make_pair(gammatone::impulse_response::time(fs,d),
+// 		 gammatone::impulse_response::implemented(f, d))
+//        , "convolution imp");
+// }
 
 
 
