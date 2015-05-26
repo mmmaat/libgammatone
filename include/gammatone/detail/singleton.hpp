@@ -39,7 +39,7 @@ namespace gammatone
       program, from first access to program end. The client instance is
       accessible at any point with the instance() method. This
       implementation is not thread safe, see reference below for more
-      utilss.
+      details.
 
       ~~~
       MyClient& client = utils::singleton<MyClient>::instance();
@@ -78,8 +78,8 @@ namespace gammatone
       ---------
 
       This is a simplified version of the singleton presented in
-      *Modern C++ Design: Generic Programming and Design Patterns
-      Applied*, Andrei Alexandrescu, Addison Wesley, 2001.
+      Modern C++ Design: Generic Programming and Design Patterns
+      Applied, Andrei Alexandrescu, Addison Wesley, 2001.
     */
     template<class Client>
     class singleton : private boost::noncopyable

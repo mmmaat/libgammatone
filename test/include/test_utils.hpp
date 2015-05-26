@@ -167,6 +167,4 @@ typename Iterator1::value_type mean_squared_error(const Iterator1& xfirst,
   return std::move(out/size);
 }
 
-
-
 #endif // LIBGAMMATONE_TEST_UTILS_HPP

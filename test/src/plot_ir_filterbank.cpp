@@ -1,9 +1,9 @@
-/*!
-  \file   plot_ir_filterbank.hpp
-
+/*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -14,16 +14,16 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <gammatone/filterbank/concrete.hpp>
 #include <gammatone/detail/impulse_response.hpp>
-#include <gnuplot-iostream.h>
+
+#include <test_setup.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <string>
 using namespace std;
 
 typedef double T;
@@ -34,7 +34,6 @@ const T duration = 0.005;
 const T sample_frequency = 96000;
 const size_t nb_channels = 5;
 const T low_cf = 500, high_cf = 8000;
-const string gpsetup = "/home/mathieu/dev/libgammatone/test/share/setup.gp";
 
 int main(int argc, char** argv)
 {

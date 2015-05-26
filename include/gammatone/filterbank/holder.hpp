@@ -22,7 +22,7 @@
 
 #include <gammatone/filterbank/interface.hpp>
 #include <gammatone/filterbank/concrete.hpp>
-#include <gammatone/factory.hpp>
+#include <gammatone/filterbank/factory.hpp>
 #include <string>
 
 namespace gammatone

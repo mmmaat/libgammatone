@@ -1,9 +1,9 @@
-/*!
-  \file   plot_bandwidth.hpp
-
+/*
   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -14,20 +14,19 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <gammatone/policy/bandwidth.hpp>
 #include <gammatone/detail/utils.hpp>
-#include <gnuplot-iostream.h>
+
+#include <test_setup.hpp>
 #include <algorithm>
 #include <functional>
 #include <fstream>
-#include <string>
 
 typedef double Scalar;
 
-const std::string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 template<class T>
 void plot(const std::string& setup,const T& f, const T& d1, const T& d2, const T& d3);

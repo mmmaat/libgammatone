@@ -1,7 +1,9 @@
 /*
-   Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
 
-  This program is free software: you can redistribute it and/or modify
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
@@ -12,12 +14,11 @@
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//!   \brief Comparison of the different impulse response avalaible in
-//!   libgammatone. Compare both theorical and implemented cores IRs.
-
+// Comparison of the different impulse response avalaible in
+// libgammatone. Compare both theorical and implemented cores IRs.
 
 #include <gammatone/detail/impulse_response.hpp>
 #include <gammatone/filter/concrete.hpp>
@@ -25,10 +26,10 @@
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
 #include <gammatone/detail/utils.hpp>
-#include <gnuplot-iostream.h>
+
+#include <test_setup.hpp>
 #include <iostream>
 #include <vector>
-#include <string>
 #include <array>
 
 using namespace std;
@@ -40,7 +41,7 @@ typedef gammatone::filter::concrete<T,gammatone::core::convolution<T> > filter3;
 const T sample_frequency = 44100; // Hz
 const T center_frequency = 1000;  // Hz
 const T duration = 0.01;           // s
-const string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
+
 
 template<class F, class C>
 inline string tostring(const F& f, const C& ir)

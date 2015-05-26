@@ -14,5 +14,5 @@ add_definitions(${DEPS_CFLAGS_OTHER})
 include_directories(${Boost_INCLUDE_DIR} include)  
 
 add_subdirectory(test)
-
-add_subdirectory(doc EXCLUDE_FROM_ALL)
+add_subdirectory(doc)
+add_subdirectory(doc/exemple)

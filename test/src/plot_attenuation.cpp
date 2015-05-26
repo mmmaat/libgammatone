@@ -1,8 +1,26 @@
-//#include <gammatone/gammatone.hpp>
+/*
+  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+
+  This file is part of libgammatone
+
+  libgammatone is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <gammatone/filter/concrete.hpp>
 #include <gammatone/detail/impulse_response.hpp>
-#include <gnuplot-iostream.h>
-#include <string>
+
+#include <test_setup.hpp>
 #include <iostream>
 #include <limits>
 
@@ -11,10 +29,8 @@ using ir = gammatone::impulse_response;
 template<class Filter, class Container, class IRBase>
 void plot(const Filter& f, const Container& ref, const IRBase& base, const Container& db)
 {
-  const std::string gnuplot_setup = "/home/mathieu/dev/libgammatone/share/setup.gp";
-
   Gnuplot gp;//(stdout);
-  gp << std::ifstream(gnuplot_setup).rdbuf() << std::endl
+  gp << std::ifstream(gpsetup).rdbuf() << std::endl
      << "set xlabel 'time (s)'" << std::endl
      << "set ylabel 'amplitude'" << std::endl
      << "plot ";

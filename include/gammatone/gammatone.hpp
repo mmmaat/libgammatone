@@ -62,21 +62,22 @@
   \code{.sh} git clone https://github.com/mmmaat/libgammatone.git  \endcode
 
 
-  \section sec_build Build examples and tests
+  \section sec_build Build exemples and tests
 
   - The build process used in libgammatone is **cmake**.
 
   - The library itself depends only on the C++ standard library and **boost**
-  (just for a proper definition of \f$\pi\f$ !)
 
-  - To build the tests and examples you need **gtest**, **gnuplot** and **gnuplot-iostream**.
+  - To build the tests and exemples you need **gnuplot** and **gnuplot-iostream**.
+
+  - To build the documentation you need **doxygen**.
 
   On a Debian based system, all the dependancies are in official repositories. To install it:
   ~~~{.sh}
-  sudo apt-get install cmake gnuplot libgnuplot-iostream-dev libgtest-dev libboost-dev
+  sudo apt-get install cmake doxygen gnuplot libgnuplot-iostream-dev libboost-dev
   cmake .
-  make
-  make doc
+  make      # build the tests
+  make doc  # call doxygen to build the doc
   ~~~
 
 
