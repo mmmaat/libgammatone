@@ -54,7 +54,7 @@ int main()
 
 void test_slaney1993(const T& fs, const T& fc, const T& d)
 {
-  gammatone::filter::concrete<T,gammatone::core::slaney1993<T> > f(fs, fc);
+  gammatone::filter::concrete<T,gammatone::core::slaney1993 > f(fs, fc);
   plot(gammatone::impulse_response::implemented(f, d), "slaney1993");
 }
 

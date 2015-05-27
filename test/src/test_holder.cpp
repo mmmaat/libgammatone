@@ -23,7 +23,7 @@
 #include <vector>
 
 
-template<class Core>
+template<template<class...> class Core>
 void test(const std::string& name)
 {
   typedef gammatone::filter::holder<double>          holder;
@@ -53,8 +53,8 @@ void test(const std::string& name)
 int main()
 {
   using namespace gammatone::core;
-  test<cooke1993<double>>("cooke1993");
-  test<slaney1993<double>>("slaney1993");
+  test<cooke1993>("cooke1993");
+  test<slaney1993>("slaney1993");
   std::cout << "all asserts verified" << std::endl;
   return 0;
 }

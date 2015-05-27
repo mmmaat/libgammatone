@@ -44,7 +44,6 @@ namespace gammatone
                                   const std::size_t& order);
       };
 
-
       //! Disable gain policy
       class off
       {

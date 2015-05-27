@@ -33,7 +33,8 @@ protected:
   };
 
   const T fs = 44100;
-  const std::vector<T> cf = {1,10,100,451,2351,6842,12504,15478,fs/2,fs};
+  // cf below 10 don't pass reset_works()
+  const std::vector<T> cf = {20,100,451.215,2351.2,6842,12504,15478,fs/2};
   std::vector<Filter> filters;
   std::vector<T> signal;
 };

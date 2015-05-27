@@ -1,113 +1,493 @@
 #ifndef GAMMATONE_TEST_FILTERBANK_TYPES_H
 #define GAMMATONE_TEST_FILTERBANK_TYPES_H
 
-#include <gammatone/gammatone.hpp>
+#include <gammatone/filterbank/concrete.hpp>
+#include <gammatone/core/convolution.hpp>
+#include <gammatone/core/slaney1993.hpp>
 #include <boost/mpl/list.hpp>
+#include <boost/mpl/joint_view.hpp>
 
-typedef double T;
+
+// cores
+template<class... X> using a1 = gammatone::core::cooke1993<X...>;
+template<class... X> using a2 = gammatone::core::slaney1993<X...>;
+template<class... X> using a3 = gammatone::core::convolution<X...>;
+
+// bandwidths
+template<class X> using b1 = gammatone::policy::bandwidth::glasberg1990<X>;
+template<class X> using b2 = gammatone::policy::bandwidth::slaney1988<X>;
+template<class X> using b3 = gammatone::policy::bandwidth::greenwood1990<X>;
+
+// channels
+template<class... X> using c1 = gammatone::policy::channels::fixed_size<X...>;
+template<class... X> using c2 = gammatone::policy::channels::fixed_overlap<X...>;
+
+// orders
+using d1 = gammatone::policy::order::increasing;
+using d2 = gammatone::policy::order::decreasing;
+
+// gains
+using e1 = gammatone::policy::gain::forall_0dB;
+using e2 = gammatone::policy::gain::peroctave_6dB;
+
+// clipping
+using f1 = gammatone::policy::clipping::on;
+using f2 = gammatone::policy::clipping::off;
+
+// postprocessing
+template<class Arg> using g1 = gammatone::policy::postprocessing::off<Arg>;
+template<class Arg> using g2 = gammatone::policy::postprocessing::hwr<Arg>;
+
 
 // enumeration of all possible filterbank types (core/policy combination)
 
-typedef gammatone::policy::gain::old_cooke1993 g1;
-
-typedef gammatone::core::cooke1993<T, g1, gammatone::policy::clipping::off> c1;
-typedef gammatone::core::cooke1993<T, g1, gammatone::policy::clipping::on>  c2;
-typedef gammatone::core::slaney1993<T>                                  c3;
-typedef gammatone::core::convolution<T>                                 c4;
-
-typedef gammatone::policy::bandwidth::glasberg1990<T>  b1;
-typedef gammatone::policy::bandwidth::slaney1988<T>    b2;
-typedef gammatone::policy::bandwidth::greenwood1990<T> b3;
-
-typedef gammatone::policy::order::decreasing   o1;
-typedef gammatone::policy::order::increasing   o2;
-
-typedef gammatone::policy::channels::fixed_size<T,o1>    n1;
-typedef gammatone::policy::channels::fixed_size<T,o2>    n2;
-typedef gammatone::policy::channels::fixed_overlap<T,o1> n3;
-typedef gammatone::policy::channels::fixed_overlap<T,o2> n4;
-
-typedef gammatone::filterbank::concrete<T,c1,b1,n1> f111;
-typedef gammatone::filterbank::concrete<T,c2,b1,n1> f211;
-typedef gammatone::filterbank::concrete<T,c3,b1,n1> f311;
-typedef gammatone::filterbank::concrete<T,c4,b1,n1> f411;
-
-typedef gammatone::filterbank::concrete<T,c1,b2,n1> f121;
-typedef gammatone::filterbank::concrete<T,c2,b2,n1> f221;
-typedef gammatone::filterbank::concrete<T,c3,b2,n1> f321;
-typedef gammatone::filterbank::concrete<T,c4,b2,n1> f421;
-
-typedef gammatone::filterbank::concrete<T,c1,b3,n1> f131;
-typedef gammatone::filterbank::concrete<T,c2,b3,n1> f231;
-typedef gammatone::filterbank::concrete<T,c3,b3,n1> f331;
-typedef gammatone::filterbank::concrete<T,c4,b3,n1> f431;
+using T = double;
 
 
-typedef gammatone::filterbank::concrete<T,c1,b1,n2> f112;
-typedef gammatone::filterbank::concrete<T,c2,b1,n2> f212;
-typedef gammatone::filterbank::concrete<T,c3,b1,n2> f312;
-typedef gammatone::filterbank::concrete<T,c4,b1,n2> f412;
+using types111 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e1,f2,g2>,
 
-typedef gammatone::filterbank::concrete<T,c1,b2,n2> f122;
-typedef gammatone::filterbank::concrete<T,c2,b2,n2> f222;
-typedef gammatone::filterbank::concrete<T,c3,b2,n2> f322;
-typedef gammatone::filterbank::concrete<T,c4,b2,n2> f422;
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d1,e2,f2,g2>,
 
-typedef gammatone::filterbank::concrete<T,c1,b3,n2> f132;
-typedef gammatone::filterbank::concrete<T,c2,b3,n2> f232;
-typedef gammatone::filterbank::concrete<T,c3,b3,n2> f332;
-typedef gammatone::filterbank::concrete<T,c4,b3,n2> f432;
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c1,d2,e2,f2,g2>
+  >;
+
+using types112 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b1,c2,d2,e2,f2,g2>
+  >;
+
+using types121 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c1,d2,e2,f2,g2>
+  >;
+
+using types122 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b2,c2,d2,e2,f2,g2>
+  >;
 
 
+using types131 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e1,f2,g2>,
 
-typedef gammatone::filterbank::concrete<T,c1,b1,n3> f113;
-typedef gammatone::filterbank::concrete<T,c2,b1,n3> f213;
-typedef gammatone::filterbank::concrete<T,c3,b1,n3> f313;
-typedef gammatone::filterbank::concrete<T,c4,b1,n3> f413;
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d1,e2,f2,g2>,
 
-typedef gammatone::filterbank::concrete<T,c1,b2,n3> f123;
-typedef gammatone::filterbank::concrete<T,c2,b2,n3> f223;
-typedef gammatone::filterbank::concrete<T,c3,b2,n3> f323;
-typedef gammatone::filterbank::concrete<T,c4,b2,n3> f423;
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e1,f2,g2>,
 
-typedef gammatone::filterbank::concrete<T,c1,b3,n3> f133;
-typedef gammatone::filterbank::concrete<T,c2,b3,n3> f233;
-typedef gammatone::filterbank::concrete<T,c3,b3,n3> f333;
-typedef gammatone::filterbank::concrete<T,c4,b3,n3> f433;
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c1,d2,e2,f2,g2>
+  >;
+
+using types132 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a1,b3,c2,d2,e2,f2,g2>
+  >;
 
 
+using types1 = boost::mpl::joint_view<boost::mpl::joint_view<
+                                        boost::mpl::joint_view<types111,types112>::type,
+                                        boost::mpl::joint_view<types121,types122>::type>::type,
+                                      boost::mpl::joint_view<types131,types132>::type>::type;
 
-typedef gammatone::filterbank::concrete<T,c1,b1,n4> f114;
-typedef gammatone::filterbank::concrete<T,c2,b1,n4> f214;
-typedef gammatone::filterbank::concrete<T,c3,b1,n4> f314;
-typedef gammatone::filterbank::concrete<T,c4,b1,n4> f414;
-
-typedef gammatone::filterbank::concrete<T,c1,b2,n4> f124;
-typedef gammatone::filterbank::concrete<T,c2,b2,n4> f224;
-typedef gammatone::filterbank::concrete<T,c3,b2,n4> f324;
-typedef gammatone::filterbank::concrete<T,c4,b2,n4> f424;
-
-typedef gammatone::filterbank::concrete<T,c1,b3,n4> f134;
-typedef gammatone::filterbank::concrete<T,c2,b3,n4> f234;
-typedef gammatone::filterbank::concrete<T,c3,b3,n4> f334;
-typedef gammatone::filterbank::concrete<T,c4,b3,n4> f434;
+//////////////////////////////////////////////////////////////////
 
 
-typedef boost::mpl::list< f111,f211,f311,f411,
-                          f121,f221,f321,f421,
-                          f131,f231,f331,f431
+using types211 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e1,f2,g2>,
 
-                          // f112,f212,f312,f412,
-                          // f122,f222,f322,f422,
-                          // f132,f232,f332,f432,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d1,e2,f2,g2>,
 
-                          // f113,f213,f313,f413,
-                          // f123,f223,f323,f423,
-                          // f133,f233,f333,f433,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e1,f2,g2>,
 
-                          // f114,f214,f314,f414,
-                          // f124,f224,f324,f424,
-                          // f134,f234,f334,f434
-                          > filterbank_types;
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c1,d2,e2,f2,g2>
+  >;
+
+using types212 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b1,c2,d2,e2,f2,g2>
+  >;
+
+using types221 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c1,d2,e2,f2,g2>
+  >;
+
+using types222 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b2,c2,d2,e2,f2,g2>
+  >;
+
+
+using types231 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c1,d2,e2,f2,g2>
+  >;
+
+using types232 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a2,b3,c2,d2,e2,f2,g2>
+  >;
+
+
+using types2 = boost::mpl::joint_view<boost::mpl::joint_view<
+                                        boost::mpl::joint_view<types211,types212>::type,
+                                        boost::mpl::joint_view<types221,types222>::type>::type,
+                                      boost::mpl::joint_view<types231,types232>::type>::type;
+
+//////////////////////////////////////////////////////////////////
+
+
+using types311 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c1,d2,e2,f2,g2>
+  >;
+
+using types312 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b1,c2,d2,e2,f2,g2>
+  >;
+
+using types321 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c1,d2,e2,f2,g2>
+  >;
+
+using types322 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b2,c2,d2,e2,f2,g2>
+  >;
+
+
+using types331 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c1,d2,e2,f2,g2>
+  >;
+
+using types332 = boost::mpl::list
+  <
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d1,e2,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e1,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e1,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e1,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e1,f2,g2>,
+
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e2,f1,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e2,f1,g2>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e2,f2,g1>,
+  gammatone::filterbank::concrete<T,a3,b3,c2,d2,e2,f2,g2>
+  >;
+
+
+using types3 = boost::mpl::joint_view<boost::mpl::joint_view<
+                                        boost::mpl::joint_view<types311,types312>::type,
+                                        boost::mpl::joint_view<types321,types322>::type>::type,
+                                      boost::mpl::joint_view<types331,types332>::type>::type;
+
+//////////////////////////////////////////////////////////////////
+
+
+using filterbank_types = boost::mpl::joint_view<boost::mpl::joint_view<types1,types2>::type,types3>::type;
 
 #endif // GAMMATONE_TEST_FILTERBANK_TYPES_H

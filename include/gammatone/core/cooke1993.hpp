@@ -47,19 +47,22 @@ namespace gammatone
       \tparam GainPolicy     Policy for gain computation, see policy::gain .
       \tparam ClippingPolicy Policy for clipping small values, see policy::clipping .
     */
-    template<class Scalar,
-             class GainPolicy = policy::gain::forall_0dB,
-             class ClippingPolicy = policy::clipping::off>
+    template
+    <
+      class Scalar,
+      class GainPolicy = policy::gain::forall_0dB,
+      class ClippingPolicy = policy::clipping::off
+      >
     class cooke1993 : public base<Scalar,GainPolicy>
     {
     public:
       cooke1993(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
       cooke1993(const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);
       virtual ~cooke1993();
-      
+
       cooke1993<Scalar, GainPolicy, ClippingPolicy>& operator=
-      (const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);    
-      
+      (const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);
+
       inline void reset();
       inline Scalar compute(const Scalar& input);
 
@@ -67,9 +70,9 @@ namespace gammatone
 
       // inline Scalar find_factor(const Scalar& sample_frequency,
       //                           const Scalar& center_frequency,
-      // 				const Scalar& bandwidth);
+      //                                const Scalar& bandwidth);
 
-        // Filter coefficients
+      // Filter coefficients
 
       //! \f$ c = e^{2i\pi f_c/f_s} \f$
       const std::complex<Scalar> c;
@@ -88,7 +91,7 @@ cooke1993(const Scalar& sample_frequency,
           const Scalar& bandwidth)
   : base<Scalar,GainPolicy>(sample_frequency, center_frequency, bandwidth),
   c( std::complex<Scalar>(cos(base<Scalar,GainPolicy>::m_tau*center_frequency),
-			  sin(base<Scalar,GainPolicy>::m_tau*center_frequency)))
+                          sin(base<Scalar,GainPolicy>::m_tau*center_frequency)))
 {
   const Scalar a0 = exp (-this->m_tau*bandwidth);
   a[0] = 4.0*a0;
@@ -104,11 +107,11 @@ template<class Scalar, class GainPolicy, class ClippingPolicy>
 gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
 cooke1993(const cooke1993<Scalar,GainPolicy,ClippingPolicy>& other)
   : base<Scalar,GainPolicy>(other),
-    c(other.c),
-    u(other.u),
-    q(other.q),
-    a(other.a),
-    p(other.p)
+  c(other.c),
+  u(other.u),
+  q(other.q),
+  a(other.a),
+  p(other.p)
 {}
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>

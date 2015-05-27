@@ -22,6 +22,7 @@
 
 #include <gammatone/core/base.hpp>
 #include <gammatone/core/slaney1993_iir.hpp>
+#include <gammatone/policy/clipping.hpp>
 #include <array>
 
 namespace gammatone
@@ -41,15 +42,17 @@ namespace gammatone
       \todo Describe the implementation in doc.
     */
     template<class Scalar,
-             class GainPolicy = policy::gain::forall_0dB>
+             class GainPolicy = policy::gain::forall_0dB,
+	     class ClippingPolicy = policy::clipping::off>
     class slaney1993 : public base<Scalar,GainPolicy>
     {
     public:
       slaney1993(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
-      slaney1993(const slaney1993<Scalar,GainPolicy>& other);
+      slaney1993(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other);
       virtual ~slaney1993();
 
-      slaney1993<Scalar,GainPolicy>& operator=(const slaney1993<Scalar,GainPolicy>& other);
+      slaney1993<Scalar,GainPolicy,ClippingPolicy>&
+      operator=(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other);
 
       inline void reset();
       inline Scalar compute(const Scalar& input);
@@ -65,8 +68,8 @@ namespace gammatone
   }
 }
 
-template<class Scalar, class GainPolicy>
-gammatone::core::slaney1993<Scalar,GainPolicy>::
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
 slaney1993(const Scalar& sample_frequency,
            const Scalar& center_frequency,
            const Scalar& bandwidth)
@@ -76,17 +79,19 @@ slaney1993(const Scalar& sample_frequency,
   reset();
 }
 
-template<class Scalar, class GainPolicy>
-gammatone::core::slaney1993<Scalar,GainPolicy>::slaney1993(const slaney1993<Scalar,GainPolicy>& other)
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
+slaney1993(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other)
   : base<Scalar,GainPolicy>(other),
     m_filter({other.m_filter[0],other.m_filter[1],other.m_filter[2],other.m_filter[3]})
 {}
 
-template<class Scalar, class GainPolicy>
-gammatone::core::slaney1993<Scalar,GainPolicy>& gammatone::core::slaney1993<Scalar,GainPolicy>::
-operator=(const slaney1993<Scalar,GainPolicy>& other)
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>&
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
+operator=(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other)
 {
-  gammatone::core::slaney1993<Scalar,GainPolicy> tmp(other);
+  gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy> tmp(other);
   
   base<Scalar,GainPolicy>::operator=(tmp);
   std::swap(m_filter, tmp.m_filter);
@@ -94,11 +99,11 @@ operator=(const slaney1993<Scalar,GainPolicy>& other)
   return *this;
 }
 
-template<class Scalar, class GainPolicy>
-gammatone::core::slaney1993<Scalar,GainPolicy>::~slaney1993()
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::~slaney1993()
 {}
 
-// template<class Scalar, class GainPolicy>
+// template<class Scalar, class GainPolicy, class ClippingPolicy>
 // Scalar gammatone::core::slaney1993<Scalar,GainPolicy>::
 // find_gain(const Scalar& sample_frequency,
 //           const Scalar& center_frequency,
@@ -119,21 +124,22 @@ gammatone::core::slaney1993<Scalar,GainPolicy>::~slaney1993()
 //                          sample_frequency, center_frequency,4);
 // }
 
-template<class Scalar, class GainPolicy>
-void gammatone::core::slaney1993<Scalar,GainPolicy>::reset()
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+void gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::reset()
 {
   for(auto& f:m_filter) f.reset();
 }
 
-template<class Scalar, class GainPolicy>
-Scalar gammatone::core::slaney1993<Scalar,GainPolicy>::compute(const Scalar& input)
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+Scalar gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::compute(const Scalar& input)
 {
   return m_filter[3].compute(m_filter[2].compute(m_filter[1].compute(m_filter[0].compute(input,this->m_factor))));
 }
 
 
-template<class Scalar, class GainPolicy>
-std::array<gammatone::core::slaney1993_iir<Scalar>,4> gammatone::core::slaney1993<Scalar,GainPolicy>::
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+std::array<gammatone::core::slaney1993_iir<Scalar>,4>
+gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
 find_filters(const Scalar& sample_frequency,
              const Scalar& center_frequency,
 	     const Scalar& bandwidth)

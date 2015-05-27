@@ -95,8 +95,8 @@ template<class Scalar>
 gammatone::filterbank::factory<Scalar>::factory()
 {
   using namespace gammatone;
-  register_type<filter::concrete<Scalar,core::cooke1993<Scalar> > >( "cooke1993");
-  register_type<filter::concrete<Scalar,core::slaney1993<Scalar> > >("slaney1993");
+  register_type<filter::concrete<Scalar,core::cooke1993> >( "cooke1993");
+  register_type<filter::concrete<Scalar,core::slaney1993 > >("slaney1993");
 }
 
 template<class Scalar>

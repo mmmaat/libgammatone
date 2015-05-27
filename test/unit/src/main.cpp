@@ -19,5 +19,4 @@
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MODULE libgammatone
-#define BOOST_MPL_LIMIT_LIST_SIZE 100
 #include <boost/test/unit_test.hpp>

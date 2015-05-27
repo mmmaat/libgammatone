@@ -25,36 +25,37 @@
 #include <sstream>
 
 typedef double T;
+using namespace gammatone;
 
 // gain types
-typedef gammatone::policy::gain::forall_0dB     gain1;
-typedef gammatone::policy::gain::peroctave_6dB  gain2;
-//typedef gammatone::policy::gain::old_cooke1993  gain3;
-//typedef gammatone::policy::gain::off            gain4;
+using g1 = policy::gain::forall_0dB;
+using g2 = policy::gain::peroctave_6dB;
 
-// core type
-typedef gammatone::core::convolution<T,gain1>  core11;
-typedef gammatone::core::convolution<T,gain2>  core12;
-typedef gammatone::core::slaney1993<T,gain1>   core21;
-typedef gammatone::core::slaney1993<T,gain2>   core22;
-typedef gammatone::core::cooke1993<T, gain1>   core31;
-typedef gammatone::core::cooke1993<T, gain2>   core32;
+// default bandwidth channel and order
+template<class X> using b = policy::bandwidth::glasberg1990<X>;
+template<class... X> using c = policy::channels::fixed_size<X...>;
+using o = policy::order::increasing;
+
+// core types
+template<class... X> using c1 = core::convolution<X...>;
+template<class... X> using c2 = core::cooke1993<X...>;
+template<class... X> using c3 = core::slaney1993<X...>;
 
 // filterbank types
-typedef gammatone::filterbank::concrete<T,core11>   filterbank11;
-typedef gammatone::filterbank::concrete<T,core12>   filterbank12;
-typedef gammatone::filterbank::concrete<T,core21>   filterbank21;
-typedef gammatone::filterbank::concrete<T,core22>   filterbank22;
-typedef gammatone::filterbank::concrete<T,core31>   filterbank31;
-typedef gammatone::filterbank::concrete<T,core32>   filterbank32;
+using filterbank11 = filterbank::concrete<T,c1,b,c,o,g1>;
+using filterbank22 = filterbank::concrete<T,c2,b,c,o,g2>;
+using filterbank31 = filterbank::concrete<T,c3,b,c,o,g1>;
+using filterbank12 = filterbank::concrete<T,c1,b,c,o,g2>;
+using filterbank21 = filterbank::concrete<T,c2,b,c,o,g1>;
+using filterbank32 = filterbank::concrete<T,c3,b,c,o,g2>;
 
 // filter types
-typedef gammatone::filter::concrete<T,core11>   filter11;
-typedef gammatone::filter::concrete<T,core12>   filter12;
-typedef gammatone::filter::concrete<T,core21>   filter21;
-typedef gammatone::filter::concrete<T,core22>   filter22;
-typedef gammatone::filter::concrete<T,core31>   filter31;
-typedef gammatone::filter::concrete<T,core32>   filter32;
+using filter11 = filter::concrete<T,c1,b,g1>;
+using filter22 = filter::concrete<T,c2,b,g2>;
+using filter31 = filter::concrete<T,c3,b,g1>;
+using filter12 = filter::concrete<T,c1,b,g2>;
+using filter21 = filter::concrete<T,c2,b,g1>;
+using filter32 = filter::concrete<T,c3,b,g2>;
 
 
 
@@ -128,7 +129,7 @@ int main()
   //////////////////////////
 
   // 3000 Hz IR
-  using ir = gammatone::impulse_response;
+  using ir = impulse_response;
   const T f = 3000;
   const auto t = ir::time(fs,0.01);
   std::vector<DataType> ir_base;

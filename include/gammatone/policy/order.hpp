@@ -141,9 +141,8 @@ namespace gammatone
   }
 }
 
-/*
-  non const version
-*/
+
+//  non const version
 
 template<class Container>
 typename Container::reverse_iterator gammatone::policy::order::increasing::begin(Container& container)
@@ -170,10 +169,7 @@ typename Container::iterator gammatone::policy::order::decreasing::end(Container
 }
 
 
-/*
-  const version
-*/
-
+//  const version
 
 template<class Container>
 typename Container::const_reverse_iterator gammatone::policy::order::increasing::begin(const Container& container)
@@ -198,7 +194,5 @@ typename Container::const_iterator gammatone::policy::order::decreasing::end(con
 {
   return container.end();
 }
-
-
 
 #endif // GAMMATONE_POLICY_ORDER_HPP

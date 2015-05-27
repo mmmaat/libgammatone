@@ -155,7 +155,11 @@ namespace gammatone
       /*!
         \tparam OrderPolicy  Policy for ordering frequency channels. See policy::order.
       */
-      template<class Scalar, class OrderPolicy = order::increasing>
+      template
+      <
+	class Scalar,
+	class OrderPolicy = order::increasing
+	>
       class fixed_size : public base
       {
       public:
@@ -212,7 +216,11 @@ namespace gammatone
       /*!
         \tparam OrderPolicy  Policy for ordering frequency channels. See policy::order.
       */
-      template<class Scalar, class OrderPolicy = order::increasing>
+      template
+      <
+	class Scalar,
+	class OrderPolicy = order::increasing
+	>
       class fixed_overlap : public base
       {
       public:

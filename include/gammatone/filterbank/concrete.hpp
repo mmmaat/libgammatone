@@ -23,7 +23,6 @@
 #include <gammatone/filterbank/interface.hpp>
 #include <gammatone/filter/concrete.hpp>
 #include <gammatone/policy/channels.hpp>
-#include <gammatone/core/cooke1993.hpp>
 #include <utility>
 #include <vector>
 
@@ -46,20 +45,40 @@ namespace gammatone
     template
     <
       class Scalar,
-      class Core                 = core::cooke1993<Scalar>,
-      class BandwidthPolicy      = policy::bandwidth::glasberg1990<Scalar>,
-      class ChannelsPolicy       = policy::channels::fixed_size<Scalar>,
-      class PostProcessingPolicy = policy::postprocessing::off<Scalar>
+      template<class...> class Core               = core::cooke1993,
+      template<class> class BandwidthPolicy       = policy::bandwidth::glasberg1990,
+      template<class...> class ChannelsPolicy     = policy::channels::fixed_size,
+      class OrderPolicy                           = policy::order::increasing,
+      class GainPolicy                            = policy::gain::forall_0dB,
+      class ClippingPolicy                        = policy::clipping::off,
+      template<class> class PostProcessingPolicy  = policy::postprocessing::off
       >
-    class concrete : public ::gammatone::filterbank::interface<Scalar>
+    class concrete : public gammatone::filterbank::interface<Scalar>
     {
+      //! type of *this
+      using concrete_type =
+        concrete<Scalar,
+                 Core,
+                 BandwidthPolicy,
+                 ChannelsPolicy,
+                 OrderPolicy,
+                 GainPolicy,
+                 ClippingPolicy,
+                 PostProcessingPolicy>;
+
     public:
 
       //! Type of the underlying gammatone filter
-      typedef ::gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,PostProcessingPolicy> filter_type;
+      using filter_type = gammatone::filter::
+        concrete<Scalar,
+                 Core,
+                 BandwidthPolicy,
+                 GainPolicy,
+                 ClippingPolicy,
+                 PostProcessingPolicy>;
 
       //! Type of the output container
-      typedef typename ::gammatone::filterbank::interface<Scalar>::output_type output_type;
+      typedef typename gammatone::filterbank::interface<Scalar>::output_type output_type;
 
       //! Type of the underlying bank of filters
       typedef std::vector<filter_type > bank_type;
@@ -102,14 +121,13 @@ namespace gammatone
       concrete(const Scalar& sample_frequency,
                const Scalar& low_frequency,
                const Scalar& high_frequency,
-               const typename ChannelsPolicy::param_type& channels_parameter);
+               const typename ChannelsPolicy<Scalar,OrderPolicy>::param_type& channels_parameter);
 
       //! Copy constructor
-      concrete(const concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>& other);
+      concrete(const concrete_type& other);
 
       //! Assignment operator
-      concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>& operator=
-      (const concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>& other);
+      concrete_type& operator=(const concrete_type& other);
 
       //! Destructor.
       virtual ~concrete();
@@ -166,50 +184,132 @@ namespace gammatone
   }
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+//! \todo Merge the 2 follinwing functions
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 concrete(const Scalar& sample_frequency,
          const Scalar& low_cf,
          const Scalar& high_cf)
 {
-  const std::vector<Scalar> cf = ChannelsPolicy::template center_frequency<BandwidthPolicy>(low_cf,high_cf);
+  const std::vector<Scalar> cf = ChannelsPolicy<Scalar,OrderPolicy>::
+    template center_frequency<BandwidthPolicy<Scalar> >(low_cf,high_cf);
+
   this->m_nb_channels = cf.size();
 
   std::for_each(cf.begin(),cf.end(), [&](const auto& f)
                 {this->m_bank.push_back( filter_type( sample_frequency, f));});
 }
 
-
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 concrete(const Scalar& sample_frequency,
          const Scalar& low_cf,
          const Scalar& high_cf,
-         const typename ChannelsPolicy::param_type& channels_parameter)
+         const typename ChannelsPolicy<Scalar,OrderPolicy>::param_type& channels_parameter)
 {
-  const std::vector<Scalar> cf =
-    ChannelsPolicy::template center_frequency<BandwidthPolicy>(low_cf,high_cf,channels_parameter);
+  const std::vector<Scalar> cf = ChannelsPolicy<Scalar,OrderPolicy>::
+    template center_frequency<BandwidthPolicy<Scalar> >(low_cf,high_cf,channels_parameter);
+
   this->m_nb_channels = cf.size();
 
   std::for_each(cf.begin(),cf.end(), [&](const auto& f)
                 {this->m_bank.push_back( filter_type( sample_frequency, f));});
 }
 
-
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
-concrete(const concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>& other)
-  : m_nb_channels(other.m_nb_channels),
-    m_bank(other.m_bank)
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
+concrete(const concrete_type& other)
+: m_nb_channels(other.m_nb_channels),
+  m_bank(other.m_bank)
 {}
 
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>&
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
-operator=(const concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>& other)
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>&
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
+operator=(const concrete_type& other)
 {
-  concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy> tmp( other );
+  concrete_type tmp( other );
 
   std::swap( this->m_nb_channels, other.m_nb_channels );
   std::swap( this->m_bank, other.m_bank );
@@ -217,28 +317,108 @@ operator=(const concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessi
   return *this;
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 ~concrete()
 {}
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-void gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+void gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 reset()
 {
   for(auto& b:this->m_bank) b.reset();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-Scalar gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+Scalar gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 sample_frequency() const
 {
   return this->begin()->sample_frequency();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::output_type
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::output_type
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 center_frequency() const
 {
   output_type out(this->nb_channels());
@@ -247,9 +427,35 @@ center_frequency() const
   return std::move(out);
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::output_type
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::output_type
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 bandwidth() const
 {
   output_type out(this->nb_channels());
@@ -258,9 +464,35 @@ bandwidth() const
   return std::move(out);
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::output_type
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::output_type
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 gain() const
 {
   output_type out(this->nb_channels());
@@ -269,80 +501,332 @@ gain() const
   return std::move(out);
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-std::size_t gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+std::size_t gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 nb_channels() const
 {
   return m_nb_channels;
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::const_iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::const_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 begin() const
 {
   return m_bank.begin();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::const_iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::const_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 end() const
 {
   return m_bank.end();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::const_reverse_iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::const_reverse_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 rbegin() const
 {
   return m_bank.rbegin();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::const_reverse_iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::const_reverse_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 rend() const
 {
   return m_bank.rend();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 begin()
 {
   return m_bank.begin();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::iterator
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 end()
 {
   return m_bank.end();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
-reverse_iterator gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::reverse_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 rbegin()
 {
   return m_bank.rbegin();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
-reverse_iterator gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::reverse_iterator
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 rend()
 {
   return m_bank.rend();
 }
 
-template<class Scalar, class Core, class BandwidthPolicy, class ChannelsPolicy, class PostProcessingPolicy>
-typename gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::output_type
-gammatone::filterbank::concrete<Scalar,Core,BandwidthPolicy,ChannelsPolicy,PostProcessingPolicy>::
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class...> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+typename gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::output_type
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
 compute_internal(const Scalar& input)
 {
   output_type out(this->nb_channels());
@@ -352,24 +836,3 @@ compute_internal(const Scalar& input)
 }
 
 #endif // GAMMATONE_FILTERBANK_CONCRETE_HPP
-
-// template<class Scalar>
-// template<class InputIterator, class OutputIterator>
-// void gammatone::filterbank::interface<Scalar>::
-// compute(const InputIterator& first, const InputIterator& last, const OutputIterator& result)
-// {
-//   std::transform(first,last,result,[&](const auto& x){return this->compute(x);});
-// }
-
-// template<class Scalar>
-// template<class NestedContainer>
-// NestedContainer gammatone::filterbank::interface<Scalar>::
-// compute(const typename NestedContainer::value_type& input)
-// {
-//   // Allocation of output nested container
-//   NestedContainer out(input.size());
-//   std::for_each(out.begin(),out.end(),[&](auto& x){x.assign(this->nb_channels(),0);});
-
-//   this->compute(input.begin(),input.end(),out.begin());
-//   return std::move(out);
-// }

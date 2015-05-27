@@ -41,7 +41,7 @@ namespace gammatone
       \tparam Scalar  Type of the scalars.
     */
     template<class Scalar>
-    class holder : public ::gammatone::filter::interface<Scalar>
+    class holder : public gammatone::filter::interface<Scalar>
     {
     public:
 

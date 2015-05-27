@@ -73,12 +73,17 @@ BOOST_AUTO_TEST_CASE(iteration_test)
 
 BOOST_AUTO_TEST_CASE(filterbank_test)
 {
-  namespace gpc = gammatone::policy::channels;
-  namespace gpo = gammatone::policy::order;
-  typedef gammatone::core::cooke1993<T> core;
-  typedef gammatone::policy::bandwidth::glasberg1990<T> bandwidth;
-  typedef gammatone::filterbank::concrete<T,core,bandwidth,gpc::fixed_size<T,gpo::increasing> > increasing_fb;
-  typedef gammatone::filterbank::concrete<T,core,bandwidth,gpc::fixed_size<T,gpo::decreasing> > decreasing_fb;
+  using increasing_fb = gammatone::filterbank::concrete<T,
+                                                        gammatone::core::cooke1993,
+                                                        gammatone::policy::bandwidth::glasberg1990,
+                                                        gammatone::policy::channels::fixed_size,
+                                                        gammatone::policy::order::increasing>;
+
+  using decreasing_fb = gammatone::filterbank::concrete<T,
+                                                        gammatone::core::cooke1993,
+                                                        gammatone::policy::bandwidth::glasberg1990,
+                                                        gammatone::policy::channels::fixed_size,
+                                                        gammatone::policy::order::decreasing>;
 
   const T fs = 44100, lf = 500, hf = 8000, nbc = 10;
   increasing_fb fi(fs,lf,hf,nbc);
