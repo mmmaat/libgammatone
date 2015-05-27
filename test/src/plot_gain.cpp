@@ -18,7 +18,6 @@
 */
 
 #include <gammatone/gammatone.hpp>
-//#include <gammatoneutils/range.hpp>
 #include <gnuplot-iostream.h>
 #include <fstream>
 #include <string>
@@ -42,12 +41,13 @@ template<class... X> using c2 = core::cooke1993<X...>;
 template<class... X> using c3 = core::slaney1993<X...>;
 
 // filterbank types
-using filterbank11 = filterbank::concrete<T,c1,b,c,o,g1>;
-using filterbank22 = filterbank::concrete<T,c2,b,c,o,g2>;
-using filterbank31 = filterbank::concrete<T,c3,b,c,o,g1>;
-using filterbank12 = filterbank::concrete<T,c1,b,c,o,g2>;
-using filterbank21 = filterbank::concrete<T,c2,b,c,o,g1>;
-using filterbank32 = filterbank::concrete<T,c3,b,c,o,g2>;
+using filterbank11 = filterbank::concrete<T,c1,b,policy::channels::fixed_size,o,g1>;
+using filterbank22 = filterbank::concrete<T,c2,b,policy::channels::fixed_size,o,g2>;
+using filterbank31 = filterbank::concrete<T,c3,b,policy::channels::fixed_size,o,g1>;
+
+using filterbank12 = filterbank::concrete<T,c1,b,policy::channels::fixed_size,o,g2>;
+using filterbank21 = filterbank::concrete<T,c2,b,policy::channels::fixed_size,o,g1>;
+using filterbank32 = filterbank::concrete<T,c3,b,policy::channels::fixed_size,o,g2>;
 
 // filter types
 using filter11 = filter::concrete<T,c1,b,g1>;

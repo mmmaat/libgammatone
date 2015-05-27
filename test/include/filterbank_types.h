@@ -19,8 +19,8 @@ template<class X> using b2 = gammatone::policy::bandwidth::slaney1988<X>;
 template<class X> using b3 = gammatone::policy::bandwidth::greenwood1990<X>;
 
 // channels
-template<class... X> using c1 = gammatone::policy::channels::fixed_size<X...>;
-template<class... X> using c2 = gammatone::policy::channels::fixed_overlap<X...>;
+template<class X1,template<class> class X2,class X3> using c1 = gammatone::policy::channels::fixed_size<X1,X2,X3>;
+template<class X1,template<class> class X2,class X3> using c2 = gammatone::policy::channels::fixed_overlap<X1,X2,X3>;
 
 // orders
 using d1 = gammatone::policy::order::increasing;

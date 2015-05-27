@@ -19,6 +19,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <gammatone/policy/channels.hpp>
+#include <gammatone/policy/order.hpp>
 #include <gammatone/filterbank/concrete.hpp>
 #include <gammatone/detail/utils.hpp>
 #include <vector>
@@ -42,6 +43,8 @@ BOOST_AUTO_TEST_CASE(silly_test)
   using namespace gammatone::policy::order;
   BOOST_CHECK(increasing::begin(v) == increasing::end(v) );
   BOOST_CHECK(decreasing::begin(v) == decreasing::end(v) );
+  // BOOST_CHECK(increasing::begin(v) == decreasing::end(v) );
+  // BOOST_CHECK(decreasing::begin(v) == increasing::end(v) );
 }
 
 
@@ -73,17 +76,18 @@ BOOST_AUTO_TEST_CASE(iteration_test)
 
 BOOST_AUTO_TEST_CASE(filterbank_test)
 {
-  using increasing_fb = gammatone::filterbank::concrete<T,
-                                                        gammatone::core::cooke1993,
-                                                        gammatone::policy::bandwidth::glasberg1990,
-                                                        gammatone::policy::channels::fixed_size,
-                                                        gammatone::policy::order::increasing>;
+  using namespace gammatone;
+  using increasing_fb = filterbank::concrete<T,
+                                             core::cooke1993,
+                                             policy::bandwidth::glasberg1990,
+                                             policy::channels::fixed_size>;//,
+    //                                             policy::order::increasing>;
 
-  using decreasing_fb = gammatone::filterbank::concrete<T,
-                                                        gammatone::core::cooke1993,
-                                                        gammatone::policy::bandwidth::glasberg1990,
-                                                        gammatone::policy::channels::fixed_size,
-                                                        gammatone::policy::order::decreasing>;
+  using decreasing_fb = filterbank::concrete<T,
+                                             core::cooke1993,
+                                             policy::bandwidth::glasberg1990,
+                                             policy::channels::fixed_size,
+                                             policy::order::decreasing>;
 
   const T fs = 44100, lf = 500, hf = 8000, nbc = 10;
   increasing_fb fi(fs,lf,hf,nbc);

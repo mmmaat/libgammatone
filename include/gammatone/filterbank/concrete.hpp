@@ -23,6 +23,7 @@
 #include <gammatone/filterbank/interface.hpp>
 #include <gammatone/filter/concrete.hpp>
 #include <gammatone/policy/channels.hpp>
+#include <gammatone/policy/order.hpp>
 #include <utility>
 #include <vector>
 
@@ -47,7 +48,7 @@ namespace gammatone
       class Scalar,
       template<class...> class Core               = core::cooke1993,
       template<class> class BandwidthPolicy       = policy::bandwidth::glasberg1990,
-      template<class...> class ChannelsPolicy     = policy::channels::fixed_size,
+      template<class,template<class> class,class> class ChannelsPolicy     = policy::channels::fixed_size,
       class OrderPolicy                           = policy::order::increasing,
       class GainPolicy                            = policy::gain::forall_0dB,
       class ClippingPolicy                        = policy::clipping::off,
@@ -55,7 +56,9 @@ namespace gammatone
       >
     class concrete : public gammatone::filterbank::interface<Scalar>
     {
-      //! type of *this
+    private:
+
+      //! Type of *this
       using concrete_type =
         concrete<Scalar,
                  Core,
@@ -66,9 +69,12 @@ namespace gammatone
                  ClippingPolicy,
                  PostProcessingPolicy>;
 
+      //! Type of the parameter for channels computation
+      using param_type = typename ChannelsPolicy<Scalar,BandwidthPolicy,OrderPolicy>::param_type;
+
     public:
 
-      //! Type of the underlying gammatone filter
+      //! Type of the underlying gammatone filters
       using filter_type = gammatone::filter::
         concrete<Scalar,
                  Core,
@@ -78,33 +84,22 @@ namespace gammatone
                  PostProcessingPolicy>;
 
       //! Type of the output container
-      typedef typename gammatone::filterbank::interface<Scalar>::output_type output_type;
+      using output_type = typename gammatone::filterbank::interface<Scalar>::output_type;
 
       //! Type of the underlying bank of filters
-      typedef std::vector<filter_type > bank_type;
+      using bank_type = std::vector<filter_type >;
 
       //! Const iterator on filters
-      typedef typename bank_type::const_iterator const_iterator;
+      using const_iterator = typename bank_type::const_iterator;
 
       //! Const reverse iterator on filters
-      typedef typename bank_type::const_reverse_iterator const_reverse_iterator;
+      using const_reverse_iterator = typename bank_type::const_reverse_iterator;
 
       //! Iterator on filters
-      typedef typename bank_type::iterator iterator;
+      using iterator = typename bank_type::iterator;
 
       //! Reverse iterator on filters
-      typedef typename bank_type::reverse_iterator reverse_iterator;
-
-
-      //! Create a gammatone filterbank from explicit parameters.
-      /*!
-        \param sample_frequency    The sample frequency of the input signal (Hz)
-        \param low_frequency       The lowest center frequency in the filterbank (Hz)
-        \param high_frequency      The highest center frequency in the filterbank (Hz)
-      */
-      concrete(const Scalar& sample_frequency,
-               const Scalar& low_frequency,
-               const Scalar& high_frequency);
+      using reverse_iterator = typename bank_type::reverse_iterator;
 
 
       //! Create a gammatone filterbank from explicit parameters.
@@ -121,7 +116,7 @@ namespace gammatone
       concrete(const Scalar& sample_frequency,
                const Scalar& low_frequency,
                const Scalar& high_frequency,
-               const typename ChannelsPolicy<Scalar,OrderPolicy>::param_type& channels_parameter);
+               const param_type& channels_parameter = ChannelsPolicy<Scalar,BandwidthPolicy,OrderPolicy>::default_parameter());
 
       //! Copy constructor
       concrete(const concrete_type& other);
@@ -140,11 +135,27 @@ namespace gammatone
       void reset();
 
 
-      //! Accessor to the number of frequency channels in the bank.
+      //! The number of frequency channels in the filterbank.
       /*!
         \return The number of channels in the filterbank.
       */
       std::size_t nb_channels() const;
+
+
+      //! The bandwidth overlap factor between two successive filters.
+      /*!
+
+        An overlap factor close to zero indicate filters nearly
+        completly overlapped, an overlap factor of 0.5 means that each
+        frequency in the input signal is "sampled" by two cochlear
+        channels, and an overlap factor of 1 means that there is almost
+        no overlap between channels.
+
+        \return The filterbank overlap factor
+
+        \see policy::channels
+      */
+      Scalar overlap() const;
 
       //! Const iterator to begin
       const_iterator begin() const;
@@ -178,52 +189,21 @@ namespace gammatone
       //! The number of frequency channels
       std::size_t m_nb_channels;
 
+      //! The filterbank overlap factor
+      Scalar m_overlap;
+
       //! The underlying gammatone filter array
       bank_type m_bank;
     };
   }
 }
 
-//! \todo Merge the 2 follinwing functions
 template
 <
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
-  class OrderPolicy,
-  class GainPolicy,
-  class ClippingPolicy,
-  template<class> class PostProcessingPolicy
-  >
-gammatone::filterbank::
-concrete<Scalar,
-         Core,
-         BandwidthPolicy,
-         ChannelsPolicy,
-         OrderPolicy,
-         GainPolicy,
-         ClippingPolicy,
-         PostProcessingPolicy>::
-concrete(const Scalar& sample_frequency,
-         const Scalar& low_cf,
-         const Scalar& high_cf)
-{
-  const std::vector<Scalar> cf = ChannelsPolicy<Scalar,OrderPolicy>::
-    template center_frequency<BandwidthPolicy<Scalar> >(low_cf,high_cf);
-
-  this->m_nb_channels = cf.size();
-
-  std::for_each(cf.begin(),cf.end(), [&](const auto& f)
-                {this->m_bank.push_back( filter_type( sample_frequency, f));});
-}
-
-template
-<
-  class Scalar,
-  template<class...> class Core,
-  template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -241,11 +221,12 @@ concrete<Scalar,
 concrete(const Scalar& sample_frequency,
          const Scalar& low_cf,
          const Scalar& high_cf,
-         const typename ChannelsPolicy<Scalar,OrderPolicy>::param_type& channels_parameter)
+         const param_type& channels_parameter)
 {
-  const std::vector<Scalar> cf = ChannelsPolicy<Scalar,OrderPolicy>::
-    template center_frequency<BandwidthPolicy<Scalar> >(low_cf,high_cf,channels_parameter);
+  const auto p = ChannelsPolicy<Scalar,BandwidthPolicy,OrderPolicy>::setup(low_cf,high_cf,channels_parameter);
+  const auto& cf = p.first;
 
+  this->m_overlap = p.second;
   this->m_nb_channels = cf.size();
 
   std::for_each(cf.begin(),cf.end(), [&](const auto& f)
@@ -257,7 +238,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -274,6 +255,7 @@ concrete<Scalar,
          PostProcessingPolicy>::
 concrete(const concrete_type& other)
 : m_nb_channels(other.m_nb_channels),
+  m_overlap(other.m_overlap),
   m_bank(other.m_bank)
 {}
 
@@ -283,7 +265,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -312,6 +294,7 @@ operator=(const concrete_type& other)
   concrete_type tmp( other );
 
   std::swap( this->m_nb_channels, other.m_nb_channels );
+    std::swap( this->m_overlap, other.m_overlap );
   std::swap( this->m_bank, other.m_bank );
 
   return *this;
@@ -322,7 +305,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -345,7 +328,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -370,7 +353,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -395,7 +378,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -432,7 +415,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -469,7 +452,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -506,7 +489,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -531,7 +514,32 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+Scalar gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
+overlap() const
+{
+  return m_overlap;
+}
+
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -565,7 +573,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -599,7 +607,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -633,7 +641,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -667,7 +675,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -701,7 +709,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -735,7 +743,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -769,7 +777,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,
@@ -803,7 +811,7 @@ template
   class Scalar,
   template<class...> class Core,
   template<class> class BandwidthPolicy,
-  template<class...> class ChannelsPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
   class OrderPolicy,
   class GainPolicy,
   class ClippingPolicy,

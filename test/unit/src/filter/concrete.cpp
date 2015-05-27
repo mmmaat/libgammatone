@@ -21,6 +21,7 @@
 #include <boost/test/test_case_template.hpp>
 #include <filter_types.h>
 #include <test_utils.hpp>
+#include <iostream>
 using namespace gammatone;
 
 template<class Filter>
@@ -33,7 +34,7 @@ protected:
   };
 
   const T fs = 44100;
-  // cf below 10 don't pass reset_works()
+  // cf below 10 don't pass reset_works()... sometimes, not all the times.
   const std::vector<T> cf = {20,100,451.215,2351.2,6842,12504,15478,fs/2};
   std::vector<Filter> filters;
   std::vector<T> signal;
@@ -115,6 +116,8 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types, fixture<F>)
       std::transform(c.begin(),c.end(),c1.begin(),d1.begin(),
                      [&](const T& x,const T& y){return x-y;});
       bool b1 = std::all_of(d1.begin(),d1.end(),[](const T& x){return x==0;});
+      if(b1)
+	std::cout << f.center_frequency() << std::endl;
       BOOST_CHECK_EQUAL(false,b1);
 
       f.reset();

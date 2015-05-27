@@ -23,6 +23,11 @@
 #include <test_utils.hpp>
 using namespace gammatone;
 
+// template<class... X> using core      = gammatone::core::cooke1993<X...>;
+// template<class X>    using bandwidth = gammatone::policy::bandwidth::glasberg1990<X>;
+// template<class... X> using channels  = gammatone::policy::channels::fixed_size<X...>;
+
+
 class fixture
 {
 protected:
@@ -56,33 +61,37 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture)
     }
 }
 
-
 //================================================
 
-// BOOST_FIXTURE_TEST_CASE_TEMPLATE(center_frequencies_works, F, filterbank_types, fixture)
-// {
-//   const T m_sample_frequency = 44100;
-//   //  const T m_nb_channels = 20;
-//   const T m_low = 500, m_high = 8000;
+BOOST_AUTO_TEST_CASE(center_frequencies_works)
+{
+  const T m_sample_frequency = 44100;
+  //  const T m_nb_channels = 20;
+  const T m_low = 500, m_high = 8000;
 
-//   using namespace gammatone::filterbank;
-//   using namespace gammatone::policy;
-//   typedef gammatone::core::cooke1993<T> core;
-//   typedef bandwidth::glasberg1990<T> bandwidth;
-//   typedef concrete<T,core,bandwidth,channels::fixed_size<T,order::increasing> > increasing;
-//   typedef concrete<T,core,bandwidth,channels::fixed_size<T,order::decreasing> > decreasing;
+  using namespace gammatone::filterbank;
+  using namespace gammatone::policy;
+  using decreasing = concrete<T, gammatone::core::cooke1993,
+                              bandwidth::glasberg1990,
+                              channels::fixed_size,
+                              order::decreasing>;
 
-//   increasing fi(m_sample_frequency,m_low,m_high);
-//   EXPECT_LE( m_low, fi.begin()->center_frequency() );
-//   EXPECT_EQ( m_high, fi.rbegin()->center_frequency() );
+  using increasing = concrete<T, gammatone::core::cooke1993,
+                              bandwidth::glasberg1990,
+                              channels::fixed_size,
+                              order::increasing>;
 
-//   decreasing fd(m_sample_frequency,m_low,m_high);
-//   EXPECT_EQ( m_high, fd.begin()->center_frequency() );
-//   EXPECT_LE( m_low, fd.rbegin()->center_frequency() );
+  increasing fi(m_sample_frequency,m_low,m_high);
+  BOOST_CHECK_LE( m_low, fi.begin()->center_frequency() );
+  BOOST_CHECK_EQUAL( m_high, fi.rbegin()->center_frequency() );
 
-//   auto it=fi.begin(); auto it2=fd.rbegin();
-//   while(it!=fi.end())
-//     EXPECT_EQ(it++->center_frequency(), it2++->center_frequency());
-// }
+  decreasing fd(m_sample_frequency,m_low,m_high);
+  BOOST_CHECK_EQUAL( m_high, fd.begin()->center_frequency() );
+  BOOST_CHECK_LE( m_low, fd.rbegin()->center_frequency() );
+
+  auto it=fi.begin(); auto it2=fd.rbegin();
+  while(it!=fi.end())
+    BOOST_CHECK_EQUAL(it++->center_frequency(), it2++->center_frequency());
+}
 
 BOOST_AUTO_TEST_SUITE_END()

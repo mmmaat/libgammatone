@@ -29,11 +29,11 @@ using namespace std;
 
 using T = double;
 template<class... X> using a = gammatone::core::convolution<X...>;
-template<class X> using b = gammatone::policy::bandwidth::glasberg1990<X>;
+template<class X>    using b = gammatone::policy::bandwidth::glasberg1990<X>;
 template<class... X> using c = gammatone::policy::channels::fixed_size<X...>;
 using d = gammatone::policy::order::increasing;
 using e = gammatone::policy::gain::forall_0dB;
-using filterbank = gammatone::filterbank::concrete<T,a,b,c,d,e>;
+using filterbank = gammatone::filterbank::concrete<T,a,b,gammatone::policy::channels::fixed_size,d,e>;
 
 const T duration = 0.02;
 const T sample_frequency = 44100;
