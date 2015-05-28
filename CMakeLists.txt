@@ -1,18 +1,14 @@
+cmake_minimum_required(VERSION 3.2)
 
-cmake_minimum_required(VERSION 2.8)
-project(libgammatone)
+project(libgammatone VERSION 0.1)
 
-set(CMAKE_CXX_COMPILER c++)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
+#set(CMAKE_BUILD_TYPE Release)
 
-# configure boost
-find_package(Boost 1.55 REQUIRED COMPONENTS system filesystem iostreams program_options unit_test_framework)
-link_directories(${DEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
-add_definitions(${DEPS_CFLAGS_OTHER})
-
-include_directories(${Boost_INCLUDE_DIR} include)  
+# libgammatone headers
+include_directories(include)
 
 add_subdirectory(test)
-add_subdirectory(doc)
-add_subdirectory(doc/exemple)
+add_subdirectory(doc EXCLUDE_FROM_ALL)
+
