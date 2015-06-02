@@ -19,20 +19,20 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/test_case_template.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 #include <gammatone/detail/impulse_response.hpp>
-
 #include <filter_types.h>
+#include <iostream>
 
 template<class Filter>
-class fixture
+class fixture2
 {
 protected:
-  fixture() : filter(fs,fc){}
-  ~fixture(){}
+  fixture2():filter(fs,fc){}
+  ~fixture2(){}
   
-  typedef typename Filter::scalar_type T;
   const T fs = 44100;
-  const T fc = 2000;
+  const T fc = 3000;
   const T duration = 0.01;
   const T attenuation = -60;
   Filter filter;
@@ -45,26 +45,27 @@ BOOST_AUTO_TEST_SUITE(detail_impulse_response)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(fs_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(fixture2_works, F, filter_types, fixture2<F>)
 {
-  BOOST_CHECK_EQUAL(this->fs, this->filter.sample_frequency());
+   BOOST_CHECK_EQUAL(this->fs, this->filter.sample_frequency());
+   BOOST_CHECK_EQUAL(this->fc, this->filter.center_frequency());
 }
 
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types, fixture2<F>)
 {
   const auto time = impulse_response::time(this->filter.sample_frequency(), this->duration);
   const auto mm = std::minmax_element(time.begin(),time.end());
-
+  
   // increasing order
   BOOST_CHECK( std::adjacent_find(time.begin(), time.end(), std::greater<int>()) == time.end());
 
   // size, min and max
   BOOST_CHECK_EQUAL( time.size(), this->fs*this->duration+1);
-  BOOST_CHECK_EQUAL( *mm.first, 0);
-  BOOST_CHECK_EQUAL( *time.begin(), 0);
+  BOOST_CHECK_EQUAL( *mm.first, 0.0);
+  BOOST_CHECK_EQUAL( *time.begin(), 0.0);
   BOOST_CHECK_EQUAL( *mm.second, this->duration);
   BOOST_CHECK_EQUAL( *time.rbegin(), this->duration);
 }
@@ -72,7 +73,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types, fixture<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types, fixture2<F>)
 {
   const auto ir = impulse_response::theorical(this->filter,this->duration);
 
@@ -85,7 +86,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types, fixture<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types, fixture2<F>)
 {
   const auto ir = impulse_response::theorical_attenuate(this->filter.center_frequency(),
                                                         this->filter.bandwidth(),
@@ -101,7 +102,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types, fixture<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(max_duration_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(max_duration_works, F, filter_types, fixture2<F>)
 {
   // test 1s
   std::size_t size = 44100+1;
@@ -117,7 +118,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(max_duration_works, F, filter_types, fixture<F>
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(implemented_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(implemented_works, F, filter_types, fixture2<F>)
 {
   const auto ir = impulse_response::implemented(this->filter,this->duration);
 
@@ -130,7 +131,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(implemented_works, F, filter_types, fixture<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(polymorphism_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(polymorphism_works, F, filter_types, fixture2<F>)
 {
   const auto t  = impulse_response::time(this->filter.sample_frequency(), this->duration);
   const auto it = impulse_response::theorical(this->filter, t.begin(), t.end());

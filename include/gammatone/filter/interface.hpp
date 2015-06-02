@@ -65,11 +65,19 @@ namespace gammatone
       template<class InputIterator, class OutputIterator>
       void compute(const InputIterator& first,
                    const InputIterator& last,
-                   const OutputIterator& result)
+                   const OutputIterator& output)
       {
-        std::transform(first,last,result,[&](const auto& x){return this->compute_internal(x);});
+        std::transform(first,last,output,[&](const auto& x){return this->compute_internal(x);});
       }
 
+      void compute(const std::size_t& size,
+		   const Scalar* input,
+		   Scalar* output)
+      {
+	for(std::size_t i=0;i<size;++i)
+	  output[i] = this->compute_internal(input[i]);
+      }
+      
     };
   }
 }

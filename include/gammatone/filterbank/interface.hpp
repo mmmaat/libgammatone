@@ -64,6 +64,19 @@ namespace gammatone
         std::transform(first,last,result,[&](const auto& x){return this->compute_internal(x);});
       }
 
+      void compute(const std::size_t& xsize,
+		   const std::size_t& ysize,
+		   const Scalar* input,
+		   Scalar* output)
+      {
+	for(std::size_t i=0;i<xsize;++i)
+	  {
+	    const auto out_i = this->compute_internal(input[i]);
+	    for(std::size_t j=0;j<ysize;++j)
+	      output[i*ysize+j] = out_i[j];
+	  }
+      }
+
     };
   }
 }

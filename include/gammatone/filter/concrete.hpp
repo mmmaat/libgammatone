@@ -27,6 +27,8 @@
 #include <gammatone/policy/clipping.hpp>
 #include <gammatone/policy/postprocessing.hpp>
 
+//#include <iostream>
+
 namespace gammatone
 {
   namespace filter
@@ -124,7 +126,9 @@ concrete(const Scalar& sample_frequency,
     m_center_frequency( center_frequency ),
     m_bandwidth( BandwidthPolicy<Scalar>::bandwidth(center_frequency) ),
     m_core( m_sample_frequency, m_center_frequency, m_bandwidth )
-{}
+{
+  //  std::cout << "ctor: " << m_sample_frequency<< " ";
+}
 
 template
 <

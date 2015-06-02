@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_SUITE(filterbank_concrete_test)
 
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture)
 {
-  using namespace gammatone;
+  //  using namespace gammatone;
   F m_filterbank( this->m_sample_frequency,this->m_low,this->m_high );
 
   BOOST_CHECK_EQUAL( this->m_sample_frequency, m_filterbank.sample_frequency() );
@@ -93,5 +93,42 @@ BOOST_AUTO_TEST_CASE(center_frequencies_works)
   while(it!=fi.end())
     BOOST_CHECK_EQUAL(it++->center_frequency(), it2++->center_frequency());
 }
+
+
+
+//================================================
+
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types, fixture)
+{  
+  const auto x = random<double>(-1.0,1.0,1000);
+  F f(this->m_sample_frequency,this->m_low,this->m_high);
+
+  const auto xsize = x.size();
+  const auto ysize = f.nb_channels();
+  
+  f.reset();
+  std::vector<std::vector<T> > c1 = f.compute(x);
+  
+  f.reset();
+  std::vector<std::vector<T> > c2(xsize,std::vector<double>(ysize));
+  f.compute(x.begin(),x.end(),c2.begin());
+  
+  f.reset();
+  std::vector<std::vector<T> > c3(xsize,std::vector<double>(ysize));
+  std::transform(x.begin(),x.end(),c3.begin(),[&](const T& xx){return f.compute(xx);});
+  
+  f.reset();
+  std::vector<T> c4(xsize*ysize);
+  f.compute(xsize,ysize,x.data(),c4.data());
+  
+  for(std::size_t i=0;i<xsize;i++)
+    for(std::size_t j=0;j<ysize;j++)
+    {
+      BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
+      BOOST_CHECK_EQUAL(c1[i][j],c3[i][j]);
+      BOOST_CHECK_EQUAL(c1[i][j],c4[i*ysize+j]);
+    }
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

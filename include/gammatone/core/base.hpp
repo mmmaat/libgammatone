@@ -31,6 +31,9 @@ namespace gammatone
     /*!
       \class base
 
+      This base class provides all facilities needed by concrete cores
+      but leave reset() and compute() abstracts.
+
       \tparam Scalar         Type of scalar values
       \tparam GainPolicy     Policy for gain computation, see policy::gain .
     */
@@ -80,7 +83,7 @@ namespace gammatone
                                 const Scalar& center_frequency,
                                 const Scalar& bandwidth);
 
-      //! 2\pi / f_s
+      //! \f$ 2\pi / f_s \f$
       const Scalar m_tau;
 
       //! Inverse of the filter gain

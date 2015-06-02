@@ -47,11 +47,12 @@ Container random(const Value& min,
 
 template<class Container = std::vector<double> >
 Container make_sinus(const typename Container::value_type& fs,
-                     const typename Container::value_type& f)
+                     const typename Container::value_type& f,
+		     const std::size_t size = 10000)
 {
   typedef typename Container::value_type T;
 
-  Container sinus(10000);
+  Container sinus(size);
   T t = 0;
   for_each(sinus.begin(),sinus.end(),[&](T& x){x=sin(2*boost::math::constants::pi<T>()*f*t++/fs);});
   return std::move(sinus);

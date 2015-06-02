@@ -68,10 +68,6 @@ namespace gammatone
 
     private:
 
-      // inline Scalar find_factor(const Scalar& sample_frequency,
-      //                           const Scalar& center_frequency,
-      //                                const Scalar& bandwidth);
-
       // Filter coefficients
 
       //! \f$ c = e^{2i\pi f_c/f_s} \f$

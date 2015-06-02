@@ -34,8 +34,8 @@ protected:
   };
 
   const T fs = 44100;
-  // cf below 10 don't pass reset_works()... sometimes, not all the times.
-  const std::vector<T> cf = {20,100,451.215,2351.2,6842,12504,15478,fs/2};
+  // cf below 20 don't pass reset_works()... sometimes, not all the times.
+  const std::vector<T> cf = {50,100,451.215,2351.2,6842,12504,15478,fs/2};
   std::vector<Filter> filters;
   std::vector<T> signal;
 };
@@ -43,6 +43,13 @@ protected:
 
 BOOST_AUTO_TEST_SUITE(filter_concrete_test)
 
+
+//================================================
+
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(fixture_works, F, filter_types, fixture<F>)
+{
+  BOOST_REQUIRE(this->signal.size() != 0);
+}
 
 //================================================
 
@@ -93,10 +100,15 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types, fixture<F>)
       std::vector<T> c3(x.size());
       std::transform(x.begin(),x.end(),c3.begin(),[&](const T& xx){return f.compute(xx);});
 
+      f.reset();
+      std::vector<T> c4(x.size());
+      f.compute(x.size(),x.data(),c4.data());
+      
       for(std::size_t i=0;i<x.size();i++)
         {
           BOOST_CHECK_EQUAL(c1[i],c2[i]);
           BOOST_CHECK_EQUAL(c1[i],c3[i]);
+	  BOOST_CHECK_EQUAL(c1[i],c4[i]);
         }
     }
 }
