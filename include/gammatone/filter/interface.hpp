@@ -54,7 +54,9 @@ namespace gammatone
       template<class InputType>
       inline InputType compute(const InputType& input)
       {
-        // Any non arithmetic type is considered as a container
+        // If Input is arithmetic run internal::scalar, else run
+	// internal::container.  In other words a non arithmetic type
+	// is processed as a container
         return std::conditional<std::is_arithmetic<InputType>::value,
                                 detail::internal::scalar<interface<Scalar> >,
                                 detail::internal::container<interface<Scalar> > >

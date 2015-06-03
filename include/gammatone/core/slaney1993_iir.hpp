@@ -34,8 +34,12 @@ namespace gammatone
     {
     public:
       slaney1993_iir(const std::array<Scalar,3>& a, const std::array<Scalar,3>& b);
+
       slaney1993_iir(const slaney1993_iir<Scalar>& other);
+      slaney1993_iir(slaney1993_iir<Scalar>&& other) noexcept;
+      
       slaney1993_iir<Scalar>& operator=(const slaney1993_iir<Scalar>& other);
+      slaney1993_iir<Scalar>& operator=(slaney1993_iir<Scalar>&& other);
 
       virtual ~slaney1993_iir();
 
@@ -44,8 +48,8 @@ namespace gammatone
       inline Scalar compute(const Scalar& input, const Scalar& gain);
 
     private:
-      const std::array<Scalar,3> m_a;
-      const std::array<Scalar,3> m_b;
+      std::array<Scalar,3> m_a;
+      std::array<Scalar,3> m_b;
 
       Scalar m_z1, m_z2;
     };
@@ -70,6 +74,16 @@ slaney1993_iir(const slaney1993_iir<Scalar>& other)
     m_z2( other.m_z2 )
 {}
 
+
+template<class Scalar>
+gammatone::core::slaney1993_iir<Scalar>::
+slaney1993_iir(slaney1993_iir<Scalar>&& other) noexcept
+  : m_a( std::move(other.m_a )),
+    m_b( std::move(other.m_b )),
+    m_z1( std::move(other.m_z1 )),
+    m_z2( std::move(other.m_z2 ))
+{}
+
 template<class Scalar>
 gammatone::core::slaney1993_iir<Scalar>& gammatone::core::slaney1993_iir<Scalar>::
 operator=(const slaney1993_iir<Scalar>& other)
@@ -80,6 +94,19 @@ operator=(const slaney1993_iir<Scalar>& other)
   std::swap(m_b, tmp.m_b);
   std::swap(m_z1, other.m_z1);
   std::swap(m_z2, other.m_z2);
+
+  return *this;
+}
+
+
+template<class Scalar>
+gammatone::core::slaney1993_iir<Scalar>& gammatone::core::slaney1993_iir<Scalar>::
+operator=(slaney1993_iir<Scalar>&& other)
+{
+  m_a = std::move(other.m_a);
+  m_b = std::move(other.m_b);
+  m_z1 = std::move(other.m_z1);
+  m_z2 = std::move(other.m_z2);
 
   return *this;
 }

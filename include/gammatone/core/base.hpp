@@ -50,27 +50,30 @@ namespace gammatone
         \param center_frequency  The core center frequency (Hz).
         \param bandwidth         The core bandwidth (Hz).
       */
-      base(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
+      base(const Scalar& sample_frequency,
+	   const Scalar& center_frequency,
+	   const Scalar& bandwidth);
 
       //! Copy constructor
-      /*!
-        \param other The core to copy.
-      */
-      base(const base<Scalar, GainPolicy>& other);
+      base(const base<Scalar,GainPolicy>& other);
 
+      //! Move constructor
+      base(base<Scalar,GainPolicy>&& other) noexcept;
+      
       //! Assignment operator
-      /*!
-        \param other The core to copy.
-        \return A reference to a new copied core.
-      */
-      base<Scalar, GainPolicy>& operator=(const base<Scalar, GainPolicy>& other);
+      base<Scalar,GainPolicy>& operator=(const base<Scalar,GainPolicy>& other);
 
+      //! Move operator
+      base<Scalar,GainPolicy>& operator=(base<Scalar,GainPolicy>&& other);
+      
       //! Destructor
       virtual ~base();
 
-      //! Return the core internal gain
+            
+      //! Return the core internal gain, as specified by GainPolicy
       inline Scalar gain() const;
 
+      
       //! Set the core at its initial state
       virtual inline void reset() = 0;
 
@@ -83,11 +86,16 @@ namespace gammatone
                                 const Scalar& center_frequency,
                                 const Scalar& bandwidth);
 
+      Scalar tau() const {return m_tau;}
+      Scalar factor() const {return m_factor;}
+      
+    private:
+      
       //! \f$ 2\pi / f_s \f$
-      const Scalar m_tau;
+      Scalar m_tau;
 
       //! Inverse of the filter gain
-      const Scalar m_factor;
+      Scalar m_factor;
     };
   }
 }
@@ -104,19 +112,38 @@ base(const Scalar& sample_frequency,
 
 
 template<class Scalar, class GainPolicy>
-gammatone::core::base<Scalar, GainPolicy>::base(const base<Scalar, GainPolicy>& other)
+gammatone::core::base<Scalar, GainPolicy>::
+base(const base<Scalar, GainPolicy>& other)
   : m_tau(other.m_tau),
     m_factor(other.m_factor)
 {}
 
 template<class Scalar, class GainPolicy>
-gammatone::core::base<Scalar, GainPolicy>& gammatone::core::base<Scalar, GainPolicy>::
-operator=(const base<Scalar, GainPolicy>& other)
-{
-  base<Scalar, GainPolicy> tmp(other);
-  std::swap(m_tau,other.m_tau);
-  std::swap(m_factor,other.m_factor);
+gammatone::core::base<Scalar, GainPolicy>::
+base(base<Scalar, GainPolicy>&& other) noexcept
+  : m_tau(std::move(other.m_tau)),
+    m_factor(std::move(other.m_factor))
+{}
 
+template<class Scalar, class GainPolicy>
+gammatone::core::base<Scalar, GainPolicy>&
+gammatone::core::base<Scalar, GainPolicy>::
+operator=(const base<Scalar, GainPolicy>& other)
+{  
+  m_tau = other.m_tau;
+  m_factor = other.m_factor;
+
+  return *this;
+}
+
+template<class Scalar, class GainPolicy>
+gammatone::core::base<Scalar, GainPolicy>&
+gammatone::core::base<Scalar, GainPolicy>::
+operator=(base<Scalar, GainPolicy>&& other)
+{
+  m_tau = std::move(other.m_tau);
+  m_factor = std::move(other.m_factor);
+  
   return *this;
 }
 

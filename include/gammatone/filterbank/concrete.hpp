@@ -116,13 +116,20 @@ namespace gammatone
       concrete(const Scalar& sample_frequency,
                const Scalar& low_frequency,
                const Scalar& high_frequency,
-               const param_type& channels_parameter = ChannelsPolicy<Scalar,BandwidthPolicy,OrderPolicy>::default_parameter());
+               const param_type& channels_parameter
+	       = ChannelsPolicy<Scalar,BandwidthPolicy,OrderPolicy>::default_parameter());
 
       //! Copy constructor
       concrete(const concrete_type& other);
 
+      //! Move constructor
+      concrete(concrete_type&& other);
+
       //! Assignment operator
-      concrete_type& operator=(const concrete_type& other);
+      concrete_type& operator=(const concrete_type& other) noexcept;
+
+      //! Move operator
+      concrete_type& operator=(concrete_type&& other);
 
       //! Destructor.
       virtual ~concrete();
@@ -279,6 +286,33 @@ concrete<Scalar,
          OrderPolicy,
          GainPolicy,
          ClippingPolicy,
+         PostProcessingPolicy>::
+concrete(concrete_type&& other)
+  : m_nb_channels(std::move(other.m_nb_channels)),
+    m_overlap(std::move(other.m_overlap)),
+    m_bank(std::move(other.m_bank))
+{}
+
+
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
          PostProcessingPolicy>&
 gammatone::filterbank::
 concrete<Scalar,
@@ -289,16 +323,56 @@ concrete<Scalar,
          GainPolicy,
          ClippingPolicy,
          PostProcessingPolicy>::
-operator=(const concrete_type& other)
+operator=(const concrete_type& other) noexcept
 {
   concrete_type tmp( other );
 
-  std::swap( this->m_nb_channels, other.m_nb_channels );
-    std::swap( this->m_overlap, other.m_overlap );
-  std::swap( this->m_bank, other.m_bank );
+  std::swap( this->m_nb_channels, tmp.m_nb_channels );
+  std::swap( this->m_overlap, tmp.m_overlap );
+  std::swap( this->m_bank, tmp.m_bank );
 
   return *this;
 }
+
+
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  template<class,template<class> class,class> class ChannelsPolicy,
+  class OrderPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>&
+gammatone::filterbank::
+concrete<Scalar,
+         Core,
+         BandwidthPolicy,
+         ChannelsPolicy,
+         OrderPolicy,
+         GainPolicy,
+         ClippingPolicy,
+         PostProcessingPolicy>::
+operator=(concrete_type&& other)
+{
+  this->m_nb_channels = std::move(other.m_nb_channels);
+  this->m_overlap = std::move(other.m_overlap);
+  this->m_bank = std::move(other.m_bank);
+
+  return *this;
+}
+
 
 template
 <

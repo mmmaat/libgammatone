@@ -20,6 +20,8 @@
 #ifndef GAMMATONE_POLICY_ORDER_HPP
 #define GAMMATONE_POLICY_ORDER_HPP
 
+#include <gammatone/policy/policy.hpp>
+
 namespace gammatone
 {
   namespace policy
@@ -59,7 +61,7 @@ namespace gammatone
         \tparam Container The type container on which iterate. Must
         define a bidirectionnal iterator.
       */
-      class increasing
+      class increasing : public gammatone::policy::policy
       {
       public:
         //! Returns an iterator on the first (lowest) frequency channel
@@ -101,7 +103,7 @@ namespace gammatone
         \tparam Container  The type container on which iterate. Must
         define a forward iterator.
       */
-      class decreasing
+      class decreasing : public gammatone::policy::policy
       {
       public:
         //! Returns an iterator on the first (highest) frequency channel

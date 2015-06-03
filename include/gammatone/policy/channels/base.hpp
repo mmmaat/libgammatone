@@ -20,6 +20,7 @@
 #ifndef GAMMATONE_POLICY_CHANNELS_BASE_HPP
 #define GAMMATONE_POLICY_CHANNELS_BASE_HPP
 
+#include <gammatone/policy/policy.hpp>
 #include <algorithm>
 #include <utility> // for std::pair
 #include <vector>
@@ -47,7 +48,7 @@ namespace gammatone
         template<class> class BandwidthPolicy,
         class OrderPolicy
         >
-      class base
+      class base : public gammatone::policy::policy
       {
       protected:
         //! Usefull constant

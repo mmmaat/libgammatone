@@ -20,6 +20,8 @@
 #ifndef GAMMATONE_POLICY_POSTPROCESSING_HPP
 #define GAMMATONE_POLICY_POSTPROCESSING_HPP
 
+#include <gammatone/policy/policy.hpp>
+
 namespace gammatone
 {
   namespace policy
@@ -41,7 +43,8 @@ namespace gammatone
         \class off.
         \tparam Scalar  Type of scalar values.
       */
-      template<class Scalar> class off
+      template<class Scalar>
+      class off : public gammatone::policy::policy
       {
       public:
         //! Do nothing
@@ -53,7 +56,8 @@ namespace gammatone
         \class hwr
         \tparam Scalar  Type of scalar values
       */
-      template<class Scalar> class hwr
+      template<class Scalar>
+      class hwr : public gammatone::policy::policy
       {
       public:
         //! Put the negative values to 0.

@@ -44,12 +44,24 @@ namespace gammatone
 	     class ClippingPolicy = policy::clipping::off>
     class convolution : public base<Scalar,GainPolicy>
     {
+      using this_type = convolution<Scalar,GainPolicy,ClippingPolicy>;
+      
     public:
-      convolution(const Scalar& sample_frequency, const Scalar& center_frequency, const Scalar& bandwidth);
-      convolution(const convolution<Scalar,GainPolicy,ClippingPolicy>& other);
-      convolution<Scalar,GainPolicy,ClippingPolicy>& operator=(const convolution<Scalar,GainPolicy,ClippingPolicy>& other);
+      
+      convolution(const Scalar& sample_frequency,
+		  const Scalar& center_frequency,
+		  const Scalar& bandwidth);
+      
+      convolution(const this_type& other);
+      convolution(this_type&& other) noexcept;
+      
+      this_type& operator=(const this_type& other);
+      this_type& operator=(this_type&& other);
+      
       virtual ~convolution();
+
       inline void reset();
+
       inline Scalar compute(const Scalar& input);
 
     private:
@@ -62,6 +74,7 @@ namespace gammatone
       //! History of the input signal
       std::deque<Scalar> m_input;
 
+      //! Convolution core doesn't use find_factor for gain computation
       inline Scalar find_factor(const Scalar&, const Scalar&, const Scalar&){}
     };
   }
@@ -90,9 +103,18 @@ convolution(const convolution<Scalar, GainPolicy,ClippingPolicy>& other)
   m_input( other.m_input )
 {}
 
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+convolution(convolution<Scalar, GainPolicy,ClippingPolicy>&& other) noexcept
+  : base<Scalar, GainPolicy>(std::move(other)),
+  m_ir( std::move(other.m_ir) ),
+  m_input( std::move(other.m_input) )
+{}
+
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>& gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>&
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
 operator=(const convolution<Scalar, GainPolicy,ClippingPolicy>& other)
 {
   convolution<Scalar, GainPolicy,ClippingPolicy> tmp(other);
@@ -103,21 +125,37 @@ operator=(const convolution<Scalar, GainPolicy,ClippingPolicy>& other)
   return *this;
 }
 
+template<class Scalar, class GainPolicy, class ClippingPolicy>
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>&
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+operator=(convolution<Scalar, GainPolicy,ClippingPolicy>&& other)
+{
+  base<Scalar, GainPolicy>::operator=(other);
+  m_ir = std::move(other.m_ir);
+  m_input = std::move(other.m_input);
+
+  return *this;
+}
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::~convolution()
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+~convolution()
 {}
 
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-void gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::reset()
+void
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+reset()
 {
   m_input.assign(m_ir.size(), 0.0);
 }
 
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-Scalar gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::compute(const Scalar& input)
+Scalar
+gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
+compute(const Scalar& input)
 {
   m_input.pop_front();
   m_input.push_back(input);

@@ -27,12 +27,11 @@
 #include <gammatone/policy/clipping.hpp>
 #include <gammatone/policy/postprocessing.hpp>
 
-//#include <iostream>
-
 namespace gammatone
 {
   namespace filter
   {
+
     //! Concrete gammatone filter
     /*!
       \class concrete
@@ -57,13 +56,16 @@ namespace gammatone
       >
     class concrete : public gammatone::filter::interface<Scalar>
     {
+    private:
+      
       //! type of *this
-      typedef concrete<Scalar,
-                       Core,
-                       BandwidthPolicy,
-                       GainPolicy,
-                       ClippingPolicy,
-                       PostProcessingPolicy>  concrete_type;
+      using concrete_type = concrete
+	<Scalar,
+	 Core,
+	 BandwidthPolicy,
+	 GainPolicy,
+	 ClippingPolicy,
+	 PostProcessingPolicy>;
 
     public:
 
@@ -77,8 +79,14 @@ namespace gammatone
       //! Copy constructor
       concrete(const concrete_type& other);
 
+      //! Move constructor
+      concrete(concrete_type&& other) noexcept;
+            
       //! Assignment operator
       concrete_type& operator=(const concrete_type& other);
+
+      //! Move operator
+      concrete_type& operator=(concrete_type&& other);
 
       //! Destructor
       virtual ~concrete();
@@ -95,14 +103,16 @@ namespace gammatone
       // Method inherited from filter::interface
       inline Scalar compute_internal(const Scalar& input);
 
+    private:
+      
       //! Sample frequency of the filter (Hz)
-      const Scalar m_sample_frequency;
+      Scalar m_sample_frequency;
 
       //! Center frequency of the filter (Hz)
-      const Scalar m_center_frequency;
+      Scalar m_center_frequency;
 
       //! Bandwidth of the filter (Hz)
-      const Scalar m_bandwidth;
+      Scalar m_bandwidth;
 
       //! The underlying processing core
       Core<Scalar,GainPolicy,ClippingPolicy> m_core;
@@ -126,9 +136,7 @@ concrete(const Scalar& sample_frequency,
     m_center_frequency( center_frequency ),
     m_bandwidth( BandwidthPolicy<Scalar>::bandwidth(center_frequency) ),
     m_core( m_sample_frequency, m_center_frequency, m_bandwidth )
-{
-  //  std::cout << "ctor: " << m_sample_frequency<< " ";
-}
+{}
 
 template
 <
@@ -156,6 +164,23 @@ template
   class ClippingPolicy,
   template<class> class PostProcessingPolicy
   >
+gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,GainPolicy,ClippingPolicy,PostProcessingPolicy>::
+concrete(concrete_type&& other) noexcept
+  : m_sample_frequency( std::move(other.m_sample_frequency) ),
+    m_center_frequency( std::move(other.m_center_frequency) ),
+    m_bandwidth( std::move(other.m_bandwidth) ),
+    m_core( std::move(other.m_core) )
+{}
+
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
 gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,GainPolicy,ClippingPolicy,PostProcessingPolicy>&
 gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,GainPolicy,ClippingPolicy,PostProcessingPolicy>::
 operator=(const concrete_type& other)
@@ -166,6 +191,27 @@ operator=(const concrete_type& other)
   std::swap( m_center_frequency, tmp.m_center_frequency );
   std::swap( m_bandwidth, tmp.m_bandwidth );
   std::swap( m_core, tmp.m_core );
+
+  return *this;
+}
+
+template
+<
+  class Scalar,
+  template<class...> class Core,
+  template<class> class BandwidthPolicy,
+  class GainPolicy,
+  class ClippingPolicy,
+  template<class> class PostProcessingPolicy
+  >
+gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,GainPolicy,ClippingPolicy,PostProcessingPolicy>&
+gammatone::filter::concrete<Scalar,Core,BandwidthPolicy,GainPolicy,ClippingPolicy,PostProcessingPolicy>::
+operator=(concrete_type&& other)
+{
+  m_sample_frequency = std::move(other.m_sample_frequency);
+  m_center_frequency = std::move(other.m_center_frequency);
+  m_bandwidth = std::move(other.m_bandwidth);
+  m_core = std::move(other.m_core);
 
   return *this;
 }

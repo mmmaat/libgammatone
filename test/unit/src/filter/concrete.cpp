@@ -19,26 +19,48 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/test_case_template.hpp>
-#include <filter_types.h>
 #include <test_utils.hpp>
 #include <iostream>
+
+
+#ifdef LIBGAMMATONE_TEST_ALL
+#include <filter_types_all.h>
+#else
+#include <filter_types.h>
+#endif
+
+
 using namespace gammatone;
 
 template<class Filter>
 class fixture
 {
 protected:
-  fixture() : signal(random<double>(-1.0,1.0,1000))
+  fixture() : signal(random<T>(-1.0,1.0,1000))
   {
     std::for_each(cf.begin(),cf.end(),[&](const auto& x){filters.push_back(Filter(fs,x));});
   };
 
+  bool is_same_filter(Filter& f1, Filter& f2) const
+  {
+    f1.reset(); f2.reset();
+    for(const auto& x:signal)
+      {
+	const auto o1 = f1.compute(x);
+	const auto o2 = f2.compute(x);
+	if(o1 != o2) return false;
+      }
+    return true;
+  }
+
   const T fs = 44100;
   // cf below 20 don't pass reset_works()... sometimes, not all the times.
   const std::vector<T> cf = {50,100,451.215,2351.2,6842,12504,15478,fs/2};
+  const std::vector<T> signal;
   std::vector<Filter> filters;
-  std::vector<T> signal;
+
 };
+
 
 
 BOOST_AUTO_TEST_SUITE(filter_concrete_test)
@@ -46,39 +68,47 @@ BOOST_AUTO_TEST_SUITE(filter_concrete_test)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(fixture_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_op_works, F, filter_types, fixture<F>)
 {
-  BOOST_REQUIRE(this->signal.size() != 0);
+  const T fc = 2000;
+  F f1(44100,fc);
+  F f2(44100*1.6572,2.054*fc);
+  f2 = f1;
+  BOOST_CHECK(this->is_same_filter(f1,f2));
 }
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_works, F, filter_types, fixture<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_ctor_works, F, filter_types, fixture<F>)
 {
-  const auto& x = this->signal;
-  for(auto& f:this->filters)
-    {
-      F f1(f);
-      BOOST_CHECK_EQUAL( f1.sample_frequency(), f.sample_frequency() );
-      BOOST_CHECK_EQUAL( f1.center_frequency(), f.center_frequency() );
-      BOOST_CHECK_EQUAL( f1.bandwidth(), f.bandwidth() );
-      BOOST_CHECK_EQUAL( f1.gain(), f.gain() );
+  const T fc = 2000;
+  F f1(44100,fc);
+  F f2(f1);
+  BOOST_CHECK(this->is_same_filter(f1,f2));
+}
 
-      F f2 = f;
-      BOOST_CHECK_EQUAL( f2.sample_frequency(), f.sample_frequency() );
-      BOOST_CHECK_EQUAL( f2.center_frequency(), f.center_frequency() );
-      BOOST_CHECK_EQUAL( f2.bandwidth(), f.bandwidth() );
-      BOOST_CHECK_EQUAL( f2.gain(), f.gain() );
 
-      auto out = f.compute(x);
-      auto out1 = f1.compute(x);
-      auto out2 = f2.compute(x);
-      for(size_t i=0;i<x.size();i++)
-        {
-          BOOST_CHECK_EQUAL(out[i],out1[i]);
-          BOOST_CHECK_EQUAL(out[i],out2[i]);
-        }
-    }
+//================================================
+
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(move_op_works, F, filter_types, fixture<F>)
+{
+  const T fc = 2000;
+  F f1(44100,fc);
+  F f(44100,fc);
+  F f2(44100*1.6572,2.054*fc);
+  f2 = std::move(f);
+  BOOST_CHECK(this->is_same_filter(f1,f2));
+}
+
+//================================================
+
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(move_ctor_works, F, filter_types, fixture<F>)
+{
+  const T fc = 2000;
+  F f1(44100,fc);
+  F f(44100,fc);
+  F f2(std::move(f));
+  BOOST_CHECK(this->is_same_filter(f1,f2));
 }
 
 
@@ -148,7 +178,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types, fixture<F>)
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filter_types, fixture<F>)
 {
   size_t i=0;
-  for(auto& f:this->filters)
+  for(const auto& f:this->filters)
     {
       BOOST_CHECK_EQUAL( this->fs, f.sample_frequency() );
       BOOST_CHECK_EQUAL( this->cf[i++], f.center_frequency() );

@@ -3,7 +3,6 @@ add_custom_target(tests)
 # test specific headers in test/include
 include_directories(include)
 
-
 # the unit tests are in a separate directory
 add_subdirectory(unit)
 

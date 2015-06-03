@@ -63,6 +63,19 @@ inline double mean(I first,I last)
   return accumulate(first,last,0.0)/distance(first,last);
 }
 
+template<class Core>
+bool is_same_core(Core& c1, Core& c2, const vector<double>& in)
+{
+  for(const auto& x:in)
+    {
+      const auto o1 = c1.compute(x);
+      const auto o2 = c2.compute(x);
+      if(o1 != o2) return false;
+    }
+  return true;
+}
+
+
 BOOST_AUTO_TEST_SUITE(core_test)
 
 //================================================
@@ -103,6 +116,66 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
         }
     }
 }
+
+
+//================================================
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(copy_op_works, C, core_types)
+{
+  const double fs = 44100, fc = 2000, bw = 120;
+  C c1(fs,fc,bw);
+  C c2(fs,fc,bw);
+  c2 = c1;
+
+  for(const auto& in : {in1,in2,in3})
+    {
+      BOOST_CHECK(is_same_core(c1,c2,in));
+      c1.reset(); c2.reset();
+    }  
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(copy_ctor_works, C, core_types)
+{
+  const double fs = 44100, fc = 2000, bw = 120;
+  C c1(fs,fc,bw);
+  C c2(c1);
+
+  for(const auto& in : {in1,in2,in3})
+    {
+      BOOST_CHECK(is_same_core(c1,c2,in));
+      c1.reset(); c2.reset();
+    }  
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(move_op_works, C, core_types)
+{
+  const double fs = 44100, fc = 2000, bw = 120;
+  C c(fs,fc,bw);
+  C c1(fs,fc,bw);
+  C c2(fs,fc,bw);
+  c2 = std::move(c1);
+
+  for(const auto& in : {in1,in2,in3})
+    {
+      BOOST_CHECK(is_same_core(c,c2,in));
+      c.reset(); c2.reset();
+    }  
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(move_ctor_works, C, core_types)
+{
+  const double fs = 44100, fc = 2000, bw = 120;
+  C c(fs,fc,bw);
+  C c1(fs,fc,bw);
+  C c2(std::move(c1));
+
+  for(const auto& in : {in1,in2,in3})
+    {
+      BOOST_CHECK(is_same_core(c,c2,in));
+      c.reset(); c2.reset();
+    }  
+}
+
 
 
 // //================================================
