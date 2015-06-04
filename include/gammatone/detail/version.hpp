@@ -23,6 +23,9 @@
 namespace gammatone
 {
   //! Version of libgammatone
+  /*!
+    \return A string in the format "libgammatone MAJOR.MINOR"
+   */
   std::string version(){return "libgammatone 0.1";}
 }
 

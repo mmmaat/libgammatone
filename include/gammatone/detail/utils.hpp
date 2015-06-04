@@ -30,8 +30,7 @@ namespace gammatone
     /*!
 
       Generate a container of *size* points linearly spaced between
-      and including *min* and *max*. For *size* = 1, linspace returns
-      *max*.
+      and including *min* and *max*. For *size* = 1, linspace returns *max*.
 
       \tparam Value      Type of values
       \tparam Container  Type of the returned container
@@ -50,7 +49,7 @@ namespace gammatone
 
     //! Return the maximum absolute value in a range
     /*!
-      \tparam Iterator Type of the range iterator. Can be
+      \tparam Iterator A forward iterator. Can be
       const_iterator. std::abs is used so it's works on complex.
 
       \param first  First position in the range
@@ -68,15 +67,14 @@ namespace gammatone
 
       Normalizes the range [first,last) in the interval [-1,1].
 
-      \tparam Iterator  Type of the range iterator
+      \tparam Iterator  A forward iterator
 
-      \param begin Begin iterator of the range
-      \param end   End iterator of the range
-
-      \post utils::absmax(begin,end) == 1
+      \param first  Forst iterator of the range
+      \param last   Last iterator of the range
     */
-    template<class I>
-    inline void normalize(const I& begin, const I& end);    
+    template<class Iterator>
+    inline void normalize(const Iterator& first,
+			  const Iterator& last);    
   }
 }
 

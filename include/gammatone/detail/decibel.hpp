@@ -29,13 +29,15 @@ namespace gammatone
   namespace detail
   {
 
-    //! Convert a range of values in decibel
+    //! Convert values in the range [first,last) in a decibel scale
     /*!  
 
       Given \f$ X=(x_i) \f$ the values in [first,last) and its
-      absolute max \f$ M = max_i(|X|) \f$, this function converts the
-      range X in its decibel representation: \f$ \forall x_i \in X,
+      absolute max \f$ M = max_i(|x_i|) \f$, this function converts the
+      range \f$X\f$ in its decibel representation: \f$ \forall x_i \in X,
       x_i \leftarrow 20log\frac{x_i}{M}\f$.
+
+      \attention the values in \f$X\f$ must be positive.
 
       \tparam Iterator  An iterator to the range to convert.
 
@@ -45,25 +47,24 @@ namespace gammatone
     template<class Iterator>
     inline void decibel(const Iterator& first, const Iterator& last);
 
-    //! Find the position where a signal reachs a given attenuation (in dB)
+    //! Find the position in a signal where it reachs a given attenuation (in dB)
     /*!
 
-      Given a signal \f$ X=\{x_t\} \f$ and its absolute max \f$ M =
-      max_t(X) \f$, this function returns the time position \f$
-      t_\alpha \f$ where the signal envelope reach the attenuation
-      level \f$ \alpha \f$ such as \f$ t_\alpha = min(\{t|\alpha <
-      20log\frac{|x_t|}{M}\}) \f$
+      Given a signal \f$X=(x_i)\f$ and its absolute max \f$ M =
+      max_i(|x_i|)\f$, this function returns the index \f$I_\alpha\f$
+      where the signal envelope reach the attenuation level \f$ \alpha
+      \f$ such as \f$I_\alpha = min_i(\{i|\alpha <
+      20log\frac{|x_i|}{M}\})\f$
 
-      \tparam Signal The type of the signal container. Must have
+      \tparam Container The type of the signal container. Must have
       bidirectionnal iterator.
 
-      \param signal  The processed input signal \f$ X=\{x_t\} \f$
+      \param signal  The processed input signal \f$ X=\{x_i\} \f$
       \param level The attenuation level \f$ \alpha \f$ to search for
-      (dB). May be negative.
+      (dB). No effect if positive.
 
       \return A const iterator where the signal attenuation reach the
-      given level. If the attenuation is not reached, return a const
-      iterator to the signal end position.
+      given level. If the attenuation is not reached, return signal.cend()
     */
     template<class Container>
     typename Container::const_iterator find_attenuation(const Container& signal,
@@ -71,9 +72,15 @@ namespace gammatone
 
     //! Shrink a signal up to a given attenuation (in dB)
     /*!
+
+      Reduce the signal up to the position returned by
+      find_attenuation(signal,level)
+      
+      \tparam Container Type of container to be processed
+
       \param signal  The processed input signal \f$ X=\{x_t\} \f$
       \param level The attenuation level \f$ \alpha \f$ to search for
-      (dB). May be negative.
+      (dB). No effect if positive.
 
      */
     template<class Container>

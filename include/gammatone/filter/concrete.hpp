@@ -34,7 +34,7 @@ namespace gammatone
 
     //! Concrete gammatone filter
     /*!
-      \class concrete
+      \class concrete gammatone/filter/concrete.hpp
 
       This class models a single gammatone filter. Processing core,
       bandwidth computation and postprocessing are specified by

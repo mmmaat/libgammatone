@@ -1,5 +1,3 @@
-// minimal.cpp
-// Compile with: g++ -std=c++14 -o minimal minimal.cpp -I/path/to/libgammatone/include
 #include <gammatone/filter.hpp>
 #include <vector>
 
