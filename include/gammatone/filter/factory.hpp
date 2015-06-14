@@ -37,12 +37,16 @@ namespace gammatone
 {
   namespace filter
   {
+    //!
+    /*!
+      \class factory gammatone/filter/factory.hpp
+     */
     template<class Scalar>
     class factory : private boost::noncopyable
     {
     public:
       //! Shared pointer to concrete filter
-      typedef std::shared_ptr<filter::interface<Scalar> > shared_ptr;
+      using shared_ptr = std::shared_ptr<filter::interface<Scalar> >;
       
       //! Creates a concrete filter from a parameter string
       /*!
@@ -63,19 +67,23 @@ namespace gammatone
       virtual ~factory();
 
       //! Keys type of the factory map
-      typedef std::string key_type;
+      using key_type = std::string;
 
       //! Value type of the factory map
-      typedef boost::function<shared_ptr(const Scalar&, const Scalar&)>  value_type;
+      using value_type = boost::function<shared_ptr(const Scalar&, const Scalar&)>;
 
       //! Type of the factory map
-      typedef std::map<key_type,value_type> factory_map;
+      using factory_map = std::map<key_type,value_type>;
+
+      
 
       template<class ConcreteType>
       bool register_type(const key_type& key);
 
       bool unregister_type(const key_type& key);
 
+
+      
       key_type parse(const std::string& key) const
       {
         if(key=="slaney1993")
@@ -102,25 +110,30 @@ gammatone::filter::factory<Scalar>::~factory()
 
 template<class Scalar>
 template<class ConcreteFilter>
-bool gammatone::filter::factory<Scalar>::register_type(const key_type& key)
+bool
+gammatone::filter::factory<Scalar>::
+register_type(const key_type& key)
 {
   const auto f = boost::factory<std::shared_ptr<ConcreteFilter> >();
   return m_map.insert(typename factory_map::value_type(key, f)).second;
 }
 
 template<class Scalar>
-bool gammatone::filter::factory<Scalar>::unregister_type(const key_type& key)
+bool
+gammatone::filter::factory<Scalar>::
+unregister_type(const key_type& key)
 {
   return m_map.erase(key) == 1;
 }
 
 template<class Scalar>
-typename gammatone::filter::factory<Scalar>::shared_ptr gammatone::filter::factory<Scalar>::
+typename gammatone::filter::factory<Scalar>::shared_ptr
+gammatone::filter::factory<Scalar>::
 create(const Scalar& sample_frequency,
        const Scalar& center_frequency,
        const std::string& key)
 {
-  return m_map.at(parse(key))(sample_frequency,center_frequency);
+  return m_map.at(filter_key(key))(sample_frequency,center_frequency);
 }
 
 #endif // GAMMATONE_FILTER_FACTORY_HPP

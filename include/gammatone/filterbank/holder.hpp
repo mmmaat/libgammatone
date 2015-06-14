@@ -90,7 +90,8 @@ gammatone::filterbank::holder<Scalar>::
 holder(const Scalar& sample_frequency,
        const Scalar& center_frequency,
        const std::string params)
-  : p_filterbank(factory<double>::filterbank(sample_frequency,center_frequency,params))
+  : p_filterbank(gammatone::detail::singleton<gammatone::filter::factory<Scalar> >::instance().
+		 create(sample_frequency,center_frequency,params))
 {}
 
 template<class Scalar>

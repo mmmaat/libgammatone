@@ -44,9 +44,11 @@ namespace gammatone
         \tparam Scalar  Type of scalar values.
       */
       template<class Scalar>
-      class off : public gammatone::policy::policy
+      class off : private gammatone::policy::policy
       {
       public:
+	template<class> using type = off;
+	
         //! Do nothing
         static inline Scalar process(const Scalar& x);
       };
@@ -57,9 +59,11 @@ namespace gammatone
         \tparam Scalar  Type of scalar values
       */
       template<class Scalar>
-      class hwr : public gammatone::policy::policy
+      class hwr : private gammatone::policy::policy
       {
       public:
+	template<class> using type = hwr;
+	
         //! Put the negative values to 0.
         static inline Scalar process(const Scalar& x);
       };

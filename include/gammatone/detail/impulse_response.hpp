@@ -202,6 +202,13 @@ namespace gammatone
                                  const Iterator& first,
                                  const Iterator& last);
 
+    template<class Filter,
+             class Iterator,
+             class Container = std::vector<typename Filter::scalar_type> >
+    static Container implemented(Filter& filter,
+                                 const Iterator& first,
+                                 const Iterator& last);
+
 
     //! Compute the implemented impulse response for given filter and duration
     /*!
@@ -335,21 +342,30 @@ implemented(const Filter& filter,
             const Iterator& first,
             const Iterator& last)
 {
-  // copy the filter and reset before computation
   Filter f(filter);
-  f.reset();
+  return implemented(f,first,last);
+}
+
+
+template<class Filter, class Iterator, class Container>
+Container gammatone::impulse_response::
+implemented(Filter& filter,
+            const Iterator& first,
+            const Iterator& last)
+{
+  filter.reset();
 
   // allocation for output
   Container ir(std::distance(first,last));
 
   // compute the first sample (= 1)
   auto it = ir.begin();
-  *it++ = f.compute(1.0);
+  *it++ = filter.compute(1.0);
 
   // compute other samples (= 0)
-  std::for_each(it,ir.end(),[&](auto& x){x = f.compute(0.0);});
+  std::for_each(it,ir.end(),[&](auto& x){x = filter.compute(0.0);});
 
-  return std::move(ir);
+  return ir;
 }
 
 

@@ -22,7 +22,7 @@
 
 #include <gammatone/filter/interface.hpp>
 #include <gammatone/filter/concrete.hpp>
-#include <gammatone/detail/factory.hpp>
+#include <gammatone/filter/factory.hpp>
 #include <string>
 
 namespace gammatone
@@ -31,14 +31,15 @@ namespace gammatone
   {
     //! Gammatone filter holder
     /*!
-      \class holder
+      \class holder gammatone/filter/holder.hpp
 
       This class models a single gammatone filter. Processing core,
       bandwidth computation and postprocessing are specified by string
       during construction. Internally this class holds a pointer to a
-      filter::concrete.
+      filter::concrete. It's concstruction is deleguated to
+      filter::factory.
 
-      \tparam Scalar  Type of the scalars.
+      \tparam Scalar  Type of scalar values
     */
     template<class Scalar>
     class holder : public gammatone::filter::interface<Scalar>
@@ -46,13 +47,14 @@ namespace gammatone
     public:
 
       //! Creates a gammatone filter from explicit parameters.
-      /*! 
+      /*!  
+
+	Creates a concrete filter from a parameter string.
+
 	\param sample_frequency The input signal sample frequency (Hz).
         \param center_frequency The filter center frequency (Hz).
 	\param params A parameters string specifying core, bandwidth
-	and postprocessing policies.
-
-	\todo Comment params !
+	and postprocessing policies. See filter::factory.
       */
       holder(const Scalar& sample_frequency,
              const Scalar& center_frequency,
@@ -61,8 +63,14 @@ namespace gammatone
       //! Copy constructor
       holder(const holder<Scalar>& other);
 
+      //! Move constructor
+      holder(holder<Scalar>&& other);
+
       //! Assignment operator
       holder<Scalar>& operator=(const holder<Scalar>& other);
+
+      //! Move operator
+      holder<Scalar>& operator=(holder<Scalar>&& other);
 
       //! Destructor
       virtual ~holder();
@@ -90,7 +98,8 @@ gammatone::filter::holder<Scalar>::
 holder(const Scalar& sample_frequency,
        const Scalar& center_frequency,
        const std::string params)
-  : p_filter(gammatone::factory<double>::filter(sample_frequency,center_frequency,params))
+  : p_filter(gammatone::detail::singleton<gammatone::filter::factory<Scalar> >::instance().
+	     create(sample_frequency,center_frequency,params))
 {}
 
 template<class Scalar>
@@ -100,10 +109,23 @@ holder(const gammatone::filter::holder<Scalar>& other)
 {}
 
 template<class Scalar>
+gammatone::filter::holder<Scalar>::
+holder(gammatone::filter::holder<Scalar>&& other)
+  : p_filter(std::move(other.p_filter))
+{}
+
+template<class Scalar>
 gammatone::filter::holder<Scalar>& gammatone::filter::holder<Scalar>::
 operator=(const gammatone::filter::holder<Scalar>& other)
 {
   p_filter = other.p_filter;
+}
+
+template<class Scalar>
+gammatone::filter::holder<Scalar>& gammatone::filter::holder<Scalar>::
+operator=(gammatone::filter::holder<Scalar>&& other)
+{
+  p_filter = std::move(other.p_filter);
 }
 
 template<class Scalar> gammatone::filter::holder<Scalar>::

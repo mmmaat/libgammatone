@@ -35,7 +35,7 @@
 using namespace std;
 typedef double T;
 typedef gammatone::filter::concrete<T,gammatone::core::cooke1993 >   filter1;
-typedef gammatone::filter::concrete<T,gammatone::core::slaney1993 > filter2;
+typedef gammatone::filter::concrete<T,gammatone::core::slaney1993 >  filter2;
 typedef gammatone::filter::concrete<T,gammatone::core::convolution > filter3;
 
 const T sample_frequency = 44100; // Hz

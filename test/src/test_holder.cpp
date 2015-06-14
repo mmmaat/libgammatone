@@ -21,40 +21,39 @@
 #include <gammatone/detail/utils.hpp>
 #include <iostream>
 #include <vector>
+#include <exception>
 
+using namsespace gammatone;
+
+void check(bool b){  if(!b) throw std::exception(); }
 
 template<template<class...> class Core>
-void test(const std::string& name)
+void test(const std::string& name,
+          const std::vector<double>& input)
 {
-  typedef gammatone::filter::holder<double>          holder;
-  typedef gammatone::filter::concrete<double, Core>  concrete;
+  filter::holder<double>          f1(20000,3000,name);
+  filter::concrete<double, Core>  f2(20000,3000);
 
-  holder   f1(44100,3000,name);
-  concrete f2(44100,3000);
-
-  std::vector<double> input(10);
-  input[0] = 1.0;
-
-  // compute1
   std::for_each(input.begin(),input.end(), [&](const auto& x)
-   		{assert(f1.compute(x) == f2.compute(x));});
-
-  // compute2
-  std::vector<double> out1(input.size());
-  f1.compute(input.begin(),input.end(),out1.begin());
-
-  // compute3
-  auto out2 = f2.compute(input);
-
-  for(std::size_t i=0;i<input.size();i++)
-    assert(out1[i] == out2[i]);
+                {check((f1.compute(x)) == f2.compute(x));});
 }
 
 int main()
 {
-  using namespace gammatone::core;
-  test<cooke1993>("cooke1993");
-  test<slaney1993>("slaney1993");
+  std::vector<double> input(10000);
+  input[0] = 1.0;
+
+  try
+    {
+      test<core::cooke1993>("cooke1993", input);
+      test<core::slaney1993>("slaney1993", input);
+    }
+  catch(const std::exception e)
+    {
+      std::cout << "error detected !" << std::endl;
+      return -1;
+    }
+
   std::cout << "all asserts verified" << std::endl;
   return 0;
 }
