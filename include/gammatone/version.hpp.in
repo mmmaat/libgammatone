@@ -17,21 +17,25 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/test/unit_test.hpp>
-#include <gammatone/detail/factory.hpp>
+#ifndef GAMMATONE_DETAIL_VERSION_HPP
+#define GAMMATONE_DETAIL_VERSION_HPP
 
-BOOST_AUTO_TEST_SUITE(detail_factory)
+#include <string>
+#include <sstream>
 
-//================================================
-
-BOOST_AUTO_TEST_CASE(filter_test)
+namespace gammatone
 {
+  const int LIBGAMMATONE_VERSION_MAJOR = @libgammatone_VERSION_MAJOR@;
+  const int LIBGAMMATONE_VERSION_MINOR = @libgammatone_VERSION_MINOR@;
   
+  //! Version of libgammatone
+  std::string version()
+  {
+    std::stringstream v;
+    v << "libgammatone " << LIBGAMMATONE_VERSION_MAJOR << "." << LIBGAMMATONE_VERSION_MINOR;
+    
+    return v.str();
+  }
 }
 
-BOOST_AUTO_TEST_CASE(filterbank_test)
-{
-  
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#endif // GAMMATONE_DETAIL_VERSION_HPP

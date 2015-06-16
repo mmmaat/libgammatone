@@ -19,41 +19,20 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/test_case_template.hpp>
-#include <test_utils.hpp>
-
-
-#ifdef LIBGAMMATONE_TEST_ALL
-#include <filterbank_types_all.h>
-#else
 #include <filterbank_types.h>
-#endif
+#include <test_utils.hpp>
+using namespace gammatone;
+
+// template<class... X> using core      = gammatone::core::cooke1993<X...>;
+// template<class X>    using bandwidth = gammatone::policy::bandwidth::glasberg1990<X>;
+// template<class... X> using channels  = gammatone::policy::channels::fixed_size<X...>;
 
 
-template<class F>
-class fixture_fb
+class fixture
 {
 protected:
-  fixture_fb()
-    : signal(random<T>(-1.0,1.0,5000)),
-      fb(fs,fl,fh)
-  {}
-  
-  const T fs = 44100, fl = 500, fh = 8000;
-  
-  std::vector<T> signal;
-  F fb;
-  
-  bool is_same_filterbank(F& f1, F& f2) const
-  {
-    f1.reset(); f2.reset();
-    for(const auto& x:signal)
-      {
-	const auto o1 = f1.compute(x);
-	const auto o2 = f2.compute(x);
-	if(!std::equal(o1.begin(),o1.end(),o2.begin())) return false;
-      }
-    return true;
-  }
+  const T m_sample_frequency = 44100;
+  const T m_low = 500, m_high = 8000;
 };
 
 
@@ -62,57 +41,22 @@ BOOST_AUTO_TEST_SUITE(filterbank_concrete_test)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_op_works, F, filterbank_types, fixture_fb<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture)
 {
-  F fb2(44100*1.6572,54,8120);
-  fb2 = this->fb;
-  BOOST_CHECK(this->is_same_filterbank(this->fb,fb2));
-}
+  //  using namespace gammatone;
+  F m_filterbank( this->m_sample_frequency,this->m_low,this->m_high );
 
-//================================================
-
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_ctor_works, F, filterbank_types, fixture_fb<F>)
-{
-  F fb2(this->fb);
-  BOOST_CHECK(this->is_same_filterbank(this->fb,fb2));
-}
-
-
-//================================================
-
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(move_op_works, F, filterbank_types, fixture_fb<F>)
-{
-  F tmp(this->fb);
-  F f2(44100*1.6572,2.054*1000,6847.12);
-  f2 = std::move(tmp);
-  BOOST_CHECK(this->is_same_filterbank(this->fb,f2));
-}
-
-//================================================
-
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(move_ctor_works, F, filterbank_types, fixture_fb<F>)
-{  
-  F tmp(this->fb);
-  F fb2(std::move(tmp));
-  BOOST_CHECK(this->is_same_filterbank(this->fb,fb2));
-}
-
-
-//================================================
-
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture_fb<F>)
-{
-  BOOST_CHECK_EQUAL( this->fs, this->fb.sample_frequency() );
+  BOOST_CHECK_EQUAL( this->m_sample_frequency, m_filterbank.sample_frequency() );
 
   size_t i=0;
-  for(const auto& f:this->fb)
+  for(const auto& f:m_filterbank)
     {
       BOOST_CHECK_GT( f.bandwidth(), 0.0 );
       BOOST_CHECK_GT( f.gain(), 0.0 );
 
-      BOOST_CHECK_EQUAL( this->fb.center_frequency()[i], f.center_frequency() );
-      BOOST_CHECK_EQUAL( this->fb.bandwidth()[i], f.bandwidth() );
-      BOOST_CHECK_EQUAL( this->fb.gain()[i], f.gain() );
+      BOOST_CHECK_EQUAL( m_filterbank.center_frequency()[i], f.center_frequency() );
+      BOOST_CHECK_EQUAL( m_filterbank.bandwidth()[i], f.bandwidth() );
+      BOOST_CHECK_EQUAL( m_filterbank.gain()[i], f.gain() );
       i++;
     }
 }
@@ -154,11 +98,11 @@ BOOST_AUTO_TEST_CASE(center_frequencies_works)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types, fixture_fb<F>)
-{
-  const auto& x = this->signal;
-  auto& f = this->fb;
-  
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types, fixture)
+{  
+  const auto x = random<double>(-1.0,1.0,1000);
+  F f(this->m_sample_frequency,this->m_low,this->m_high);
+
   const auto xsize = x.size();
   const auto ysize = f.nb_channels();
   

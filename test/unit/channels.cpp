@@ -21,7 +21,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <gammatone/policy/channels.hpp>
 #include <gammatone/policy/order.hpp>
-#include <gammatone/filterbank/concrete.hpp>
+#include <gammatone/filterbank.hpp>
 #include <gammatone/detail/utils.hpp>
 #include <vector>
 #include <iterator>

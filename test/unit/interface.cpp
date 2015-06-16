@@ -18,8 +18,8 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include <gammatone/filter/interface.hpp>
-#include <gammatone/filterbank/interface.hpp>
+#include <gammatone/interface_filter.hpp>
+#include <gammatone/interface_filterbank.hpp>
 
 #include <test_utils.hpp>
 #include <vector>
