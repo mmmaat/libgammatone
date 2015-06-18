@@ -32,15 +32,13 @@ namespace gammatone
       /*!
         \tparam Scalar           Type of scalar values.
         \tparam BandwidthPolicy  Policy for bandwith constants. See policy::bandwidth.
-        \tparam OrderPolicy      Policy for ordering frequency channels. See policy::order.
       */
       template
       <
         class Scalar,
-        template<class> class BandwidthPolicy,
-        class OrderPolicy
+        template<class> class BandwidthPolicy
         >
-      class fixed_overlap : private base<Scalar,BandwidthPolicy,OrderPolicy>
+      class fixed_overlap : private base<Scalar,BandwidthPolicy>
       {
       public:
 
@@ -70,7 +68,7 @@ namespace gammatone
           frequencies (Hz) and p.second the overlap factor. The number
           of channels is thus p.first.size()
         */
-        static typename gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::setup_type
+        static typename gammatone::policy::channels::base<Scalar,BandwidthPolicy>::setup_type
         setup(const Scalar& low_frequency,
               const Scalar& high_frequency,
               const param_type& overlap_factor);
@@ -82,21 +80,19 @@ namespace gammatone
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-const typename gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy,OrderPolicy>::param_type
-gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy,OrderPolicy>::
+const typename gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::param_type
+gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::
 default_overlap = 0.25;
 
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-typename gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy,OrderPolicy>::param_type
-gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy,OrderPolicy>::
+typename gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::param_type
+gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::
 default_parameter()
 {
   return default_overlap;
@@ -105,14 +101,13 @@ default_parameter()
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-typename gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::setup_type
-gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy,OrderPolicy>::
+typename gammatone::policy::channels::base<Scalar,BandwidthPolicy>::setup_type
+gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::
 setup(const Scalar& fl, const Scalar& fh, const Scalar& overlap_factor)
 {
-  using base = base<Scalar,BandwidthPolicy,OrderPolicy>;
+  using base = base<Scalar,BandwidthPolicy>;
   
   const Scalar b = -overlap_factor / BandwidthPolicy<Scalar>::earq;
   const std::size_t nbc = base::beta(fl,fh) / b;

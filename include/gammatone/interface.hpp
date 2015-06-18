@@ -26,22 +26,9 @@
 
 namespace gammatone
 {
-  namespace detail
-  {
-    template<class C> class scalar
-    { public:
-      template<class T, class U> static inline U compute(const T& input, C* client);
-    };
-
-    template<class C> class container
-    { public:
-      template<class T, class U> static U compute(const T& input, C* client);
-    };
-  }
-
   //! Generic interface for both gammatone filters and filterbanks
   /*!
-    \class interface
+    \class interface gammatone/interface.hpp
 
     This abstract class provides a common generic interface for both
     gammatone filters and filterbanks (i.e. single and multi channels
@@ -61,10 +48,10 @@ namespace gammatone
   public:
 
     //! The type of scalar values
-    typedef Scalar scalar_type;
+    using scalar_type = Scalar;
 
     //! The type of the output values
-    typedef Output output_type;
+    using output_type = Output;
 
     //! Accessor to the sample frequency
     /*!
@@ -104,6 +91,8 @@ namespace gammatone
     virtual void reset() = 0;
 
 
+    inline output_type compute(const scalar_type& input);
+
     //! Compute preallocated output from a range of scalar inputs.
     /*!
       Sequentially computes a range of input values and stores the
@@ -118,12 +107,17 @@ namespace gammatone
       range. The range must include at least as many elements as
       [first,last).
     */
-    // template<class InputIterator,
-    //          class OutputIterator>
-    // void compute(const InputIterator& first,
-    //              const InputIterator& last,
-    //              const OutputIterator& result);
+    template<class InputIterator,
+             class OutputIterator>
+    void compute(const InputIterator& first,
+                 const InputIterator& last,
+                 const OutputIterator& result);
 
+    void compute(const std::size_t& size,
+                 const scalar_type* input,
+                 scalar_type* output);
+    
+    
   protected:
 
     //! Compute an output from a scalar input
@@ -138,43 +132,36 @@ namespace gammatone
   };
 }
 
-// template<class Scalar, class Output>
-// template<class InputType>
-// T gammatone::detail::interface<Scalar,Output>::
-// compute(const InputType& input)
-// {
-//   // Any non arithmetic type is considered as a container
-//   return std::conditional<std::is_arithmetic<T>::value,
-//                           internal::scalar<interface<Scalar,Output> >,
-//                           internal::container<interface<Scalar,Output> > >
-//     ::type::compute(input,this);
-// }
 
-// template<class Scalar, class Output>
-// template<class InputIterator, class OutputIterator>
-// void gammatone::detail::interface<Scalar,Output>::
-// compute(const InputIterator& first,
-//         const InputIterator& last,
-//         const OutputIterator& result)
-// {
-//   std::transform(first,last,result,[&](const auto& x){return this->compute_internal(x);});
-// }
 
-template<class C> template<class T, class U>
-U gammatone::detail::scalar<C>::
-compute(const T& input, C* client)
+
+template<class Scalar, class Output>
+Output gammatone::interface<Scalar,Output>::
+compute(const Scalar& input)
 {
-  return client->compute_internal(input);
+  return compute_internal(input);
 }
 
-template<class C> template<class T, class U>
-U gammatone::detail::container<C>::
-compute (const T& input, C* client)
+template<class Scalar, class Output>
+template<class InputIterator, class OutputIterator>
+void gammatone::interface<Scalar,Output>::
+compute(const InputIterator& first,
+        const InputIterator& last,
+        const OutputIterator& output)
 {
-  U out(input.size());
-  std::transform(input.begin(),input.end(),out.begin(),
-                 [&](const auto& x){return client->compute(x);});
-  return out;
+  std::transform(first,last,output,[&](const auto& x){return this->compute_internal(x);});
 }
+
+
+template<class Scalar, class Output>
+void gammatone::interface<Scalar,Output>::
+compute(const std::size_t& size,
+        const Scalar* input,
+        Scalar* output)
+{
+  for(std::size_t i=0;i<size;++i)
+    output[i] = this->compute_internal(input[i]);
+}
+
 
 #endif // GAMMATONE_INTERFACE_HPP

@@ -17,7 +17,7 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gammatone/filterbank/concrete.hpp>
+#include <gammatone/filterbank.hpp>
 #include <gammatone/core/convolution.hpp>
 #include <gammatone/detail/impulse_response.hpp>
 
@@ -28,12 +28,8 @@
 using namespace std;
 
 using T = double;
-template<class... X> using a = gammatone::core::convolution<X...>;
-template<class X>    using b = gammatone::policy::bandwidth::glasberg1990<X>;
-template<class... X> using c = gammatone::policy::channels::fixed_size<X...>;
-using d = gammatone::policy::order::increasing;
-using e = gammatone::policy::gain::forall_0dB;
-using filterbank = gammatone::filterbank::concrete<T,a,b,gammatone::policy::channels::fixed_size,d,e>;
+//template<class... X> using a = gammatone::core::convolution<X...>;
+using filterbank = gammatone::filterbank<T>;
 
 const T duration = 0.02;
 const T sample_frequency = 44100;
@@ -44,11 +40,11 @@ int main(int argc, char** argv)
 {
   filterbank bank(sample_frequency, low_cf, high_cf, nb_channels);
   
-  auto t = gammatone::impulse_response::time(bank.begin()->sample_frequency(), duration);
+  auto t = gammatone::detail::impulse_response::time(bank.begin()->sample_frequency(), duration);
 
   vector<vector<T> > ir(bank.nb_channels());
   transform(bank.begin(),bank.end(),ir.begin(),
-   	    [&](auto& x){return gammatone::impulse_response::implemented(x, t.begin(),t.end());});
+   	    [&](auto& x){return gammatone::detail::impulse_response::implemented(x, t.begin(),t.end());});
  
   // initialize gnuplot
   Gnuplot gp;

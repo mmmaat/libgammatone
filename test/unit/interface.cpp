@@ -18,14 +18,14 @@
 */
 
 #include <boost/test/unit_test.hpp>
-#include <gammatone/interface_filter.hpp>
-#include <gammatone/interface_filterbank.hpp>
+#include <gammatone/interface.hpp>
+#include <gammatone/interface.hpp>
 
 #include <test_utils.hpp>
 #include <vector>
 typedef double T;
 
-class fixture_filter : public gammatone::filter::interface<T>
+class fixture_filter : public gammatone::interface<T,T>
 {
 protected:
   T sample_frequency() const {return 0;}
@@ -37,9 +37,9 @@ private:
   T compute_internal(const T& in){return 2*in;}
 };
 
-class fixture_filterbank : public gammatone::filterbank::interface<T>
+class fixture_filterbank : public gammatone::interface<T,std::vector<T> >
 {
-  typedef gammatone::filterbank::interface<T>::output_type U;
+  typedef gammatone::interface<T,std::vector<T> >::output_type U;
 protected:
   T sample_frequency() const {return 0;}
   U center_frequency() const {return empty;};
@@ -62,7 +62,6 @@ BOOST_FIXTURE_TEST_CASE(compute_works, fixture_filter)
 
   std::vector<T> input(1,1);
   BOOST_CHECK_EQUAL(2, compute(input[0]));
-  BOOST_CHECK_EQUAL(2, compute(input)[0]);
 
   std::vector<T> output(input.size());
   compute(input.begin(),input.end(),output.begin());
@@ -79,10 +78,10 @@ BOOST_FIXTURE_TEST_CASE(compute_works, fixture_filter)
   compute(in.begin(),in.end(),out2.begin());
 
   // 3rd version
-  std::vector<T> out3 = compute(in);
+  //  std::vector<T> out3 = compute(in);
 
   BOOST_CHECK(std::equal(out1.begin(),out1.end(),out2.begin()));
-  BOOST_CHECK(std::equal(out1.begin(),out1.end(),out3.begin()));
+  //BOOST_CHECK(std::equal(out1.begin(),out1.end(),out3.begin()));
 }
 
 
@@ -104,13 +103,13 @@ BOOST_FIXTURE_TEST_CASE(compute_works_on_bank, fixture_filterbank)
   compute(in.begin(),in.end(),out2.begin());
 
   // 3rd version
-  auto out3 = compute(in);
+  //  auto out3 = compute(in);
 
   for(std::size_t i=0;i<in.size();i++)
     {
       BOOST_CHECK_EQUAL(3, out1[i].size());
       BOOST_CHECK(std::equal(out1[i].begin(),out1[i].end(),out2[i].begin()));
-      BOOST_CHECK(std::equal(out1[i].begin(),out1[i].end(),out3[i].begin()));
+      //  BOOST_CHECK(std::equal(out1[i].begin(),out1[i].end(),out3[i].begin()));
     }
 }
 

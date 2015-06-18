@@ -89,7 +89,7 @@ convolution(const Scalar& sample_frequency,
             const Scalar& bandwidth)
   : base<Scalar, GainPolicy>(sample_frequency,center_frequency,bandwidth),
   //! \todo remove -60db magic number !
-  m_ir(gammatone::impulse_response::theorical_attenuate(center_frequency,bandwidth,sample_frequency,-60.0))
+  m_ir(gammatone::detail::impulse_response::theorical_attenuate(center_frequency,bandwidth,sample_frequency,-60.0))
 {
   reset();
 }

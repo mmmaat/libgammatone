@@ -31,13 +31,10 @@
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
-//#include <gammatone/core/holdsworth.hpp>
 
 #include <gammatone/policy/bandwidth.hpp>
-#include <gammatone/policy/order.hpp>
 #include <gammatone/policy/channels.hpp>
 #include <gammatone/policy/clipping.hpp>
-#include <gammatone/policy/postprocessing.hpp>
 
 
 // Above are some general comments on libgammatone for Doxygen doc
@@ -69,18 +66,6 @@
   \brief Policy classes for filter and filterbank
   customization
 */
-
-/*!
-  \namespace gammatone::filter
-
-  \brief Gammatone filter implementation (concrete or holder)
- */
-
-/*!
-  \namespace gammatone::filterbank
-
-  \brief Gammatone filterbank implementation (concrete or holder)
- */
 
 /*!
   \namespace gammatone::detail

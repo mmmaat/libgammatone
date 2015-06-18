@@ -1,5 +1,5 @@
-#include <gammatone/filter/concrete.hpp>
-#include <gammatone/filterbank/concrete.hpp>
+#include <gammatone/filter.hpp>
+#include <gammatone/filterbank.hpp>
 #include <iostream>
 using namespace std;
 
@@ -10,21 +10,21 @@ void write(const std::string msg)
   cout << msg << endl;
 }
 
-class filter : public gammatone::filter::concrete<double>
+class filter : public gammatone::filter<double>
 {
-  using concrete = gammatone::filter::concrete<double>;
+  using concrete = gammatone::filter<double>;
   
 public:
   filter(const double& fs, const double& fc)
-    : concrete::concrete(fs,fc)
+    : concrete::filter(fs,fc)
   { write("explicit"); }
 
   filter(const filter& other)
-    : concrete::concrete(other)
+    : concrete::filter(other)
   { write("copy ctor"); }
 
   filter(filter&& other)
-    : concrete::concrete(std::move(other))
+    : concrete::filter(std::move(other))
   { write("move ctor"); }
 
   virtual ~filter()

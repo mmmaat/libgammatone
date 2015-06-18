@@ -32,15 +32,13 @@ namespace gammatone
       /*!
         \tparam Scalar           Type of scalar values.
         \tparam BandwidthPolicy  Policy for bandwith constants. See policy::bandwidth.
-        \tparam OrderPolicy      Policy for ordering frequency channels. See policy::order.
       */
       template
       <
         class Scalar,
-        template<class> class BandwidthPolicy,
-        class OrderPolicy
+        template<class> class BandwidthPolicy
         >
-      class fixed_size : private base<Scalar,BandwidthPolicy,OrderPolicy>
+      class fixed_size : private base<Scalar,BandwidthPolicy>
       {
       public:
 
@@ -69,7 +67,7 @@ namespace gammatone
           frequencies (Hz) and p.second the overlap factor. The number
           of channels is thus p.first.size()
         */
-        static typename gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::setup_type
+        static typename gammatone::policy::channels::base<Scalar,BandwidthPolicy>::setup_type
         setup(const Scalar& low_frequency,
               const Scalar& high_frequency,
               const param_type& nb_channels);
@@ -81,21 +79,19 @@ namespace gammatone
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-const typename gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy,OrderPolicy>::param_type
-gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy,OrderPolicy>::
+const typename gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy>::param_type
+gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy>::
 default_size = 30;
 
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-typename gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy,OrderPolicy>::param_type
-gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy,OrderPolicy>::
+typename gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy>::param_type
+gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy>::
 default_parameter()
 {
   return default_size;
@@ -104,14 +100,13 @@ default_parameter()
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-typename gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::setup_type
-gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy,OrderPolicy>::
+typename gammatone::policy::channels::base<Scalar,BandwidthPolicy>::setup_type
+gammatone::policy::channels::fixed_size<Scalar,BandwidthPolicy>::
 setup(const Scalar& fl, const Scalar& fh, const std::size_t& nbc)
 {
-  using base = base<Scalar,BandwidthPolicy,OrderPolicy>;
+  using base = base<Scalar,BandwidthPolicy>;
   
   const Scalar b = base::beta(fl,fh) / static_cast<Scalar>(nbc);
 

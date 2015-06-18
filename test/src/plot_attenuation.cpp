@@ -17,14 +17,14 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <gammatone/filter/concrete.hpp>
+#include <gammatone/filter.hpp>
 #include <gammatone/detail/impulse_response.hpp>
 
 #include <test_setup.hpp>
 #include <iostream>
 #include <limits>
 
-using ir = gammatone::impulse_response;
+using ir = gammatone::detail::impulse_response;
 
 template<class Filter, class Container, class IRBase>
 void plot(const Filter& f, const Container& ref, const IRBase& base, const Container& db)
@@ -56,7 +56,7 @@ void plot(const Filter& f, const Container& ref, const IRBase& base, const Conta
 int main()
 {
   // the gammatone filter
-  const gammatone::filter::concrete<double> f(44100, 1000);
+  const gammatone::filter<double> f(44100, 1000);
 
   // the reference impulse response (0.1 second long)
   const double max_duration = 0.1;

@@ -26,37 +26,25 @@
 typedef double T;
 using namespace gammatone;
 
+// core types
+template<class... X> using a1 = core::convolution<X...>;
+template<class... X> using a2 = core::cooke1993<X...>;
+template<class... X> using a3 = core::slaney1993<X...>;
+
 // gain types
 using g1 = policy::gain::forall_0dB;
 using g2 = policy::gain::peroctave_6dB;
 
-// default bandwidth channel and order
-template<class X> using b = policy::bandwidth::glasberg1990<X>;
-template<class... X> using c = policy::channels::fixed_size<X...>;
-using o = policy::order::increasing;
 
-// core types
-template<class... X> using c1 = core::convolution<X...>;
-template<class... X> using c2 = core::cooke1993<X...>;
-template<class... X> using c3 = core::slaney1993<X...>;
 
 // filterbank types
-using filterbank11 = filterbank::concrete<T,c1,b,policy::channels::fixed_size,o,g1>;
-using filterbank22 = filterbank::concrete<T,c2,b,policy::channels::fixed_size,o,g2>;
-using filterbank31 = filterbank::concrete<T,c3,b,policy::channels::fixed_size,o,g1>;
+using filterbank11 = filterbank<T,a1,policy::channels::fixed_size,g1>;
+using filterbank22 = filterbank<T,a2,policy::channels::fixed_size,g2>;
+using filterbank31 = filterbank<T,a3,policy::channels::fixed_size,g1>;
 
-using filterbank12 = filterbank::concrete<T,c1,b,policy::channels::fixed_size,o,g2>;
-using filterbank21 = filterbank::concrete<T,c2,b,policy::channels::fixed_size,o,g1>;
-using filterbank32 = filterbank::concrete<T,c3,b,policy::channels::fixed_size,o,g2>;
-
-// filter types
-using filter11 = filter::concrete<T,c1,b,g1>;
-using filter22 = filter::concrete<T,c2,b,g2>;
-using filter31 = filter::concrete<T,c3,b,g1>;
-using filter12 = filter::concrete<T,c1,b,g2>;
-using filter21 = filter::concrete<T,c2,b,g1>;
-using filter32 = filter::concrete<T,c3,b,g2>;
-
+using filterbank12 = filterbank<T,a1,policy::channels::fixed_size,g2>;
+using filterbank21 = filterbank<T,a2,policy::channels::fixed_size,g1>;
+using filterbank32 = filterbank<T,a3,policy::channels::fixed_size,g2>;
 
 
 // filterbank parameters
@@ -129,18 +117,18 @@ int main()
   //////////////////////////
 
   // 3000 Hz IR
-  using ir = impulse_response;
-  const T f = 3000;
+  using ir = detail::impulse_response;
+  //  const T f = 3000;
   const auto t = ir::time(fs,0.01);
   std::vector<DataType> ir_base;
-  ir_base.push_back(make_tuple(ir::implemented(filter11(fs,f),t.begin(),t.end()), "convolution 0dB"));
-  ir_base.push_back(make_tuple(ir::implemented(filter12(fs,f),t.begin(),t.end()), "convolution 6dB"));
-  ir_base.push_back(make_tuple(ir::implemented(filter31(fs,f),t.begin(),t.end()), "cooke 0dB"));
-  ir_base.push_back(make_tuple(ir::implemented(filter32(fs,f),t.begin(),t.end()), "cooke 6dB"));
-  ir_base.push_back(make_tuple(ir::implemented(filter21(fs,f),t.begin(),t.end()), "slaney 0dB"));
-  ir_base.push_back(make_tuple(ir::implemented(filter22(fs,f),t.begin(),t.end()), "slaney 6dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter11(fs,f),t.begin(),t.end()), "convolution 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter12(fs,f),t.begin(),t.end()), "convolution 6dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter31(fs,f),t.begin(),t.end()), "cooke 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter32(fs,f),t.begin(),t.end()), "cooke 6dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter21(fs,f),t.begin(),t.end()), "slaney 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filter22(fs,f),t.begin(),t.end()), "slaney 6dB"));
 
-  plot(t, ir_base, "amplitude","time (s)");
+   plot(t, ir_base, "amplitude","time (s)");
 
   // // normalized IR
   // for(auto& ir:ir_base)
@@ -152,16 +140,16 @@ int main()
   //   Check octave
   //////////////////////////
 
-  std::vector<T> frequencies({500,1000,2000,3000,5000});
-  for(const auto& f : frequencies)
-    {
-      check<filter11>(fs,f,"convolution 0dB");
-      check<filter12>(fs,f,"convolution 6dB");
-      check<filter21>(fs,f,"slaney 0dB");
-      check<filter22>(fs,f,"slaney 6dB");
-      check<filter31>(fs,f,"cooke 0dB");
-      check<filter32>(fs,f,"cooke 6dB");
-    }
+  // std::vector<T> frequencies({500,1000,2000,3000,5000});
+  // for(const auto& f : frequencies)
+  //   {
+  //     check<filter11>(fs,f,"convolution 0dB");
+  //     check<filter12>(fs,f,"convolution 6dB");
+  //     check<filter21>(fs,f,"slaney 0dB");
+  //     check<filter22>(fs,f,"slaney 6dB");
+  //     check<filter31>(fs,f,"cooke 0dB");
+  //     check<filter32>(fs,f,"cooke 6dB");
+  //   }
 
   return 0;
 }

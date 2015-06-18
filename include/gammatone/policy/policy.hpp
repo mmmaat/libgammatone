@@ -28,9 +28,12 @@ namespace gammatone
   {
     //! Base class of all gammatone policies
     /*!  
+      \class policy gammatone/policy/policy.hpp
 
       This base class simply make private constructor, destructor and
-      copy members. Indeed policy classes just endow static methods.
+      copy members. 
+
+      This fix the design of derived policy classes : static methods only.
      */
     class policy : private boost::noncopyable {};
   }

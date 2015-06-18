@@ -16,9 +16,9 @@ using T = double;
 
 using filter_types = boost::mpl::list
   <
-  gammatone::filter::concrete<T,a1>,
-  gammatone::filter::concrete<T,a2>,
-  gammatone::filter::concrete<T,a3>
+  gammatone::filter<T,a1>,
+  gammatone::filter<T,a2>,
+  gammatone::filter<T,a3>
   >;
   
 #endif // GAMMATONE_TEST_FILTER_TYPES_H

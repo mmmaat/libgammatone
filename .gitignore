@@ -2,6 +2,7 @@
 *.pdf
 *.wav
 .#*
+/build
 /minimal
 CMakeCache.txt
 CMakeFiles/

@@ -21,7 +21,7 @@
 // libgammatone. Compare both theorical and implemented cores IRs.
 
 #include <gammatone/detail/impulse_response.hpp>
-#include <gammatone/filter/concrete.hpp>
+#include <gammatone/filter.hpp>
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
 #include <gammatone/core/convolution.hpp>
@@ -34,9 +34,9 @@
 
 using namespace std;
 typedef double T;
-typedef gammatone::filter::concrete<T,gammatone::core::cooke1993 >   filter1;
-typedef gammatone::filter::concrete<T,gammatone::core::slaney1993 >  filter2;
-typedef gammatone::filter::concrete<T,gammatone::core::convolution > filter3;
+typedef gammatone::filter<T,gammatone::core::cooke1993 >   filter1;
+typedef gammatone::filter<T,gammatone::core::slaney1993 >  filter2;
+typedef gammatone::filter<T,gammatone::core::convolution > filter3;
 
 const T sample_frequency = 44100; // Hz
 const T center_frequency = 1000;  // Hz
@@ -81,13 +81,15 @@ int main(int argc, char** argv)
   filter3 f3(sample_frequency,center_frequency);
 
   // impulse responses computation
-  const auto t = gammatone::impulse_response::time(f1.sample_frequency(),duration);
+  using ir = gammatone::detail::impulse_response;
+  
+  const auto t = ir::time(f1.sample_frequency(),duration);
 
   vector<pair<vector<T>,string> > ir_data;
-  ir_data.push_back(make_pair(gammatone::impulse_response::theorical(  f1,t.begin(),t.end()), "theorical"));
-  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f1,t.begin(),t.end()), "ma"));
-  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f2,t.begin(),t.end()), "flax"));
-  ir_data.push_back(make_pair(gammatone::impulse_response::implemented(f3,t.begin(),t.end()), "convolution"));
+  ir_data.push_back(make_pair(ir::theorical(  f1,t.begin(),t.end()), "theorical"));
+  ir_data.push_back(make_pair(ir::implemented(f1,t.begin(),t.end()), "ma"));
+  ir_data.push_back(make_pair(ir::implemented(f2,t.begin(),t.end()), "flax"));
+  ir_data.push_back(make_pair(ir::implemented(f3,t.begin(),t.end()), "convolution"));
 
   cout << "  ma : " << tostring(f1, ir_data[1].first) << endl;
   cout << "flax : " << tostring(f2, ir_data[2].first) << endl;

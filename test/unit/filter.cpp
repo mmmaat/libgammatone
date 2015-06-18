@@ -70,9 +70,13 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_works, F, filter_types, fixture<F>)
       BOOST_CHECK_EQUAL( f2.bandwidth(), f.bandwidth() );
       BOOST_CHECK_EQUAL( f2.gain(), f.gain() );
 
-      auto out = f.compute(x);
-      auto out1 = f1.compute(x);
-      auto out2 = f2.compute(x);
+      std::vector<T> out(x.size());
+      auto out1 = out;
+      auto out2 = out;
+      f.compute(x.begin(),x.end(),out.begin());
+      f1.compute(x.begin(),x.end(),out1.begin());
+      f2.compute(x.begin(),x.end(),out2.begin());
+      
       for(size_t i=0;i<x.size();i++)
         {
           BOOST_CHECK_EQUAL(out[i],out1[i]);
@@ -89,8 +93,8 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types, fixture<F>)
   const auto& x = this->signal;
   for(auto& f:this->filters)
     {
-      f.reset();
-      std::vector<T> c1 = f.compute(x);
+      // f.reset();
+      // std::vector<T> c1 = f.compute(x);
 
       f.reset();
       std::vector<T> c2(x.size());
@@ -106,9 +110,9 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types, fixture<F>)
       
       for(std::size_t i=0;i<x.size();i++)
         {
-          BOOST_CHECK_EQUAL(c1[i],c2[i]);
-          BOOST_CHECK_EQUAL(c1[i],c3[i]);
-	  BOOST_CHECK_EQUAL(c1[i],c4[i]);
+	  // BOOST_CHECK_EQUAL(c1[i],c2[i]);
+          BOOST_CHECK_EQUAL(c2[i],c3[i]);
+	  BOOST_CHECK_EQUAL(c2[i],c4[i]);
         }
     }
 }
@@ -119,11 +123,15 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types, fixture<F>)
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types, fixture<F>)
 {
   const auto& x = this->signal;
+  std::vector<T> c(x.size());
+  std::vector<T> c1(x.size());
+  std::vector<T> c2(x.size());
+  
   for(auto& f:this->filters)
     {
-      auto c = f.compute(x);
+      f.compute(x.begin(),x.end(),c.begin());
+      f.compute(x.begin(),x.end(),c1.begin());
 
-      auto c1 = f.compute(x);
       std::vector<T> d1(x.size());
       std::transform(c.begin(),c.end(),c1.begin(),d1.begin(),
                      [&](const T& x,const T& y){return x-y;});
@@ -133,7 +141,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types, fixture<F>)
       BOOST_CHECK_EQUAL(false,b1);
 
       f.reset();
-      auto c2 = f.compute(x);
+      f.compute(x.begin(),x.end(),c2.begin());
       std::vector<T> d2(x.size());
       std::transform(c.begin(),c.end(),c2.begin(),d2.begin(),
                      [&](const T& x,const T& y){return x-y;});
