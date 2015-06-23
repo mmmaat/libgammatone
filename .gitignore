@@ -2,6 +2,10 @@
 *.pdf
 *.wav
 .#*
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
 /build
 /minimal
 CMakeCache.txt
