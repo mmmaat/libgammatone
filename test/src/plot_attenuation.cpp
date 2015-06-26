@@ -35,7 +35,7 @@ void plot(const Filter& f, const Container& ref, const IRBase& base, const Conta
      << "set ylabel 'amplitude'" << std::endl
      << "plot ";
 
-  const auto fs = f.sample_frequency();
+  const double fs = f.sample_frequency();
   const double duration = (ref.size()-1)/fs;
 
   // plot reference IR
@@ -49,7 +49,7 @@ void plot(const Filter& f, const Container& ref, const IRBase& base, const Conta
   // send data to gnuplot
   gp.send1d(std::make_pair(ir::time(fs,duration), ref));
   for(const auto& ir : base)
-    gp.send1d(std::make_pair(ir::time(fs,(ir.size()-1)/fs), ir));
+  gp.send1d(std::make_pair(ir::time(fs,(ir.size()-1)/fs), ir));
 }
 
 
@@ -60,7 +60,7 @@ int main()
 
   // the reference impulse response (0.1 second long)
   const double max_duration = 0.1;
-  const auto ir_ref = ir::theorical(f,max_duration);
+  const std::vector<double> ir_ref = ir::theorical(f,max_duration);
 
   // IR for different attenuation levels (in db)
   std::vector<double> db = {-200,-100,-60,-30,-20,-10,-6,-3};

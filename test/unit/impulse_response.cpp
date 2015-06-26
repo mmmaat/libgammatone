@@ -30,6 +30,8 @@ class fixture2
 protected:
   fixture2():filter(fs,fc){}
   ~fixture2(){}
+
+  using T = typename Filter::scalar_type;
   
   const T fs = 44100;
   const T fc = 3000;
@@ -38,27 +40,20 @@ protected:
   Filter filter;
 };
 
-using namespace gammatone;
+using ir = gammatone::detail::impulse_response;
+using gammatone::detail::absmax;
 
 
 BOOST_AUTO_TEST_SUITE(detail_impulse_response)
 
-//================================================
-
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(fixture2_works, F, filter_types, fixture2<F>)
-{
-   BOOST_CHECK_EQUAL(this->fs, this->filter.sample_frequency());
-   BOOST_CHECK_EQUAL(this->fc, this->filter.center_frequency());
-}
-
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types<double>, fixture2<F>)
 {
-  const auto time = detail::impulse_response::time(this->filter.sample_frequency(), this->duration);
+  const auto time = ir::time(this->filter.sample_frequency(), this->duration);
   const auto mm = std::minmax_element(time.begin(),time.end());
-  
+
   // increasing order
   BOOST_CHECK( std::adjacent_find(time.begin(), time.end(), std::greater<int>()) == time.end());
 
@@ -73,12 +68,12 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(time_works, F, filter_types, fixture2<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types<double>, fixture2<F>)
 {
-  const auto ir = detail::impulse_response::theorical(this->filter,this->duration);
+  const auto ir = ir::theorical(this->filter,this->duration);
 
   BOOST_CHECK_NE( ir.size() , 0);
-  BOOST_CHECK_NE( detail::absmax(ir.cbegin(),ir.cend()), 0.0);
+  BOOST_CHECK_NE( absmax(ir.cbegin(),ir.cend()), 0.0);
   BOOST_CHECK_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
   BOOST_CHECK_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
 }
@@ -86,15 +81,15 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(theorical_works, F, filter_types, fixture2<F>)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types<double>, fixture2<F>)
 {
-  const auto ir = detail::impulse_response::theorical_attenuate(this->filter.center_frequency(),
-                                                        this->filter.bandwidth(),
-                                                        this->filter.sample_frequency(),
-                                                        this->attenuation);
+  const auto ir = ir::theorical_attenuate(this->filter.center_frequency(),
+                                          this->filter.bandwidth(),
+                                          this->filter.sample_frequency(),
+                                          this->attenuation);
 
   BOOST_CHECK_NE( ir.size() , 0);
-  BOOST_CHECK_NE( detail::absmax(ir.cbegin(),ir.cend()), 0.0);
+  BOOST_CHECK_NE( absmax(ir.cbegin(),ir.cend()), 0.0);
   BOOST_CHECK_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
   BOOST_CHECK_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
 }
@@ -102,47 +97,46 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(attenuation_works, F, filter_types, fixture2<F>
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(max_duration_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(max_duration_works, F, filter_types<double>, fixture2<F>)
 {
   // test 1s
   std::size_t size = 44100+1;
-  auto ir = detail::impulse_response::theorical_attenuate<typename F::scalar_type>(5000,200,44100,1);
-  BOOST_CHECK_EQUAL(size, ir.size());
+  auto ir1 = ir::theorical_attenuate<typename F::scalar_type>(5000,200,44100,1);
+  BOOST_CHECK_EQUAL(size, ir1.size());
 
   // test 2s
   size = 2*44100+1;
-  ir = detail::impulse_response::theorical_attenuate<typename F::scalar_type>(5000,200,44100,1,2);
-  BOOST_CHECK_EQUAL(size, ir.size());
+  ir1 = ir::theorical_attenuate<typename F::scalar_type>(5000,200,44100,1,2);
+  BOOST_CHECK_EQUAL(size, ir1.size());
 }
 
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(implemented_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(implemented_works, F, filter_types<double>, fixture2<F>)
 {
-  const auto ir = detail::impulse_response::implemented(this->filter,this->duration);
+  const auto ir1 = ir::implemented(this->filter,this->duration);
 
-  BOOST_CHECK_NE( (int)ir.size() , 0);
-  BOOST_CHECK_NE( detail::absmax(ir.cbegin(),ir.cend()), 0.0);
-  BOOST_CHECK_LE( *std::min_element(ir.cbegin(),ir.cend()), 0.0);
-  BOOST_CHECK_GE( *std::max_element(ir.cbegin(),ir.cend()), 0.0);
+  BOOST_CHECK_NE( (int)ir1.size() , 0);
+  BOOST_CHECK_NE( absmax(ir1.cbegin(),ir1.cend()), 0.0);
+  BOOST_CHECK_LE( *std::min_element(ir1.cbegin(),ir1.cend()), 0.0);
+  BOOST_CHECK_GE( *std::max_element(ir1.cbegin(),ir1.cend()), 0.0);
 }
 
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(polymorphism_works, F, filter_types, fixture2<F>)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(polymorphism_works, F, filter_types<double>, fixture2<F>)
 {
-  using namespace gammatone::detail;
-  const auto t  = impulse_response::time(this->filter.sample_frequency(), this->duration);
-  const auto it = impulse_response::theorical(this->filter, t.begin(), t.end());
-  const auto pt = impulse_response::theorical(this->filter,this->duration);
-  const auto et = impulse_response::theorical(this->fc,
-                                              this->filter.bandwidth(),
-                                              this->fs, this->duration);
+  const auto t  = ir::time(this->filter.sample_frequency(), this->duration);
+  const auto it = ir::theorical(this->filter, t.begin(), t.end());
+  const auto pt = ir::theorical(this->filter,this->duration);
+  const auto et = ir::theorical(this->fc,
+                                this->filter.bandwidth(),
+                                this->fs, this->duration);
 
-  const auto pi = impulse_response::implemented(this->filter,this->duration);
-  const auto ii = impulse_response::implemented(this->filter, t.begin(), t.end());
+  const auto pi = ir::implemented(this->filter,this->duration);
+  const auto ii = ir::implemented(this->filter, t.begin(), t.end());
 
   BOOST_CHECK_EQUAL(t.size(), ii.size());
   BOOST_CHECK_EQUAL(t.size(), pi.size());
@@ -154,11 +148,11 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(polymorphism_works, F, filter_types, fixture2<F
   BOOST_CHECK_NE(0, t.size());
 
   for(std::size_t n=0; n<t.size();n++)
-    {
-      BOOST_CHECK_EQUAL(it[n], pt[n]);
-      BOOST_CHECK_EQUAL(it[n], et[n]);
-      BOOST_CHECK_EQUAL(ii[n], pi[n]);
-    }
+  {
+    BOOST_CHECK_EQUAL(it[n], pt[n]);
+    BOOST_CHECK_EQUAL(it[n], et[n]);
+    BOOST_CHECK_EQUAL(ii[n], pi[n]);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -35,17 +35,17 @@ namespace gammatone
       \class impulse_response
 
       This class provide static methods for impulse response
-      generation. Both theorical and obtained impulse responses are
+      generation. Both theoretical and obtained impulse responses are
       provided.
     */
     class impulse_response
     {
     public:
 
-      //! Compute the theorical impulse response for given filter and
+      //! Compute the theoretical impulse response for given filter and
       //! duration
       /*!
-        \tparam Filter     Type of the gamamtone filter
+        \tparam Filter     Type of the gammatone filter
         \tparam Container  Type of the output container
 
         \param filter   The gammatone filter to be processed
@@ -53,13 +53,17 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Filter,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container theorical(const Filter& filter,
-                                 const typename Filter::scalar_type& duration);
+      template
+      <
+      class Filter,
+      template<class...> class Container = std::vector
+      >
+      static Container<typename Filter::scalar_type> theorical(
+        const Filter& filter,
+        const typename Filter::scalar_type& duration);
 
 
-      //! Compute the theorical impulse response for given filter and
+      //! Compute the theoretical impulse response for given filter and
       //! timestamps
       /*!
         The timestamps range in [first,last) is expressed in seconds)
@@ -74,15 +78,18 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Filter,
-               class Iterator,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container theorical(const Filter& filter,
-                                 const Iterator& first,
-                                 const Iterator& last);
+      template
+      <
+        class Filter,
+        class Iterator,
+        template<class...> class Container = std::vector
+        >
+      static Container<typename Filter::scalar_type> theorical(
+        const Filter& filter,
+        const Iterator& first,
+        const Iterator& last);
 
-
-      //! Compute the theorical impulse response for given explicit
+      //! Compute the theoretical impulse response for given explicit
       //! parameters and timestamps
       /*!
         The timestamps range in [first,last) is expressed in seconds)
@@ -99,16 +106,20 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Scalar,
-               class Iterator,
-               class Container = std::vector<Scalar> >
-      static Container theorical(const Scalar& center_frequency,
-                                 const Scalar& bandwidth,
-                                 const Iterator& first,
-                                 const Iterator& last);
+      template
+      <
+        class Scalar,
+        class Iterator,
+        template<class...> class Container = std::vector
+        >
+      static Container<Scalar> theorical(
+        const Scalar& center_frequency,
+        const Scalar& bandwidth,
+        const Iterator& first,
+        const Iterator& last);
 
 
-      //! Compute the theorical impulse response for given explicit
+      //! Compute the theoretical impulse response for given explicit
       //! parameters and duration
       /*!
         \tparam Scalar    Type of scalar values
@@ -121,16 +132,20 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Scalar,
-               class Container = std::vector<Scalar> >
-      static Container theorical(const Scalar& center_frequency,
-                                 const Scalar& bandwidth,
-                                 const Scalar& sample_frequency,
-                                 const Scalar& duration);
+      template
+      <
+        class Scalar,
+        template<class...> class Container = std::vector
+        >
+      static Container<Scalar> theorical(
+        const Scalar& center_frequency,
+        const Scalar& bandwidth,
+        const Scalar& sample_frequency,
+        const Scalar& duration);
 
 
 
-      //! Compute the theorical impulse response for given filter and
+      //! Compute the theoretical impulse response for given filter and
       //! attenuation
       /*!
         The generated impulse response length is given as an attenuation
@@ -147,14 +162,18 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Filter,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container theorical_attenuate(const Filter& filter,
-                                           const typename Filter::scalar_type& attenuation,
-                                           const typename Filter::scalar_type max_duration = 1.0);
+      template
+      <
+        class Filter,
+        template<class...> class Container = std::vector
+        >
+      static Container<typename Filter::scalar_type> theorical_attenuate(
+        const Filter& filter,
+        const typename Filter::scalar_type& attenuation,
+        const typename Filter::scalar_type max_duration = 1.0);
 
 
-      //! Compute the theorical impulse response for given filter
+      //! Compute the theoretical impulse response for given filter
       //! parameters and attenuation
       /*!
         The generated impulse response length is given as an attenuation
@@ -174,14 +193,18 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Scalar,
-               class dB = Scalar,
-               class Container = std::vector<Scalar> >
-      static Container theorical_attenuate(const Scalar& center_frequency,
-                                           const Scalar& bandwidth,
-                                           const Scalar& sample_frequency,
-                                           const dB& attenuation,
-                                           const Scalar max_duration = 1.0);
+      template
+      <
+        class Scalar,
+        class dB = Scalar,
+        template<class...> class Container = std::vector
+        >
+      static Container<Scalar> theorical_attenuate(
+        const Scalar& center_frequency,
+        const Scalar& bandwidth,
+        const Scalar& sample_frequency,
+        const dB& attenuation,
+        const Scalar max_duration = 1.0);
 
 
 
@@ -197,19 +220,27 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Filter,
-               class Iterator,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container implemented(const Filter& filter,
-                                   const Iterator& first,
-                                   const Iterator& last);
+      template
+      <
+        class Filter,
+        class Iterator,
+        template<class...> class Container = std::vector
+        >
+      static Container<typename Filter::scalar_type> implemented(
+        const Filter& filter,
+        const Iterator& first,
+        const Iterator& last);
 
-      template<class Filter,
-               class Iterator,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container implemented(Filter& filter,
-                                   const Iterator& first,
-                                   const Iterator& last);
+      template
+      <
+        class Filter,
+        class Iterator,
+        template<class...> class Container = std::vector
+        >
+      static Container<typename Filter::scalar_type> implemented(
+        Filter& filter,
+        const Iterator& first,
+        const Iterator& last);
 
 
       //! Compute the implemented impulse response for given filter and duration
@@ -222,10 +253,14 @@ namespace gammatone
 
         \return The computed impulse response
       */
-      template<class Filter,
-               class Container = std::vector<typename Filter::scalar_type> >
-      static Container implemented(const Filter& filter,
-                                   const typename Filter::scalar_type& duration);
+      template
+      <
+        class Filter,
+        template<class...> class Container = std::vector
+	>
+      static Container<typename Filter::scalar_type> implemented(
+        const Filter& filter,
+        const typename Filter::scalar_type& duration);
 
 
       //! Returns a container of timestamps for given sample frequency and duration
@@ -239,9 +274,9 @@ namespace gammatone
         \return A container of timestamps (in s) of size duration*sample_frequency+1
       */
       template<class Scalar,
-               class Container = std::vector<Scalar> >
-      static Container time(const Scalar& sample_frequency,
-                            const Scalar& duration);
+               template<class...> class Container = std::vector >
+      static Container<Scalar> time(const Scalar& sample_frequency,
+                                    const Scalar& duration);
 
     private:
       //! Compute the theorical impulse response of a single value
@@ -265,82 +300,82 @@ namespace gammatone
 }
 
 
-template<class Scalar, class dB, class Container>
-Container gammatone::detail::impulse_response::
+template<class Scalar, class dB, template<class...> class Container>
+Container<Scalar> gammatone::detail::impulse_response::
 theorical_attenuate(const Scalar& center_frequency,
                     const Scalar& bandwidth,
                     const Scalar& sample_frequency,
                     const dB& attenuation,
                     const Scalar max_duration)
 {
-  Container t = time(sample_frequency, max_duration);
+  Container<Scalar> t = time(sample_frequency, max_duration);
 
   auto ir = theorical(center_frequency,bandwidth,t.cbegin(),t.cend());
   gammatone::detail::shrink_to_attenuation(ir, static_cast<Scalar>(attenuation));
 
-  return std::move(ir);
+  return ir;
 }
 
-template<class Filter, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 theorical_attenuate(const Filter& filter,
                     const typename Filter::scalar_type& attenuation,
                     const typename Filter::scalar_type max_duration)
 {
-  return std::move(theorical_attenuate(filter.center_frequency(),
-                                       filter.bandwidth(),
-                                       filter.sample_frequency(),
-                                       attenuation, max_duration));
+  return theorical_attenuate(filter.center_frequency(),
+                             filter.bandwidth(),
+                             filter.sample_frequency(),
+                             attenuation, max_duration);
 }
 
-template<class Filter, class Iterator, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, class Iterator, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 theorical(const Filter& filter,
           const Iterator& first,
           const Iterator& last)
 {
-  return std::move(theorical(filter.center_frequency(), filter.bandwidth(), first, last));
+  return theorical(filter.center_frequency(), filter.bandwidth(), first, last);
 }
 
-template<class Filter, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 theorical(const Filter& filter,
           const typename Filter::scalar_type& duration)
 {
-  Container t = time(filter.sample_frequency(), duration);
-  return std::move(theorical(filter.center_frequency(),filter.bandwidth(),t.cbegin(),t.cend()));
+  Container<typename Filter::scalar_type> t = time(filter.sample_frequency(), duration);
+  return theorical(filter.center_frequency(),filter.bandwidth(),t.cbegin(),t.cend());
 }
 
 
-template<class Scalar, class Iterator, class Container>
-Container gammatone::detail::impulse_response::
+template<class Scalar, class Iterator, template<class...> class Container>
+Container<Scalar> gammatone::detail::impulse_response::
 theorical(const Scalar& center_frequency,
           const Scalar& bandwidth,
           const Iterator& first,
           const Iterator& last)
 {
 
-  Container ir(std::distance(first,last));
+  Container<Scalar> ir(std::distance(first,last));
   std::transform(first,last,ir.begin(),
                  [&](const auto& t){return formula_ir(center_frequency,bandwidth,t);});
-  return std::move(ir);
+  return ir;
 }
 
 
-template<class Scalar, class Container>
-Container gammatone::detail::impulse_response::
+template<class Scalar, template<class...> class Container>
+Container<Scalar> gammatone::detail::impulse_response::
 theorical(const Scalar& center_frequency,
           const Scalar& bandwidth,
           const Scalar& sample_frequency,
           const Scalar& duration)
 {
   const auto t = time(sample_frequency, duration);
-  return std::move(theorical(center_frequency,bandwidth,t.cbegin(),t.cend()));
+  return theorical(center_frequency,bandwidth,t.cbegin(),t.cend());
 }
 
 
-template<class Filter, class Iterator, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, class Iterator, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 implemented(const Filter& filter,
             const Iterator& first,
             const Iterator& last)
@@ -350,8 +385,8 @@ implemented(const Filter& filter,
 }
 
 
-template<class Filter, class Iterator, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, class Iterator, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 implemented(Filter& filter,
             const Iterator& first,
             const Iterator& last)
@@ -359,7 +394,7 @@ implemented(Filter& filter,
   filter.reset();
 
   // allocation for output
-  Container ir(std::distance(first,last));
+  Container<typename Filter::scalar_type> ir(std::distance(first,last));
 
   // compute the first sample (= 1)
   auto it = ir.begin();
@@ -372,22 +407,23 @@ implemented(Filter& filter,
 }
 
 
-template<class Filter, class Container>
-Container gammatone::detail::impulse_response::
+template<class Filter, template<class...> class Container>
+Container<typename Filter::scalar_type> gammatone::detail::impulse_response::
 implemented(const Filter& filter,
             const typename Filter::scalar_type& duration)
 {
-  Container t = time(filter.sample_frequency(), duration);
-  return std::move(implemented(filter,t.begin(), t.end()));
+  Container<typename Filter::scalar_type> t = time(filter.sample_frequency(), duration);
+  return implemented(filter,t.begin(), t.end());
 }
 
 
-template<class Scalar, class Container>
-Container gammatone::detail::impulse_response::
+template<class Scalar, template<class...> class Container>
+Container<Scalar> gammatone::detail::impulse_response::
 time(const Scalar& sample_frequency,
      const Scalar& duration)
 {
-  return std::move(gammatone::detail::linspace(0.0,duration, static_cast<std::size_t>(sample_frequency*duration+1)));
+  const std::size_t size = sample_frequency*duration + 1;
+  return gammatone::detail::linspace(0.0,duration,size);
 }
 
 

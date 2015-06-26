@@ -31,20 +31,22 @@ template<class... X> using a1 = core::convolution<X...>;
 template<class... X> using a2 = core::cooke1993<X...>;
 template<class... X> using a3 = core::slaney1993<X...>;
 
+// channel policy
+template<class X, template<class> class Y> using b = policy::channels::fixed_size<X,Y>;
+
 // gain types
 using g1 = policy::gain::forall_0dB;
 using g2 = policy::gain::peroctave_6dB;
 
 
-
 // filterbank types
-using filterbank11 = filterbank<T,a1,policy::channels::fixed_size,g1>;
-using filterbank22 = filterbank<T,a2,policy::channels::fixed_size,g2>;
-using filterbank31 = filterbank<T,a3,policy::channels::fixed_size,g1>;
+using filterbank11 = filterbank<T,a1,b,g1>;
+using filterbank21 = filterbank<T,a2,b,g1>;
+using filterbank31 = filterbank<T,a3,b,g1>;
 
-using filterbank12 = filterbank<T,a1,policy::channels::fixed_size,g2>;
-using filterbank21 = filterbank<T,a2,policy::channels::fixed_size,g1>;
-using filterbank32 = filterbank<T,a3,policy::channels::fixed_size,g2>;
+using filterbank12 = filterbank<T,a1,b,g2>;
+using filterbank22 = filterbank<T,a2,b,g2>;
+using filterbank32 = filterbank<T,a3,b,g2>;
 
 
 // filterbank parameters
@@ -59,7 +61,7 @@ void plot(std::vector<T> xaxis,
           const std::string xlabel = "frequency (Hz)")
 {
   Gnuplot gp;
-  gp << std::ifstream("/home/mathieu/dev/libgammatone/share/setup.gp").rdbuf() << std::endl
+  gp << std::ifstream("/home/mathieu/dev/libgammatone/test/share/setup.gp").rdbuf() << std::endl
      << "set xlabel '"<<xlabel<<"'" << std::endl
      << "set ylabel '"<<ylabel<<"'" << std::endl
      << "set key top right" << std::endl
@@ -94,21 +96,21 @@ int main()
   //   Gain
   //////////////////////////
 
-  // // gain of each filterbank type
-  // std::vector<DataType> data_base;
-  // data_base.push_back(make_tuple(filterbank11(fs,lf,hf).gain(), "convolution 0dB"));
-  // data_base.push_back(make_tuple(filterbank12(fs,lf,hf).gain(), "convolution 6dB"));
-  // data_base.push_back(make_tuple(filterbank31(fs,lf,hf).gain(), "cooke 0dB"));
-  // data_base.push_back(make_tuple(filterbank32(fs,lf,hf).gain(), "cooke 6dB"));
-  // data_base.push_back(make_tuple(filterbank21(fs,lf,hf).gain(), "slaney 0dB"));
-  // data_base.push_back(make_tuple(filterbank22(fs,lf,hf).gain(), "slaney 6dB"));
+  // gain of each filterbank type
+  std::vector<DataType> data_base;
+  data_base.push_back(make_tuple(filterbank11(fs,lf,hf).gain(), "convolution 0dB"));
+  data_base.push_back(make_tuple(filterbank12(fs,lf,hf).gain(), "convolution 6dB"));
+  data_base.push_back(make_tuple(filterbank31(fs,lf,hf).gain(), "cooke 0dB"));
+  data_base.push_back(make_tuple(filterbank32(fs,lf,hf).gain(), "cooke 6dB"));
+  data_base.push_back(make_tuple(filterbank21(fs,lf,hf).gain(), "slaney 0dB"));
+  data_base.push_back(make_tuple(filterbank22(fs,lf,hf).gain(), "slaney 6dB"));
 
-  // // direct gain
-  // plot(fc, data_base, "gain");
+  // direct gain
+  plot(fc, data_base, "gain");
 
   // // normalized gain
   // for(auto& data:data_base)
-  //   utils::decibel(std::get<0>(data).begin(),std::get<0>(data).end());
+  //   detail::decibel(std::get<0>(data).begin(),std::get<0>(data).end());
   // plot(fc, data_base, "normalized gain (dB)");
 
 
@@ -116,23 +118,23 @@ int main()
   //   Impulse responses
   //////////////////////////
 
-  // 3000 Hz IR
-  using ir = detail::impulse_response;
-  //  const T f = 3000;
-  const auto t = ir::time(fs,0.01);
-  std::vector<DataType> ir_base;
-  // ir_base.push_back(make_tuple(ir::implemented(filter11(fs,f),t.begin(),t.end()), "convolution 0dB"));
-  // ir_base.push_back(make_tuple(ir::implemented(filter12(fs,f),t.begin(),t.end()), "convolution 6dB"));
-  // ir_base.push_back(make_tuple(ir::implemented(filter31(fs,f),t.begin(),t.end()), "cooke 0dB"));
-  // ir_base.push_back(make_tuple(ir::implemented(filter32(fs,f),t.begin(),t.end()), "cooke 6dB"));
-  // ir_base.push_back(make_tuple(ir::implemented(filter21(fs,f),t.begin(),t.end()), "slaney 0dB"));
-  // ir_base.push_back(make_tuple(ir::implemented(filter22(fs,f),t.begin(),t.end()), "slaney 6dB"));
+  // // 3000 Hz IR
+  // using ir = detail::impulse_response;
+  // const T f = 3000;
+  // const auto t = ir::time(fs,0.01);
+  // std::vector<DataType> ir_base;
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank11::filter(fs,f),t.begin(),t.end()), "convolution 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank12::filter(fs,f),t.begin(),t.end()), "convolution 6dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank31::filter(fs,f),t.begin(),t.end()), "cooke 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank32::filter(fs,f),t.begin(),t.end()), "cooke 6dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank21::filter(fs,f),t.begin(),t.end()), "slaney 0dB"));
+  // ir_base.push_back(make_tuple(ir::implemented(filterbank22::filter(fs,f),t.begin(),t.end()), "slaney 6dB"));
 
-   plot(t, ir_base, "amplitude","time (s)");
+  //  plot(t, ir_base, "amplitude","time (s)");
 
   // // normalized IR
   // for(auto& ir:ir_base)
-  //   utils::normalize(std::get<0>(ir).begin(),std::get<0>(ir).end());
+  //   detail::normalize(std::get<0>(ir).begin(),std::get<0>(ir).end());
   // plot(t, ir_base, "normalized amplitude","time (s)");
 
 

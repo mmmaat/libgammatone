@@ -55,6 +55,8 @@ namespace gammatone
     >
   class filterbank : public detail::interface<Scalar, std::vector<Scalar> >
   {
+  public:
+
     //! Type of *this
     using type = filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>;
 
@@ -78,10 +80,7 @@ namespace gammatone
 
     //! Type of the underlying bank of filters
     using bank_type = std::vector<filter>;
-
-
-  public:
-
+    
     //! Const iterator on filters
     using const_iterator = typename bank_type::const_iterator;
 
@@ -615,7 +614,7 @@ compute(const std::size_t& size,
   for(std::size_t i=0;i<size;++i)
   {
     const std::size_t k = i*nb_channels();
-    for(std::size_t j=0;i<nb_channels();++j)
+    for(std::size_t j=0;j<nb_channels();++j)
     {
       output[j+k] = m_bank[j].compute(input[i]);
     }

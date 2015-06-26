@@ -17,99 +17,55 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/test/unit_test.hpp>
 #include <gammatone/detail/interface.hpp>
+#include <boost/test/unit_test.hpp>
 
-#include <test_utils.hpp>
-#include <vector>
-typedef double T;
+template<class Scalar>
+class child : public gammatone::detail::interface<Scalar,void>
+{
+public:
+  child(const Scalar& s) : gammatone::detail::interface<Scalar,void>(s) {}
 
-// class fixture_filter : public gammatone::detail::interface<T,T>
-// {
-// protected:
-//   T sample_frequency() const {return 0;}
-//   T center_frequency() const {return 0;};
-//   T bandwidth() const {return 0;}
-//   T gain() const {return 0;}
-//   void reset(){}
-// private:
-//   T compute_internal(const T& in){return 2*in;}
-// };
+private:
+  void center_frequency() const {}
+  void bandwidth() const {}
+  void gain() const {}
+  void reset(){}
+};
 
-// class fixture_filterbank : public gammatone::detail::interface<T,std::vector<T> >
-// {
-//   typedef gammatone::detail::interface<T,std::vector<T> >::output_type U;
-// protected:
-//   T sample_frequency() const {return 0;}
-//   U center_frequency() const {return empty;};
-//   U bandwidth() const {return empty;}
-//   U gain() const {return empty;}
-//   void reset(){}
-// private:
-//   U compute_internal(const T& in){return {in, 10*in, 100*in};}
-//   const U empty;
-// };
+BOOST_AUTO_TEST_SUITE(interface_test)
 
+//================================================
 
-BOOST_AUTO_TEST_SUITE(detail_interface)
+BOOST_AUTO_TEST_CASE(copy_works)
+{
+  child<int> c1(1);
+  child<int> c2(c1);
+  BOOST_CHECK_EQUAL(c1.sample_frequency(),c2.sample_frequency());
+}
 
-// //================================================
-
-// BOOST_FIXTURE_TEST_CASE(compute_works, fixture_filter)
-// {
-//   BOOST_CHECK_EQUAL(2, compute(1));
-
-//   std::vector<T> input(1,1);
-//   BOOST_CHECK_EQUAL(2, compute(input[0]));
-
-//   std::vector<T> output(input.size());
-//   compute(input.begin(),input.end(),output.begin());
-//   BOOST_CHECK_EQUAL(2, output[0]);
-
-//   std::vector<T> in = random<T>(-1,1,100);
-//   // 1st version
-//   std::vector<T> out1(in.size());
-//   std::transform(in.begin(),in.end(),out1.begin(),
-//                  [&](const auto& x){return this->compute(x);});
-
-//   // 2nd version
-//   std::vector<T> out2(in.size());
-//   compute(in.begin(),in.end(),out2.begin());
-
-//   // 3rd version
-//   //  std::vector<T> out3 = compute(in);
-
-//   BOOST_CHECK(std::equal(out1.begin(),out1.end(),out2.begin()));
-//   //BOOST_CHECK(std::equal(out1.begin(),out1.end(),out3.begin()));
-// }
+BOOST_AUTO_TEST_CASE(move_works)
+{
+  child<int> c1(1);
+  child<int> c2(std::move(c1));
+  BOOST_CHECK_EQUAL(1,c2.sample_frequency());
+}
 
 
-// //================================================
+//================================================
 
-// BOOST_FIXTURE_TEST_CASE(compute_works_on_bank, fixture_filterbank)
-// {
-//   std::vector<T> r = compute(1.0);
-//   BOOST_CHECK_EQUAL(3, r.size());
+BOOST_AUTO_TEST_CASE(sample_frequency_works)
+{
+  child<int> a(0), b(1), c(2);
+  BOOST_CHECK_EQUAL(a.sample_frequency(),0);
+  BOOST_CHECK_EQUAL(b.sample_frequency(),1);
+  BOOST_CHECK_EQUAL(c.sample_frequency(),2);
 
-//   std::vector<T> in = random<T>(-1,1,100);
-//   // 1st version
-//   std::vector<std::vector<T> > out1(in.size(),std::vector<T>(3));
-//   std::transform(in.begin(),in.end(),out1.begin(),
-//                  [&](const auto& x){return this->compute(x);});
-
-//   // 2nd version
-//   std::vector<std::vector<T> > out2(in.size(),std::vector<T>(3));
-//   compute(in.begin(),in.end(),out2.begin());
-
-//   // 3rd version
-//   //  auto out3 = compute(in);
-
-//   for(std::size_t i=0;i<in.size();i++)
-//     {
-//       BOOST_CHECK_EQUAL(3, out1[i].size());
-//       BOOST_CHECK(std::equal(out1[i].begin(),out1[i].end(),out2[i].begin()));
-//       //  BOOST_CHECK(std::equal(out1[i].begin(),out1[i].end(),out3[i].begin()));
-//     }
-// }
+  child<std::vector<bool> > d({true,false,true});
+  BOOST_CHECK_EQUAL(d.sample_frequency().size(),3);
+  BOOST_CHECK_EQUAL(d.sample_frequency()[0],true);
+  BOOST_CHECK_EQUAL(d.sample_frequency()[1],false);
+  BOOST_CHECK_EQUAL(d.sample_frequency()[2],true);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

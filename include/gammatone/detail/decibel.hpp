@@ -37,7 +37,8 @@ namespace gammatone
       range \f$X\f$ in its decibel representation: \f$ \forall x_i \in X,
       x_i \leftarrow 20log\frac{x_i}{M}\f$.
 
-      \attention the values in \f$X\f$ must be positive.
+      \attention the values in \f$X\f$ must be positive. Else an error
+      occurs (see std::log).
 
       \tparam Iterator  An iterator to the range to convert.
 
@@ -47,7 +48,7 @@ namespace gammatone
     template<class Iterator>
     inline void decibel(const Iterator& first, const Iterator& last);
 
-    //! Find the position in a signal where it reachs a given attenuation (in dB)
+    //! Find the position in a signal where it reaches a given attenuation (in dB)
     /*!
 
       Given a signal \f$X=(x_i)\f$ and its absolute max \f$ M =
@@ -57,7 +58,7 @@ namespace gammatone
       20log\frac{|x_i|}{M}\})\f$
 
       \tparam Container The type of the signal container. Must have
-      bidirectionnal iterator.
+      bidirectional iterator.
 
       \param signal  The processed input signal \f$ X=\{x_i\} \f$
       \param level The attenuation level \f$ \alpha \f$ to search for
@@ -107,7 +108,7 @@ find_attenuation(const Container& signal,
   // deal with silly cases
   if(level>0) return signal.cend();
 
-  // compute partial max from end to begining of the IR
+  // compute partial max from end to beginning of the IR
   std::vector<T> partial_max(signal.size());
   T max = 0.0;
   std::transform(signal.rbegin(),signal.rend(),partial_max.rbegin(),

@@ -46,6 +46,9 @@ namespace gammatone
              class Output>
     class interface
     {
+      //! Type of this class
+      using type = interface<Scalar,Output>;
+
     public:
 
       //! Type of scalar input values 
@@ -54,11 +57,8 @@ namespace gammatone
       //! Type of output values
       using output_type = Output;      
 
-      //! Type of this class
-      using type = interface<scalar_type,output_type>;
-      
       //! Constructor
-      interface(const scalar_type& sample_frequency);
+      explicit interface(const scalar_type& sample_frequency);
 
       //! Copy constructor
       interface(const type& other);
@@ -144,7 +144,7 @@ gammatone::detail::interface<Scalar,Output>::
 operator=(const type& other)
 {
   type tmp(other);
-  std::swap( m_sample_frequency, tmp.m_sample_frequency );
+  std::swap(m_sample_frequency, tmp.m_sample_frequency);
   return *this;
 }
 

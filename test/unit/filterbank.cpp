@@ -23,8 +23,10 @@
 #include <test_utils.hpp>
 using namespace gammatone;
 
+template<class Filterbank>
 class fixture
 {
+  using T = typename Filterbank::scalar_type;
 protected:
   const T m_sample_frequency = 44100;
   const T m_low = 500, m_high = 8000;
@@ -36,7 +38,7 @@ BOOST_AUTO_TEST_SUITE(filterbank_concrete_test)
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types<double>, fixture<F>)
 {
   F m_filterbank( this->m_sample_frequency,this->m_low,this->m_high );
 
@@ -59,34 +61,25 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(accessors_works, F, filterbank_types, fixture)
 
 BOOST_AUTO_TEST_CASE(center_frequencies_works)
 {
-  const T m_sample_frequency = 44100;
-  //  const T m_nb_channels = 20;
-  const T m_low = 500, m_high = 8000;
-
+  using T = double;
   using namespace gammatone;
   using namespace gammatone::policy;
-  //  using decreasing = filterbank<T, gammatone::core::cooke1993,channels::fixed_size>;
-  using increasing = filterbank<T, gammatone::core::cooke1993,channels::fixed_size>;
-
-  increasing fi(m_sample_frequency,m_low,m_high);
+  
+  const T m_sample_frequency = 44100;
+  const T m_low = 500, m_high = 8000;
+  
+  filterbank<T, gammatone::core::cooke1993,channels::fixed_size> fi(m_sample_frequency,m_low,m_high);
   BOOST_CHECK_LE( m_low, fi.begin()->center_frequency() );
   BOOST_CHECK_EQUAL( m_high, fi.rbegin()->center_frequency() );
-
-  // decreasing fd(m_sample_frequency,m_low,m_high);
-  // BOOST_CHECK_EQUAL( m_high, fd.begin()->center_frequency() );
-  // BOOST_CHECK_LE( m_low, fd.rbegin()->center_frequency() );
-
-  // auto it=fi.begin(); auto it2=fd.rbegin();
-  // while(it!=fi.end())
-  //   BOOST_CHECK_EQUAL(it++->center_frequency(), it2++->center_frequency());
 }
-
 
 
 //================================================
 
-BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types, fixture)
+BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types<double>, fixture<F>)
 {
+  using T = typename F::scalar_type;
+  
   const auto x = random<double>(-1.0,1.0,1000);
   F f(this->m_sample_frequency,this->m_low,this->m_high);
 
@@ -104,18 +97,32 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types, fixture)
   std::vector<std::vector<T> > c3(xsize,std::vector<double>(ysize));
   std::transform(x.begin(),x.end(),c3.begin(),[&](const T& xx){return f.compute(xx);});
 
-  // f.reset();
-  // std::vector<T> c4(xsize*ysize);
-  // f.compute(xsize,x.data(),c4.data());
+  f.reset();
+  std::vector<T> c4(xsize*ysize);
+  f.compute(xsize,x.data(),c4.data());
 
   for(std::size_t i=0;i<xsize;i++)
     for(std::size_t j=0;j<ysize;j++)
       {
 	// BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
         BOOST_CHECK_EQUAL(c2[i][j],c3[i][j]);
-	//        BOOST_CHECK_EQUAL(c2[i][j],c4[i*ysize+j]);
+	BOOST_CHECK_EQUAL(c2[i][j],c4[i*ysize+j]);
       }
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

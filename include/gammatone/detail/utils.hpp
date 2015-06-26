@@ -42,10 +42,10 @@ namespace gammatone
       \return  The generated linear space
     */
     template<class Value,
-             class Container = std::vector<Value> >
-    inline Container linspace(const Value& min,
-                              const Value& max,
-                              const std::size_t& size = 100);
+             template<class...> class Container = std::vector >
+    inline Container<Value> linspace(const Value& min,
+                                     const Value& max,
+                                     const std::size_t& size = 100);
 
     //! Return the maximum absolute value in a range
     /*!
@@ -60,7 +60,7 @@ namespace gammatone
     */
     template<class Iterator>
     typename Iterator::value_type absmax(const Iterator& first,
-					 const Iterator& last);
+                                         const Iterator& last);
 
     //! In place normalization of a range of values.
     /*!
@@ -74,26 +74,27 @@ namespace gammatone
     */
     template<class Iterator>
     inline void normalize(const Iterator& first,
-			  const Iterator& last);    
+                          const Iterator& last);
   }
 }
 
 
-template<class Value, class Container>
-Container gammatone::detail::linspace(const Value& min,
-                                      const Value& max,
-                                      const std::size_t& size)
+template<class Value,
+         template<class...> class Container>
+Container<Value> gammatone::detail::linspace(const Value& min,
+                                             const Value& max,
+                                             const std::size_t& size)
 {
   // check for special case
   if(size == 1)
-    return Container(1,max);
+  return Container<Value>(1,max);
 
   // Build linspace
-  Container space(size);
-  const auto k = static_cast<typename Container::value_type>((max-min)/(size-1));
+  Container<Value> space(size);
+  const Value k = (max-min)/(size-1);
   for(size_t i=0; i<size; i++) space[i] = min + k*i;
 
-  return std::move(space);
+  return space;
 }
 
 

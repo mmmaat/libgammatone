@@ -27,6 +27,7 @@ using namespace gammatone::detail;
 
 const vector<double> levels = {10,0,-3,-10,-30,-60};
 
+// TODO This test contains only silly tests. Go deeper.
 
 BOOST_AUTO_TEST_SUITE(detail_decibel)
 
@@ -42,11 +43,6 @@ BOOST_AUTO_TEST_CASE(decibel_test)
   decibel(o.begin(),o.end());
   BOOST_CHECK_EQUAL( 0.0, o[0] );
   BOOST_CHECK_EQUAL( (size_t)1, o.size() );
-
-  // vector<double> o = {0};
-  // decibel(o.begin(),o.end());
-  // BOOST_CHECK_EQUAL( 0.0, o[0] );
-  // BOOST_CHECK_EQUAL( (size_t)1, o.size() );
 }
 
 

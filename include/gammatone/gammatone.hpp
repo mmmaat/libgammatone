@@ -26,7 +26,6 @@
 
 #include <gammatone/filter.hpp>
 #include <gammatone/filterbank.hpp>
-#include <gammatone/detail/impulse_response.hpp>
 
 #include <gammatone/core/cooke1993.hpp>
 #include <gammatone/core/slaney1993.hpp>
@@ -38,7 +37,6 @@
 
 
 // Above are some general comments on libgammatone for Doxygen doc
-
 
 /*!
   \namespace gammatone
