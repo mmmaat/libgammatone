@@ -54,11 +54,11 @@ int main()
      << "     '-' u 1:2 w l ls 15 lw 1 t 'fixed size 50'  "
      << endl;
 
-  gp.send1d(make_pair(cf1,range<int>(1,cf1.size())));
-  gp.send1d(make_pair(cf2,range<int>(1,cf2.size())));
-  gp.send1d(make_pair(cf3,range<int>(1,cf3.size())));
-  gp.send1d(make_pair(cf4,range<int>(1,cf4.size())));
-  gp.send1d(make_pair(cf5,range<int>(1,cf5.size())));
+  gp.send1d(make_pair(cf1,utils::range<int>(1,cf1.size())));
+  gp.send1d(make_pair(cf2,utils::range<int>(1,cf2.size())));
+  gp.send1d(make_pair(cf3,utils::range<int>(1,cf3.size())));
+  gp.send1d(make_pair(cf4,utils::range<int>(1,cf4.size())));
+  gp.send1d(make_pair(cf5,utils::range<int>(1,cf5.size())));
 
   return 0;
 }

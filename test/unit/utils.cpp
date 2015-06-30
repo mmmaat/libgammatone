@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(absmax_test)
     }
 
   // sinus works
-  auto sinus = make_sinus(44100,1000);
+  auto sinus = utils::make_sinus(44100,1000);
   auto max = absmax(sinus.begin(),sinus.end());
   BOOST_CHECK_LT(0.999, max);
   BOOST_CHECK_GE(1, max);

@@ -29,7 +29,7 @@ template<class Filter>
 class fixture
 {
 protected:
-  fixture() : signal(random<double>(-1.0,1.0,1000))
+  fixture() : signal(utils::random<double>(-1.0,1.0,1000))
   {
     std::for_each(cf.begin(),cf.end(),[&](const auto& x){filters.push_back(Filter(fs,x));});
   };

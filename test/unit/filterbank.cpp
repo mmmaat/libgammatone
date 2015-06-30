@@ -80,7 +80,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types<double>, fix
 {
   using T = typename F::scalar_type;
   
-  const auto x = random<double>(-1.0,1.0,1000);
+  const auto x = utils::random<double>(-1.0,1.0,1000);
   F f(this->m_sample_frequency,this->m_low,this->m_high);
 
   const auto xsize = x.size();

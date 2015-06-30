@@ -41,7 +41,8 @@ set_property(
 find_package(Boost 1.55 REQUIRED COMPONENTS
   system
   filesystem
-  iostreams)
+  iostreams
+  timer)
 link_directories(${DEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_definitions(${DEPS_CFLAGS_OTHER})
 include_directories(${Boost_INCLUDE_DIR})

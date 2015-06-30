@@ -181,10 +181,10 @@ find_filters(const Scalar& sample_frequency,
   // filters coefficients
   const Scalar A0 = 1.0 / sample_frequency;
   const std::array<Scalar,4> A1 =
-    {-sqrt(3.0 + b)*c - d,
-     sqrt( 3.0 + b)*c - d,
-     -sqrt(3.0 - b)*c - d,
-     sqrt( 3.0 - b)*c - d};
+    {-std::sqrt(3.0 + b)*c - d,
+     std::sqrt( 3.0 + b)*c - d,
+     -std::sqrt(3.0 - b)*c - d,
+     std::sqrt( 3.0 - b)*c - d};
   const Scalar A2 = 0.0;
 
   const Scalar B0 = 1.0;

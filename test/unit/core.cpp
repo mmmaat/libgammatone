@@ -51,9 +51,9 @@ using t3 = boost::mpl::list< c3<a1,b1>, c3<a1,b2>, c3<a2,b1>, c3<a2,b2>>;
 using core_ref = c1<a1,b1>;
 using core_types = boost::mpl::joint_view<boost::mpl::joint_view<t1,t2>::type,t3>::type;
 
-const vector<double> in1 = make_sinus(44100,1000,10000);
-const vector<double> in2 = make_sinus(44100,500,10000);
-const vector<double> in3 = random<double>(-1.0,1.0,10000);
+const vector<double> in1 = utils::make_sinus(44100,1000,10000);
+const vector<double> in2 = utils::make_sinus(44100,500,10000);
+const vector<double> in3 = utils::random<double>(-1.0,1.0,10000);
 const vector<double> coef({1,2,3,10,0.5,1.05,2.1,30015,1.02e-3});
 
 // return the linear mean over a range

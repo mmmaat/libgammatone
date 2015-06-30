@@ -163,10 +163,30 @@ find_factor(const Scalar& sample_frequency,
             const Scalar& center_frequency,
             const Scalar& bandwidth)
 {
-  const auto a = this->m_tau*bandwidth;
-  const auto b = std::complex<Scalar>(0.0, this->m_tau*center_frequency);
-  const auto g = 2.0*std::abs(std::exp(2.0*(a+b)) - (1.0 + std::exp(2.0*b))* std::exp(a) - 1.0);
+  using Complex = std::complex<Scalar>;
+  
+  const Scalar a = this->m_tau*bandwidth;
+  const Complex b(0.0, this->m_tau*center_frequency);
+  const Scalar g = 2.0*std::abs(std::exp(static_cast<Scalar>(2)*(a+b)) -
+				(static_cast<Scalar>(1) + std::exp(static_cast<Scalar>(2)*b))* std::exp(a) -
+				static_cast<Scalar>(1));
   return 1.0 / GainPolicy::gain(g, sample_frequency, center_frequency, 4);
 }
 
 #endif // GAMMATONE_CORE_BASE_HPP
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
