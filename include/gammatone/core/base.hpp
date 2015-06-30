@@ -19,7 +19,6 @@
 #define GAMMATONE_CORE_BASE_HPP
 
 #include <gammatone/policy/gain.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <complex>
 
@@ -90,7 +89,7 @@ namespace gammatone
       Scalar factor() const {return m_factor;}
       
     private:
-      
+
       //! \f$ 2\pi / f_s \f$
       Scalar m_tau;
 
@@ -106,7 +105,7 @@ gammatone::core::base<Scalar, GainPolicy>::
 base(const Scalar& sample_frequency,
      const Scalar& center_frequency,
      const Scalar& bandwidth)
-  : m_tau( 2.0*boost::math::constants::pi<Scalar>() / sample_frequency ),
+  : m_tau( 2.0*M_PI / sample_frequency ),
     m_factor( find_factor(sample_frequency, center_frequency, bandwidth) )
 {}
 

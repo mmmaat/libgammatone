@@ -22,7 +22,6 @@
 
 #include <gammatone/detail/utils.hpp>
 #include <gammatone/detail/decibel.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <algorithm>
 #include <vector>
 
@@ -434,7 +433,7 @@ formula_ir(const Scalar& center_frequency,
            const Scalar& time,
            const Scalar& phase)
 {
-  const Scalar tt = 2 * boost::math::constants::pi<Scalar>() * time;
+  const Scalar tt = 2 * M_PI * time;
   return std::pow(time, 3) * std::exp(-tt*bandwidth) * std::cos(tt*center_frequency+phase);
 }
 

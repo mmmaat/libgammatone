@@ -71,12 +71,12 @@ namespace gammatone
 
       inline T find_alpha(const T& fs, const T& bw)
       {
-        return 1 - std::exp(-2*boost::math::constants::pi<T>()*bw/fs);
+        return 1 - std::exp(-2*M_PI*bw/fs);
       }
 
       inline std::complex<T> find_omega(const T& fs, const T& fc)
       {
-	const auto theta = 2*boost::math::constants::pi<T>()*fc/fs;
+	const auto theta = 2*M_PI*fc/fs;
         return std::complex<T>(std::cos(theta),std::sin(theta));
       }
     };

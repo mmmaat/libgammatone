@@ -20,22 +20,27 @@
 #ifndef GAMMATONE_POLICY_POLICY_HPP
 #define GAMMATONE_POLICY_POLICY_HPP
 
-#include <boost/noncopyable.hpp>
-
 namespace gammatone
 {
   namespace policy
   {
     //! Base class of all gammatone policies
-    /*!  
+    /*!
       \class policy gammatone/policy/policy.hpp
 
       This base class simply make private constructor, destructor and
-      copy members. 
+      copy members. Similar to boost::noncopyable
 
       This fix the design of derived policy classes : static methods only.
-     */
-    class policy : private boost::noncopyable {};
+    */
+    class policy
+    {
+    private:
+      policy();
+      policy(const policy&);
+      ~policy();
+      policy& operator=(const policy&);
+    };
   }
 }
 
