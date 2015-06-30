@@ -133,7 +133,7 @@ shrink_to_attenuation(Container& signal,
   if(it != signal.cbegin())
     {
       signal.assign(signal.cbegin(),it);
-      signal.shrink_to_fit();
+      signal.shrink_to_fit( );
     }
 }
 
