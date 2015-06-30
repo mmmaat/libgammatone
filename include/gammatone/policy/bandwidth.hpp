@@ -20,6 +20,7 @@
 #ifndef GAMMATONE_POLICY_BANDWIDTH_HPP
 #define GAMMATONE_POLICY_BANDWIDTH_HPP
 
+#include <gammatone/policy/policy.hpp>
 #include <cstddef>
 #include <cmath>
 
@@ -48,7 +49,7 @@ namespace gammatone
     {
       //! Base class of bandwidth policy classes
       template<class Scalar>
-      class base
+      class base : public gammatone::policy::policy
       {
       public:
         //! Bandwidth correction factor. \see Holdsworth1988 .

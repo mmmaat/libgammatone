@@ -48,7 +48,7 @@ static inline std::complex<T> formula_tf_approx
 
 
 typedef double T;
-typedef gammatone::filter::concrete<T> filter;
+typedef gammatone::filter<T> filter;
 
 
 int main()

@@ -30,8 +30,7 @@ namespace gammatone
     /*!
 
       Generate a container of *size* points linearly spaced between
-      and including *min* and *max*. For *size* = 1, linspace returns
-      *max*.
+      and including *min* and *max*. For *size* = 1, linspace returns *max*.
 
       \tparam Value      Type of values
       \tparam Container  Type of the returned container
@@ -43,14 +42,14 @@ namespace gammatone
       \return  The generated linear space
     */
     template<class Value,
-             class Container = std::vector<Value> >
-    inline Container linspace(const Value& min,
-                              const Value& max,
-                              const std::size_t& size = 100);
+             template<class...> class Container = std::vector >
+    inline Container<Value> linspace(const Value& min,
+                                     const Value& max,
+                                     const std::size_t& size = 100);
 
     //! Return the maximum absolute value in a range
     /*!
-      \tparam Iterator Type of the range iterator. Can be
+      \tparam Iterator A forward iterator. Can be
       const_iterator. std::abs is used so it's works on complex.
 
       \param first  First position in the range
@@ -61,41 +60,41 @@ namespace gammatone
     */
     template<class Iterator>
     typename Iterator::value_type absmax(const Iterator& first,
-					 const Iterator& last);
+                                         const Iterator& last);
 
     //! In place normalization of a range of values.
     /*!
 
       Normalizes the range [first,last) in the interval [-1,1].
 
-      \tparam Iterator  Type of the range iterator
+      \tparam Iterator  A forward iterator
 
-      \param begin Begin iterator of the range
-      \param end   End iterator of the range
-
-      \post utils::absmax(begin,end) == 1
+      \param first  Forst iterator of the range
+      \param last   Last iterator of the range
     */
-    template<class I>
-    inline void normalize(const I& begin, const I& end);    
+    template<class Iterator>
+    inline void normalize(const Iterator& first,
+                          const Iterator& last);
   }
 }
 
 
-template<class Value, class Container>
-Container gammatone::detail::linspace(const Value& min,
-                                      const Value& max,
-                                      const std::size_t& size)
+template<class Value,
+         template<class...> class Container>
+Container<Value> gammatone::detail::linspace(const Value& min,
+                                             const Value& max,
+                                             const std::size_t& size)
 {
   // check for special case
   if(size == 1)
-    return Container(1,max);
+  return Container<Value>(1,max);
 
   // Build linspace
-  Container space(size);
-  const auto k = static_cast<typename Container::value_type>((max-min)/(size-1));
+  Container<Value> space(size);
+  const Value k = (max-min)/(size-1);
   for(size_t i=0; i<size; i++) space[i] = min + k*i;
 
-  return std::move(space);
+  return space;
 }
 
 

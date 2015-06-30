@@ -17,13 +17,26 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_DETAIL_VERSION_HPP
-#define GAMMATONE_DETAIL_VERSION_HPP
+#ifndef GAMMATONE_POLICY_POLICY_HPP
+#define GAMMATONE_POLICY_POLICY_HPP
+
+#include <boost/noncopyable.hpp>
 
 namespace gammatone
 {
-  //! Version of libgammatone
-  std::string version(){return "libgammatone 0.1";}
+  namespace policy
+  {
+    //! Base class of all gammatone policies
+    /*!  
+      \class policy gammatone/policy/policy.hpp
+
+      This base class simply make private constructor, destructor and
+      copy members. 
+
+      This fix the design of derived policy classes : static methods only.
+     */
+    class policy : private boost::noncopyable {};
+  }
 }
 
-#endif // GAMMATONE_DETAIL_VERSION_HPP
+#endif // GAMMATONE_POLICY_POLICY_HPP

@@ -20,6 +20,7 @@
 #ifndef GAMMATONE_POLICY_CHANNELS_BASE_HPP
 #define GAMMATONE_POLICY_CHANNELS_BASE_HPP
 
+#include <gammatone/policy/policy.hpp>
 #include <algorithm>
 #include <utility> // for std::pair
 #include <vector>
@@ -39,15 +40,13 @@ namespace gammatone
 
         \tparam Scalar           Type of scalar values.
         \tparam BandwidthPolicy  Policy for bandwith constants. See policy::bandwidth.
-        \tparam OrderPolicy      Policy for ordering frequency channels. See policy::order.
       */
       template
       <
         class Scalar,
-        template<class> class BandwidthPolicy,
-        class OrderPolicy
+        template<class> class BandwidthPolicy
         >
-      class base
+      class base : public gammatone::policy::policy
       {
       protected:
         //! Usefull constant
@@ -113,11 +112,10 @@ namespace gammatone
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
 const Scalar
-gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::
+gammatone::policy::channels::base<Scalar,BandwidthPolicy>::
 alpha()
 {
   return BandwidthPolicy<Scalar>::earq * BandwidthPolicy<Scalar>::minbw;
@@ -126,11 +124,10 @@ alpha()
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
 const Scalar
-gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::
+gammatone::policy::channels::base<Scalar,BandwidthPolicy>::
 beta(const Scalar& fl, const Scalar& fh)
 {
   const Scalar a = alpha();
@@ -140,18 +137,17 @@ beta(const Scalar& fl, const Scalar& fh)
 template
 <
   class Scalar,
-  template<class> class BandwidthPolicy,
-  class OrderPolicy
+  template<class> class BandwidthPolicy
   >
-typename gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::setup_type::first_type
-gammatone::policy::channels::base<Scalar,BandwidthPolicy,OrderPolicy>::
+typename gammatone::policy::channels::base<Scalar,BandwidthPolicy>::setup_type::first_type
+gammatone::policy::channels::base<Scalar,BandwidthPolicy>::
 setup(const Scalar& fl, const Scalar& fh, const Scalar& b, const std::size_t& nbc)
 {
   const auto a = alpha();
 
   std::vector<Scalar> frequencies(nbc);
   std::size_t i = 0;
-  std::for_each(OrderPolicy::begin(frequencies),OrderPolicy::end(frequencies),
+  std::for_each(frequencies.rbegin(),frequencies.rend(),
                 [&](auto& x){x = -a + (fh+a)*std::exp(b*i++);});
 
   return frequencies;

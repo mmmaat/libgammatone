@@ -21,6 +21,7 @@
 #ifndef GAMMATONE_POLICY_CLIPPING_HPP
 #define GAMMATONE_POLICY_CLIPPING_HPP
 
+#include <gammatone/policy/policy.hpp>
 #include <complex>
 
 namespace gammatone
@@ -57,7 +58,7 @@ namespace gammatone
     namespace clipping
     {
       //! Clipping enabled
-      class on
+      class on : public gammatone::policy::policy
       {
       public:
         //! Clip very small input to zero
@@ -70,7 +71,7 @@ namespace gammatone
       };
 
       //! Clipping disabled
-      class off
+      class off : public gammatone::policy::policy
       {
       public:
         //! Do nothing

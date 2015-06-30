@@ -18,6 +18,7 @@
 #ifndef GAMMATONE_POLICY_GAIN_HPP
 #define GAMMATONE_POLICY_GAIN_HPP
 
+#include <gammatone/policy/policy.hpp>
 #include <cmath>
 
 namespace gammatone
@@ -34,7 +35,7 @@ namespace gammatone
     namespace gain
     {
       //! Old cooke1993 gain implementation
-      class old_cooke1993
+      class old_cooke1993 : public gammatone::policy::policy
       {
       public:
         template<class Scalar>
@@ -45,7 +46,7 @@ namespace gammatone
       };
 
       //! Disable gain policy
-      class off
+      class off : public gammatone::policy::policy
       {
       public:
         template<class Scalar>
@@ -56,7 +57,7 @@ namespace gammatone
       };
 
       //! 0dB gain for all channels
-      class forall_0dB
+      class forall_0dB : public gammatone::policy::policy
       {
       public:
         template<class Scalar>
@@ -67,7 +68,7 @@ namespace gammatone
       };
 
       //! Gain falling by 6dB gain per octave
-      class peroctave_6dB
+      class peroctave_6dB : public gammatone::policy::policy
       {
       public:
         template<class Scalar>

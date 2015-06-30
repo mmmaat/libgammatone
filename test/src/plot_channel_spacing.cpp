@@ -19,7 +19,6 @@
 
 #include <gammatone/policy/channels.hpp>
 #include <gammatone/policy/bandwidth.hpp>
-#include <gammatone/policy/order.hpp>
 #include <test_setup.hpp>
 #include <iostream>
 using namespace std;
@@ -33,14 +32,10 @@ const T step_factor = 0.25;
 int main()
 {
   using fixed_size = gammatone::policy::channels::fixed_size
-    < T,
-      gammatone::policy::bandwidth::glasberg1990,
-      gammatone::policy::order::increasing >;
+    < T, gammatone::policy::bandwidth::glasberg1990>;
 
   using fixed_overlap = gammatone::policy::channels::fixed_overlap
-    < T,
-      gammatone::policy::bandwidth::glasberg1990,
-      gammatone::policy::order::increasing >;
+    < T, gammatone::policy::bandwidth::glasberg1990>;
 
   const auto cf1 = fixed_overlap::setup(fl,fh,step_factor).first;
   const auto cf2 = fixed_size::setup(fl,fh,cf1.size()).first;
@@ -59,11 +54,11 @@ int main()
      << "     '-' u 1:2 w l ls 15 lw 1 t 'fixed size 50'  "
      << endl;
 
-  gp.send1d(make_pair(cf1,range<int>(1,cf1.size())));
-  gp.send1d(make_pair(cf2,range<int>(1,cf2.size())));
-  gp.send1d(make_pair(cf3,range<int>(1,cf3.size())));
-  gp.send1d(make_pair(cf4,range<int>(1,cf4.size())));
-  gp.send1d(make_pair(cf5,range<int>(1,cf5.size())));
+  gp.send1d(make_pair(cf1,utils::range<int>(1,cf1.size())));
+  gp.send1d(make_pair(cf2,utils::range<int>(1,cf2.size())));
+  gp.send1d(make_pair(cf3,utils::range<int>(1,cf3.size())));
+  gp.send1d(make_pair(cf4,utils::range<int>(1,cf4.size())));
+  gp.send1d(make_pair(cf5,utils::range<int>(1,cf5.size())));
 
   return 0;
 }

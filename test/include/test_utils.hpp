@@ -26,37 +26,72 @@
 #include <chrono>
 #include <algorithm>
 #include <vector>
+#include <utility>
+#include <cmath>
 #include <boost/math/constants/constants.hpp>
 
-
-template<class Value,
-         class Distribution = std::uniform_real_distribution<Value>,
-         class Container = std::vector<Value> >
-Container random(const Value& min,
-                 const Value& max,
-                 const std::size_t& size = 100)
+namespace utils
 {
-  const auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-  std::default_random_engine generator(seed);
-  Distribution distribution(min,max);
-  Container out(size);
-  std::for_each(out.begin(),out.end(),[&](auto& x){x = distribution(generator);});
-  return std::move(out);
-}
+
+  //! Compute mean and variance from an input range
+  template<class Iterator>
+  std::pair<typename Iterator::value_type, typename Iterator::value_type>
+  mean_variance(const Iterator& first, const Iterator& last)
+  {
+    // Get the arithmetic value type
+    using T = typename Iterator::value_type;
+
+    // 1st pass : compute mean and range size
+    T mean =0;
+    std::size_t size = 0;
+    std::for_each(first,last, [&](const T& x){mean += x; size++;});
+    mean /= size;
+
+    // 2nd pass : compute variance
+    T var = 0;
+    std::for_each(first,last, [&](const T& x){var += std::pow(mean - x, 2);});
+    var /= size;
+
+    return std::make_pair(mean,var);
+  }
+  
+  template<class T = double>
+  std::vector<T> pulse(const std::size_t size)
+  {
+    std::vector<T> p(size, 0.0);
+    p[0] = 1.0;
+    return p;
+  }
+
+// TODO Overloading a standard name is never a good idea... use a namespace
+  template<class Value,
+           class Distribution = std::uniform_real_distribution<Value>,
+           class Container = std::vector<Value> >
+  Container random(const Value& min,
+                   const Value& max,
+                   const std::size_t& size = 100)
+  {
+    const auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+    Distribution distribution(min,max);
+    Container out(size);
+    std::for_each(out.begin(),out.end(),[&](auto& x){x = distribution(generator);});
+    return out;
+  }
 
 
-template<class Container = std::vector<double> >
-Container make_sinus(const typename Container::value_type& fs,
-                     const typename Container::value_type& f,
-		     const std::size_t size = 10000)
-{
-  typedef typename Container::value_type T;
+  template<class Container = std::vector<double> >
+  Container make_sinus(const typename Container::value_type& fs,
+                       const typename Container::value_type& f,
+                       const std::size_t size = 10000)
+  {
+    typedef typename Container::value_type T;
 
-  Container sinus(size);
-  T t = 0;
-  for_each(sinus.begin(),sinus.end(),[&](T& x){x=sin(2*boost::math::constants::pi<T>()*f*t++/fs);});
-  return std::move(sinus);
-}
+    Container sinus(size);
+    T t = 0;
+    for_each(sinus.begin(),sinus.end(),[&](T& x){x=sin(2*boost::math::constants::pi<T>()*f*t++/fs);});
+    return sinus;
+  }
 
 
 //! Generate a linear sequence of values
@@ -75,30 +110,30 @@ Container make_sinus(const typename Container::value_type& fs,
 
   \return The generated linear sequence
 */
-template<class Value,
-         class Container = std::vector<Value> >
-Container range(const Value& min,
-                const Value& max,
-                const Value& step = 1)
-{
-  // detect incoherent parameters
-  if(step <= 0 || min > max)
+  template<class Value,
+           class Container = std::vector<Value> >
+  Container range(const Value& min,
+                  const Value& max,
+                  const Value& step = 1)
+  {
+    // detect incoherent parameters
+    if(step <= 0 || min > max)
     return Container();
 
-  // val is incremented by s until we reach max
-  auto val = static_cast<typename Container::value_type>(min);
-  const auto s = static_cast<typename Container::value_type>(step);
+    // val is incremented by s until we reach max
+    auto val = static_cast<typename Container::value_type>(min);
+    const auto s = static_cast<typename Container::value_type>(step);
 
-  // push values up to max
-  Container out;
-  while(val<=max)
+    // push values up to max
+    Container out;
+    while(val<=max)
     {
       out.push_back(val);
       val += s;
     }
 
-  return std::move(out);
-}
+    return out;
+  }
 
 
 //! Generate a logarithmic space between base^min and base^max
@@ -117,24 +152,24 @@ Container range(const Value& min,
 
   \return  The generated logarithmic space
 */
-template<class Value, class Container>
-Container logspace(const Value& min,
-                   const Value& max,
-                   const std::size_t& size = 100,
-                   const Value& base = 10)
-{
-  // detect silly base (avoid computation of 0^0 below)
-  if(base == 0)
+  template<class Value, class Container>
+  Container logspace(const Value& min,
+                     const Value& max,
+                     const std::size_t& size = 100,
+                     const Value& base = 10)
+  {
+    // detect silly base (avoid computation of 0^0 below)
+    if(base == 0)
     return Container(size);
 
-  // Compute underlying linspace
-  auto space = linspace(min, max, size);
+    // Compute underlying linspace
+    auto space = linspace(min, max, size);
 
-  // Raise to logspace
-  std::for_each(space.begin(),space.end(),[&](auto& x){x = std::pow(base,x);});
+    // Raise to logspace
+    std::for_each(space.begin(),space.end(),[&](auto& x){x = std::pow(base,x);});
 
-  return std::move(space);
-}
+    return space;
+  }
 
 
 /*!
@@ -150,22 +185,23 @@ Container logspace(const Value& min,
   \param ybegin Begin iterator of the second range
   \return The Mean Squared Error
 */
-template<class Iterator1, class Iterator2>
-typename Iterator1::value_type mean_squared_error(const Iterator1& xfirst,
-                                                  const Iterator1& xlast,
-                                                  const Iterator2& yfirst)
-{
-  typedef typename Iterator1::value_type T;
+  template<class Iterator1, class Iterator2>
+  typename Iterator1::value_type mean_squared_error(const Iterator1& xfirst,
+                                                    const Iterator1& xlast,
+                                                    const Iterator2& yfirst)
+  {
+    typedef typename Iterator1::value_type T;
 
-  // detect empty range
-  if(xfirst==xlast) return 0;
+    // detect empty range
+    if(xfirst==xlast) return 0;
 
-  // Accumulation in out of squarred differences (x_i - y_i)^2
-  T out = 0, size = 0; auto yit = yfirst;
-  std::for_each(xfirst,xlast,[&](const auto& x){out += std::pow(x - *(yit++), 2);size++;});
+    // Accumulation in out of squarred differences (x_i - y_i)^2
+    T out = 0, size = 0; auto yit = yfirst;
+    std::for_each(xfirst,xlast,[&](const auto& x){out += std::pow(x - *(yit++), 2);size++;});
 
-  // normalize by the number of elements
-  return std::move(out/size);
+    // normalize by the number of elements
+    return out/size;
+  }
 }
 
 #endif // LIBGAMMATONE_TEST_UTILS_HPP

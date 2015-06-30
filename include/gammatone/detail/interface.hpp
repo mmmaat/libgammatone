@@ -17,33 +17,19 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_INTERFACE_HPP
-#define GAMMATONE_INTERFACE_HPP
+#ifndef GAMMATONE_DETAIL_INTERFACE_HPP
+#define GAMMATONE_DETAIL_INTERFACE_HPP
 
-#include <memory>
+#include <memory> // for std::move
 #include <algorithm>
-#include <type_traits>
 
 namespace gammatone
 {
   namespace detail
   {
-    namespace internal
-    {
-      template<class C> class scalar
-      { public:
-        template<class T, class U> static inline U compute(const T& input, C* client);
-      };
-
-      template<class C> class container
-      { public:
-        template<class T, class U> static U compute(const T& input, C* client);
-      };
-    }
-
     //! Generic interface for both gammatone filters and filterbanks
     /*!
-      \class interface
+      \class interface gammatone/detail/interface.hpp
 
       This abstract class provides a common generic interface for both
       gammatone filters and filterbanks (i.e. single and multi channels
@@ -60,20 +46,41 @@ namespace gammatone
              class Output>
     class interface
     {
+      //! Type of this class
+      using type = interface<Scalar,Output>;
+
     public:
 
-      //! The type of scalar values
-      typedef Scalar scalar_type;
+      //! Type of scalar input values 
+      using scalar_type = Scalar;
 
-      //! The type of the output values
-      typedef Output output_type;
+      //! Type of output values
+      using output_type = Output;      
+
+      //! Constructor
+      explicit interface(const scalar_type& sample_frequency);
+
+      //! Copy constructor
+      interface(const type& other);
+
+      //! Move constructor
+      interface(type&& other) noexcept;
+
+      //! Assignment operator
+      type& operator=(const type& other);
+
+      //! Move operator
+      type& operator=(type&& other);
+
+      //! Destructor
+      virtual ~interface();
 
       //! Accessor to the sample frequency
       /*!
         Accessor to the processing sample frequency (Hz).
         \return The sample frequency.
       */
-      virtual scalar_type sample_frequency() const = 0;
+      scalar_type sample_frequency() const;
 
       //! Accessor to the center frequency
       /*!
@@ -104,80 +111,63 @@ namespace gammatone
         state as a newly created one.
       */
       virtual void reset() = 0;
+      
+    private:
 
-
-      //! Compute preallocated output from a range of scalar inputs.
-      /*!
-        Sequentially computes a range of input values and stores the
-        result in an output range.
-
-        \tparam InputIterator   Iterator on the input range.
-        \tparam OutputIterator  Iterator on the output range.
-
-        \param first  Iterator to the initial position of the input range.
-        \param last   Iterator to the final position of the input range.
-        \param result Iterator to the initial position of the output
-        range. The range must include at least as many elements as
-        [first,last).
-      */
-      // template<class InputIterator,
-      //          class OutputIterator>
-      // void compute(const InputIterator& first,
-      //              const InputIterator& last,
-      //              const OutputIterator& result);
-
-    protected:
-
-      //! Compute an output from a scalar input
-      /*!
-
-        This method is called by the compute() public methods.
-
-        \param input  The scalar value to be processed.
-        \return The computed output value.
-      */
-      virtual output_type compute_internal(const scalar_type& input) = 0;
+      //! Processing sample frequency (Hz)
+      scalar_type m_sample_frequency;
     };
   }
 }
 
-// template<class Scalar, class Output>
-// template<class InputType>
-// T gammatone::detail::interface<Scalar,Output>::
-// compute(const InputType& input)
-// {
-//   // Any non arithmetic type is considered as a container
-//   return std::conditional<std::is_arithmetic<T>::value,
-//                           internal::scalar<interface<Scalar,Output> >,
-//                           internal::container<interface<Scalar,Output> > >
-//     ::type::compute(input,this);
-// }
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>::
+interface(const scalar_type& sample_frequency)
+  : m_sample_frequency(sample_frequency)
+{}
 
-// template<class Scalar, class Output>
-// template<class InputIterator, class OutputIterator>
-// void gammatone::detail::interface<Scalar,Output>::
-// compute(const InputIterator& first,
-//         const InputIterator& last,
-//         const OutputIterator& result)
-// {
-//   std::transform(first,last,result,[&](const auto& x){return this->compute_internal(x);});
-// }
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>::
+interface(const type& other)
+  : m_sample_frequency(other.m_sample_frequency)
+{}
 
-template<class C> template<class T, class U>
-U gammatone::detail::internal::scalar<C>::
-compute(const T& input, C* client)
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>::
+interface(type&& other) noexcept
+: m_sample_frequency(std::move(other.m_sample_frequency))
+{}
+
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>&
+gammatone::detail::interface<Scalar,Output>::
+operator=(const type& other)
 {
-  return client->compute_internal(input);
+  type tmp(other);
+  std::swap(m_sample_frequency, tmp.m_sample_frequency);
+  return *this;
 }
 
-template<class C> template<class T, class U>
-U gammatone::detail::internal::container<C>::
-compute (const T& input, C* client)
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>&
+gammatone::detail::interface<Scalar,Output>::
+operator=(type&& other)
 {
-  U out(input.size());
-  std::transform(input.begin(),input.end(),out.begin(),
-                 [&](const auto& x){return client->compute(x);});
-  return out;
+  m_sample_frequency = std::move(other.m_sample_frequency);
+  return *this;
 }
 
-#endif // GAMMATONE_INTERFACE_HPP
+template<class Scalar, class Output>
+gammatone::detail::interface<Scalar,Output>::
+~interface()
+{}
+
+template<class Scalar, class Output>
+typename gammatone::detail::interface<Scalar,Output>::scalar_type
+gammatone::detail::interface<Scalar,Output>::
+sample_frequency() const
+{
+  return m_sample_frequency;
+}
+
+#endif // GAMMATONE_DETAIL_INTERFACE_HPP

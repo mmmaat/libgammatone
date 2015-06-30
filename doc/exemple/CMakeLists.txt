@@ -1,5 +1,5 @@
 
-add_custom_target(example)
+add_custom_target(exemple)
 
 # build in doc/example/bin
 set(EXECUTABLE_OUTPUT_PATH bin)
@@ -12,5 +12,5 @@ foreach( src ${EXAMPLES} )
   string( REPLACE ".cpp" "" bin ${src} )
   string( REGEX REPLACE ".*/" "" bin ${bin} )
   add_executable(${bin} ${src})
-  add_dependencies(example ${bin})
+  add_dependencies(exemple ${bin})
 endforeach(src)

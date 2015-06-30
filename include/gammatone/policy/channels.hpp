@@ -51,7 +51,6 @@
   parameter. The default is to use policy::order::increasing.
 
   - Use this policy as a template parameter of filterbank::concrete.
-  ~~~
 
   Usage
   -----
