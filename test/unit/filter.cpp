@@ -28,14 +28,14 @@ using namespace gammatone;
 template<class Filter>
 class fixture
 {
-protected:
-  fixture() : signal(utils::random<double>(-1.0,1.0,1000))
-  {
-    std::for_each(cf.begin(),cf.end(),[&](const auto& x){filters.push_back(Filter(fs,x));});
-  };
-
   using T = typename Filter::scalar_type;
   
+protected:
+  fixture() : signal(utils::random<T>(-1.0,1.0,1000))
+  {
+    std::for_each(cf.begin(),cf.end(),[&](const T& x){filters.push_back(Filter(fs,x));});
+  };
+
   const T fs = 44100;
   // FIXME cf below 20 don't pass reset_works()... sometimes, not all the times.
   const std::vector<T> cf = {50,100,451.215,2351.2,6842,12504,15478,fs/2};

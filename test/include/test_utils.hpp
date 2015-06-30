@@ -75,7 +75,7 @@ namespace utils
     std::default_random_engine generator(seed);
     Distribution distribution(min,max);
     Container out(size);
-    std::for_each(out.begin(),out.end(),[&](auto& x){x = distribution(generator);});
+    std::for_each(out.begin(),out.end(),[&](typename Container::value_type& x){x = distribution(generator);});
     return out;
   }
 
@@ -166,7 +166,7 @@ namespace utils
     auto space = linspace(min, max, size);
 
     // Raise to logspace
-    std::for_each(space.begin(),space.end(),[&](auto& x){x = std::pow(base,x);});
+    std::for_each(space.begin(),space.end(),[&](Value& x){x = std::pow(base,x);});
 
     return space;
   }
@@ -197,7 +197,7 @@ namespace utils
 
     // Accumulation in out of squarred differences (x_i - y_i)^2
     T out = 0, size = 0; auto yit = yfirst;
-    std::for_each(xfirst,xlast,[&](const auto& x){out += std::pow(x - *(yit++), 2);size++;});
+    std::for_each(xfirst,xlast,[&](const T& x){out += std::pow(x - *(yit++), 2);size++;});
 
     // normalize by the number of elements
     return out/size;

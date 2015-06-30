@@ -49,7 +49,9 @@ namespace gammatone
     >
   class filter : public detail::interface<Scalar,Scalar>
   {
-    //! Type of this filter instance
+  public:
+
+    //! Type of this filter
     using type = filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>;
 
     //! Type of the inherited interface
@@ -58,8 +60,8 @@ namespace gammatone
     //! Type of the filter core
     using core = Core<Scalar,policy::gain::forall_0dB,ClippingPolicy>;
 
-  public:
 
+    
     //! Creates a gammatone filter from explicit parameters.
     /*!
       \param sample_frequency The input signal sample frequency (Hz).
@@ -310,7 +312,8 @@ compute(const InputIterator& first,
         const InputIterator& last,
         const OutputIterator& result)
 {
-  std::transform(first,last,result,[&](const auto& x){return this->compute(x);});
+  using T = typename InputIterator::value_type;
+  std::transform(first,last,result,[&](const T& x){return this->compute(x);});
 }
 
 template

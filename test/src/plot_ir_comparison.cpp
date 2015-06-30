@@ -67,7 +67,8 @@ inline vector<pair<T,string> > compute_mse( const vector<pair<vector<T>,string> 
       }
 
   if(cout_flag)
-    for_each(out.begin(),out.end(),[&](const auto& p){cout << p.second << " : " << p.first << endl;});
+  for_each(out.begin(),out.end(),[&](const typename decltype(out)::value_type& p)
+	   {cout << p.second << " : " << p.first << endl;});
 
   return out;
 }

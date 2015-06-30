@@ -33,10 +33,10 @@ This minimal exemple initializes a gammatone filter and process an
 empty input signal.
 Compile it with:
 ~~~
-g++ -std=c++14 -o minimal minimal.cpp -I/path/to/libgammatone/include
+g++ -std=c++11 -o minimal minimal.cpp -I/path/to/libgammatone/include
 ~~~
 
-Your compiler must support the -std=c++14 option (tested on GCC 4.9.2).
+Your compiler must support the -std=c++11 option (tested on GCC 4.9.2).
 
 It work ? Great, you are now ready to read the [tutorial](@ref tutorial) !
 

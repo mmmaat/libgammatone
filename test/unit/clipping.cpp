@@ -33,15 +33,17 @@ BOOST_AUTO_TEST_SUITE(policy_channels)
 
 BOOST_AUTO_TEST_CASE(complex_test)
 {
-  std::vector<std::complex<T> > r = {-1e-201,1e-200-1, 0, 1e-250,1e-100,1,1e100};
-  std::vector<std::complex<T> > a = {      0,1e-200-1, 0,      0,1e-100,1,1e100};
+  using C = std::complex<T>;
 
-  std::vector<std::complex<T> > c1(r.size()), c2(r.size());
+  std::vector<C> r = {-1e-201,1e-200-1, 0, 1e-250,1e-100,1,1e100};
+  std::vector<C> a = {      0,1e-200-1, 0,      0,1e-100,1,1e100};
+  std::vector<C> c1(r.size()), c2(r.size());
+
   std::transform(r.begin(),r.end(),a.begin(),c1.begin(),
-                 [&](auto& x,auto& y){return on::clip(x);});
+                 [&](C& x,C& y){return on::clip(x);});
 
   std::transform(r.begin(),r.end(),c2.begin(),
-                 [&](auto& x){return off::clip(x);});
+                 [&](C& x){return off::clip(x);});
 
   for(std::size_t i=0;i<r.size();i++)
     {
@@ -55,3 +57,7 @@ BOOST_AUTO_TEST_CASE(complex_test)
 
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+
+

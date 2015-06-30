@@ -61,25 +61,25 @@ namespace gammatone
     using type = filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>;
 
     //! Type of the inherited interface
-    using base = detail::interface<Scalar,std::vector<Scalar> >;
+    using base_type = detail::interface<Scalar,std::vector<Scalar> >;
 
     // Type of scalar values
-    using scalar_type = typename base::scalar_type;
+    using scalar_type = typename base_type::scalar_type;
 
     //! Type of the output container
-    using output_type = typename base::output_type;
+    using output_type = typename base_type::output_type;
 
     //! Type of the filter core
-    using core = Core<Scalar,GainPolicy,ClippingPolicy>;
+    using core_type = Core<Scalar,GainPolicy,ClippingPolicy>;
 
     //! Type of the channels policy
     using channels = ChannelsPolicy<Scalar,BandwidthPolicy>;
 
     //! Type of the underlying gammatone filters
-    using filter = gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>;
+    using filter_type = gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>;
 
     //! Type of the underlying bank of filters
-    using bank_type = std::vector<filter>;
+    using bank_type = std::vector<filter_type>;
     
     //! Const iterator on filters
     using const_iterator = typename bank_type::const_iterator;
@@ -230,13 +230,13 @@ filterbank(const scalar_type& sample_frequency,
            const scalar_type& low_cf,
            const scalar_type& high_cf,
            const typename channels::param_type& channels_parameter)
-  : base(sample_frequency)
+  : base_type(sample_frequency)
 {
   const auto p = ChannelsPolicy<scalar_type,BandwidthPolicy>::setup(low_cf,high_cf,channels_parameter);
   m_overlap = p.second;
 
   const auto& cf = p.first;
-  std::for_each(cf.begin(),cf.end(),[&](const auto& f){m_bank.push_back(filter(sample_frequency,f));});
+  std::for_each(cf.begin(),cf.end(),[&](const scalar_type& f){m_bank.push_back(filter_type(sample_frequency,f));});
 }
 
 template
@@ -353,7 +353,7 @@ gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,Clip
 center_frequency() const
 {
   output_type out(nb_channels());
-  std::transform(begin(),end(),out.begin(),[&](const auto& f){return f.center_frequency();});
+  std::transform(begin(),end(),out.begin(),[&](const filter_type& f){return f.center_frequency();});
   return out;
 }
 
@@ -371,7 +371,7 @@ gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,Clip
 bandwidth() const
 {
   output_type out(nb_channels());
-  std::transform(begin(),end(),out.begin(),[&](const auto& f){return f.bandwidth();});
+  std::transform(begin(),end(),out.begin(),[&](const filter_type& f){return f.bandwidth();});
   return out;
 }
 
@@ -389,7 +389,7 @@ gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,Clip
 gain() const
 {
   output_type out(nb_channels());
-  std::transform(begin(),end(),out.begin(),[&](const auto& f){return f.gain();});
+  std::transform(begin(),end(),out.begin(),[&](const filter_type& f){return f.gain();});
   return out;
 }
 
@@ -466,8 +466,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-const_reverse_iterator
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::const_reverse_iterator
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 rbegin() const
 {
@@ -483,8 +482,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-const_reverse_iterator
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::const_reverse_iterator
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 rend() const
 {
@@ -516,8 +514,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-iterator
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::iterator
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 end()
 {
@@ -533,8 +530,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-reverse_iterator
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::reverse_iterator
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 rbegin()
 {
@@ -550,8 +546,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-reverse_iterator
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::reverse_iterator
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 rend()
 {
@@ -567,13 +562,12 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-output_type
+typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::output_type
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 compute(const Scalar& input)
 {
   output_type out(nb_channels());
-  std::transform(begin(),end(),out.begin(),[&](auto& f){return f.compute(input);});
+  std::transform(begin(),end(),out.begin(),[&](filter_type& f){return f.compute(input);});
   return out;
 }
 
@@ -587,13 +581,12 @@ template
   class ClippingPolicy
   >
 template<class InputIterator, class OutputIterator>
-void
-gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
+void gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 compute(const InputIterator& first,
         const InputIterator& last,
         const OutputIterator& result)
 {
-  std::transform(first,last,result,[&](const auto& x){return this->compute(x);});
+  std::transform(first,last,result,[&](const scalar_type& x){return this->compute(x);});
 }
 
 template
@@ -605,8 +598,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-void
-gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
+void gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 compute(const std::size_t& size,
         const Scalar* input,
         Scalar* output)

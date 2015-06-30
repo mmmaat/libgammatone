@@ -43,8 +43,9 @@ int main(int argc, char** argv)
   auto t = ir::time(bank.begin()->sample_frequency(), duration);
 
   vector<vector<T> > ir_base(bank.nb_channels());
+  using filter_type = typename decltype(bank)::filter_type;
   transform(bank.begin(),bank.end(),ir_base.begin(),
-   	    [&](auto& x){return ir::implemented(x, t.begin(),t.end());});
+   	    [&](filter_type& x){return ir::implemented(x, t.begin(),t.end());});
  
   // initialize gnuplot
   Gnuplot gp;

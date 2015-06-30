@@ -94,8 +94,10 @@ template<class Iterator>
 inline void gammatone::detail::
 decibel(const Iterator& first, const Iterator& last)
 {
+  using T = typename Iterator::value_type;
+  
   gammatone::detail::normalize(first,last);
-  std::for_each(first, last, [&](auto& x){x = 20*std::log(x);});
+  std::for_each(first, last, [&](T& x){x = 20*std::log(x);});
 }
 
 template<class Container>
@@ -112,15 +114,15 @@ find_attenuation(const Container& signal,
   std::vector<T> partial_max(signal.size());
   T max = 0.0;
   std::transform(signal.rbegin(),signal.rend(),partial_max.rbegin(),
-                 [&](const auto& x){if(std::abs(x)>max) max = std::abs(x); return max;});
+                 [&](const T& x){if(std::abs(x)>max) max = std::abs(x); return max;});
 
   // normalize the max
-  std::for_each(partial_max.begin(),partial_max.end(),[&](auto& x){x/=max;});
+  std::for_each(partial_max.begin(),partial_max.end(),[&](T& x){x/=max;});
 
   // find cutoff position in partial_max
   const T cutoff = std::pow(10,level/20.0);
   const auto cutoff_it = std::find_if(partial_max.begin(),partial_max.end(),
-                                      [&](const auto& x){return x <= cutoff;});
+                                      [&](const T& x){return x <= cutoff;});
 
   // convert it to an iterator on signal
   auto res_it = signal.cbegin() + std::distance(partial_max.begin(),cutoff_it);

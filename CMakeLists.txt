@@ -5,7 +5,7 @@ project(libgammatone)
 # Setup general compilation flags
 set(CMAKE_CXX_COMPILER c++)
 set(CMAKE_BUILD_TYPE Release)
-add_definitions(${CMAKE_CXX_FLAGS} -Wall -std=c++14)
+add_definitions(${CMAKE_CXX_FLAGS} -Wall -std=c++11)
 
 # Manage the version number of the project
 set(libgammatone_VERSION_MAJOR 0)

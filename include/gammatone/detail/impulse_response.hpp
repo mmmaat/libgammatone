@@ -353,10 +353,11 @@ theorical(const Scalar& center_frequency,
           const Iterator& first,
           const Iterator& last)
 {
-
+  using T = typename Iterator::value_type;
+  
   Container<Scalar> ir(std::distance(first,last));
   std::transform(first,last,ir.begin(),
-                 [&](const auto& t){return formula_ir(center_frequency,bandwidth,t);});
+                 [&](const T& t){return formula_ir(center_frequency,bandwidth,t);});
   return ir;
 }
 
@@ -390,17 +391,19 @@ implemented(Filter& filter,
             const Iterator& first,
             const Iterator& last)
 {
+  using T = typename Filter::scalar_type;
+  
   filter.reset();
 
   // allocation for output
-  Container<typename Filter::scalar_type> ir(std::distance(first,last));
+  Container<T> ir(std::distance(first,last));
 
   // compute the first sample (= 1)
   auto it = ir.begin();
   *it++ = filter.compute(1.0);
 
   // compute other samples (= 0)
-  std::for_each(it,ir.end(),[&](auto& x){x = filter.compute(0.0);});
+  std::for_each(it,ir.end(),[&](T& x){x = filter.compute(0.0);});
 
   return ir;
 }

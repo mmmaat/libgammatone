@@ -126,7 +126,8 @@ normalize(const Iterator& first, const Iterator& last)
   const auto factor = 1.0 / max;
 
   // second pass to normalize the range by this factor
-  std::for_each(first,last,[&](auto& v){v*=factor;});
+  using T = typename Iterator::value_type;
+  std::for_each(first,last,[&](T& v){v*=factor;});
 }
 
 #endif // GAMMATONE_DETAIL_UTILS_HPP

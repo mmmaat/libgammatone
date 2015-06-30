@@ -148,7 +148,7 @@ setup(const Scalar& fl, const Scalar& fh, const Scalar& b, const std::size_t& nb
   std::vector<Scalar> frequencies(nbc);
   std::size_t i = 0;
   std::for_each(frequencies.rbegin(),frequencies.rend(),
-                [&](auto& x){x = -a + (fh+a)*std::exp(b*i++);});
+                [&](Scalar& x){x = -a + (fh+a)*std::exp(b*i++);});
 
   return frequencies;
 }

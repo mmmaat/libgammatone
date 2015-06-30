@@ -53,9 +53,9 @@ BOOST_AUTO_TEST_CASE(glasberg1990_works)
   auto f = gammatone::detail::linspace<T>(1,100000,10000);
   typedef glasberg1990<T> g;
   
-  for_each(f.begin(),f.end(), [&](const auto& x)
+  for_each(f.begin(),f.end(), [&](const T& x)
            {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction*24.7*(4.37*x/1000 + 1),1e-2);});
-  for_each(f.begin(),f.end(), [&](const auto& x)
+  for_each(f.begin(),f.end(), [&](const T& x)
            {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction*24.7*(4.3700009346995*x/1000 + 1),5e-14);});
 }
 

@@ -58,14 +58,16 @@ int main()
   const std::size_t size = 5000;
 
   filter f(fs, fc);
-  const auto freq = gammatone::detail::linspace(0.0,2.0*fc,size);
+  const auto freq = gammatone::detail::linspace<T>(0.0,2.0*fc,size);
 
   std::vector<std::pair<T,T> > tf(size), tf_aprox(size);
   std::transform(freq.begin(),freq.end(),tf.begin(),
-                 [&](auto& x){auto tmp = formula_tf(f,x); return std::make_pair(std::abs(tmp),std::arg(tmp));});
+                 [&](const T& x){std::complex<T> tmp = formula_tf(f,x);
+		   return std::make_pair(std::abs(tmp),std::arg(tmp));});
 
   std::transform(freq.begin(),freq.end(),tf_aprox.begin(),
-                 [&](auto& x){auto tmp = formula_tf_approx(f,x);return std::make_pair(std::abs(tmp),std::arg(tmp));});
+                 [&](const T& x){auto tmp = formula_tf_approx(f,x);
+		   return std::make_pair(std::abs(tmp),std::arg(tmp));});
 
   Gnuplot gp_gain;
   gp_gain << std::ifstream(gpsetup).rdbuf() << std::endl

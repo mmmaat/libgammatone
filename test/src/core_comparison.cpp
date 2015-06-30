@@ -170,7 +170,7 @@ int main(int argc, char** argv)
        << "center frequency = " << fc[idx]
        << ", repetitions = " << c.repeat() << endl;
   
-  std::for_each(res.begin(),res.end(),[&](const auto& x)
+  std::for_each(res.begin(),res.end(),[&](const result_type& x)
                 {cout << x.name << ": "          // core type
                       << x.mean[idx]             // computing time
                       << " ms " << endl;});      // in microsecond		      
