@@ -22,8 +22,11 @@ Retrieve the code from github:
 git clone https://github.com/mmmaat/libgammatone.git
 ~~~
 
-After cloning, you have the libgammatone headers in `./libgammatone/include`.
-
+- After cloning, you have the libgammatone headers in
+`./libgammatone/include`.
+- You must have this dircetory in your include path in order to
+compile your code with libgammatone.
+- You must compile with the `-std=c++11` flag (tested on GCC 4.9.2).
 
 # Hello World !
 
@@ -36,14 +39,10 @@ Compile it with:
 g++ -std=c++11 -o minimal minimal.cpp -I/path/to/libgammatone/include
 ~~~
 
-Your compiler must support the -std=c++11 option (tested on GCC 4.9.2).
-
 It work ? Great, you are now ready to read the [tutorial](@ref tutorial) !
 
 
 # Build documentation and tests
-
-
 
 If you want to build documentation and tests you need the following programs:
 

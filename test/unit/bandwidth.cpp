@@ -20,12 +20,9 @@
 #include <boost/test/unit_test.hpp>
 #include <gammatone/policy/bandwidth.hpp>
 #include <gammatone/detail/utils.hpp>
-#include <limits>
 using namespace std;
 
 typedef double T;
-const T eps = numeric_limits<T>::epsilon();
-
 
 BOOST_AUTO_TEST_SUITE(policy_bandwidth)
 
@@ -39,7 +36,7 @@ BOOST_AUTO_TEST_CASE(silly_test)
   BOOST_CHECK_EQUAL(2, (int)slaney1988<T>::order);
 
   typedef glasberg1990<T> g;
-  BOOST_CHECK_EQUAL(g::minbw*g::bw_correction, g::bandwidth(0));
+  BOOST_CHECK_EQUAL(g::minbw*g::bw_correction(g::order), g::bandwidth(0));
 }
 
 
@@ -54,9 +51,19 @@ BOOST_AUTO_TEST_CASE(glasberg1990_works)
   typedef glasberg1990<T> g;
   
   for_each(f.begin(),f.end(), [&](const T& x)
-           {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction*24.7*(4.37*x/1000 + 1),1e-2);});
+           {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction(g::order)*24.7*(4.37*x/1000 + 1),1e-2);});
   for_each(f.begin(),f.end(), [&](const T& x)
-           {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction*24.7*(4.3700009346995*x/1000 + 1),5e-14);});
+           {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction(g::order)*24.7*(4.3700009346995*x/1000 + 1),5e-14);});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+
+
+
+
+
+
+
+
+

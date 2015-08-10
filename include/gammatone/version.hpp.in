@@ -17,25 +17,31 @@
   along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GAMMATONE_DETAIL_VERSION_HPP
-#define GAMMATONE_DETAIL_VERSION_HPP
+#ifndef GAMMATONE_VERSION_HPP
+#define GAMMATONE_VERSION_HPP
 
 #include <string>
 #include <sstream>
 
 namespace gammatone
 {
+  //! Major version number of libgammatone
   const int LIBGAMMATONE_VERSION_MAJOR = @libgammatone_VERSION_MAJOR@;
+
+  //! Minor version number of libgammatone
   const int LIBGAMMATONE_VERSION_MINOR = @libgammatone_VERSION_MINOR@;
   
   //! Version of libgammatone
+  /*!      
+    \return A string representing the version of libgammatone in the
+    format "libgammatone MAJOR.MINOR"
+   */
   std::string version()
   {
-    std::stringstream v;
-    v << "libgammatone " << LIBGAMMATONE_VERSION_MAJOR << "." << LIBGAMMATONE_VERSION_MINOR;
-    
-    return v.str();
+    std::stringstream stream;
+    stream << "libgammatone " << LIBGAMMATONE_VERSION_MAJOR << "." << LIBGAMMATONE_VERSION_MINOR;
+    return stream.str();
   }
 }
 
-#endif // GAMMATONE_DETAIL_VERSION_HPP
+#endif // GAMMATONE_VERSION_HPP
