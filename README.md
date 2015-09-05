@@ -1,18 +1,24 @@
+****
+
+# Why libgammatone ?
 
 Gammatone filters are linear filters widely used as cochlear models in
-auditory processing. Applications cover, among others, voice
-recognition, sound localization and hearing aids design.
+auditory processing. Applications cover, among others:
+
+- Auditory modeling,
+- Voice recognition,
+- Sound localization,
+- Hearing aids design.
 
 A lot of open source implementations have been proposed over years,
-mainly in Matlab or python, few in C or C++. Among these,
-**libgammatone** aims to be **standard C++ implementation** suitable
-for research and engineering purpose.
+mainly in Matlab or python, few in C or C++.
+Among these, **libgammatone** aims to be **standard C++
+implementation**, suitable for research and engineering purpose.
 
-- Clear and easy to use interface
-- Fast and efficient
-- Extensible and generic design
 - Documented and tested
-
+- Clear and extensible interface
+- Fast and efficient
+ 
 
 # Installation
 

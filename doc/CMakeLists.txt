@@ -1,13 +1,25 @@
+# from https://www.tty1.net/blog/2014/cmake-doxygen_en.html
 
-# Configure version in doc
-configure_file(
-  "${PROJECT_SOURCE_DIR}/doc/Doxyfile.in"
-  "${PROJECT_BINARY_DIR}/doc/Doxyfile"
-  )
-
+# add a target to generate API documentation with Doxygen
 find_package(Doxygen)
-add_custom_target(html
-  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen)" ${DOXYGEN_FOUND})
 
-add_subdirectory(exemple)
+if(BUILD_DOCUMENTATION)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen is needed to build the documentation.")
+    endif()
+
+    # Configure Doxyfile.in
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+endif()
+
+#install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/ DESTINATION share/doc)      
+# add_subdirectory(exemple)

@@ -19,7 +19,7 @@ include_directories(${Boost_INCLUDE_DIR})
 # locate the sources
 file(GLOB_RECURSE UNIT_TESTS unit/*.cpp)
 
-# build unit tests (by make or make-unit)
+# build unit tests (by make or make unit)
 # tests are done on a subset of gammatone types
 add_executable(unit ${UNIT_TESTS})
 target_link_libraries(unit ${Boost_LIBRARIES})

@@ -9,6 +9,7 @@ int main()
   // A gammatone filter sampled at 44.1 kHz, centered at 1 kHz
   gammatone::filter<double> filter(44100, 1000);
 
+  // TODO: no allocation !
   // Compute the output signal from input
   std::vector<double> output = filter.compute(input);
 

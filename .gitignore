@@ -6,6 +6,9 @@
 /GRTAGS
 /GSYMS
 /GTAGS
+/alternatives
+/build
+/install
 CMakeCache.txt
 CMakeFiles/
 Makefile

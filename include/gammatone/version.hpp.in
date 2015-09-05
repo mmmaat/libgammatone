@@ -26,20 +26,20 @@
 namespace gammatone
 {
   //! Major version number of libgammatone
-  const int LIBGAMMATONE_VERSION_MAJOR = @libgammatone_VERSION_MAJOR@;
+  const unsigned int LIBGAMMATONE_VERSION_MAJOR = @VERSION_MAJOR@;
 
   //! Minor version number of libgammatone
-  const int LIBGAMMATONE_VERSION_MINOR = @libgammatone_VERSION_MINOR@;
+  const unsigned int LIBGAMMATONE_VERSION_MINOR = @VERSION_MINOR@;
   
   //! Version of libgammatone
   /*!      
     \return A string representing the version of libgammatone in the
-    format "libgammatone MAJOR.MINOR"
+    format "libgammatone-MAJOR.MINOR"
    */
   std::string version()
   {
     std::stringstream stream;
-    stream << "libgammatone " << LIBGAMMATONE_VERSION_MAJOR << "." << LIBGAMMATONE_VERSION_MINOR;
+    stream << "libgammatone-" << LIBGAMMATONE_VERSION_MAJOR << "." << LIBGAMMATONE_VERSION_MINOR;
     return stream.str();
   }
 }
