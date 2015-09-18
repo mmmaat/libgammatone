@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.0)
 
 # Define project name and version
 project(libgammatone)
