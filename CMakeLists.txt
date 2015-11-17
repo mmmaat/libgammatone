@@ -27,7 +27,6 @@ set(CMAKE_CXX_COMPILER c++)
 set(CMAKE_BUILD_TYPE Release)
 add_definitions(${CMAKE_CXX_FLAGS} -Wall -std=c++11)
 
-
 # Configure version.hpp in source
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/gammatone/version.hpp.in"
@@ -56,4 +55,4 @@ install(
 install(
   DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/
   DESTINATION share/doc/gammatone
-  )  
+  )

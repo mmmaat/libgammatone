@@ -54,7 +54,8 @@ const T fl = 1e2, fh = 1e4;
 const std::size_t nbc = 10;
 
 // Center frequencies tested for the core (Hz)
-const std::vector<T> fc = gammatone::policy::channels::fixed_size<T,bandwidth_policy>::setup(fl,fh,nbc).first;
+const std::vector<T> fc = gammatone::policy::channels::
+    fixed_size<T,bandwidth_policy>::setup(fl,fh,nbc).first;
 
 // size in sample of the input
 const T size = fs * duration;
@@ -169,27 +170,11 @@ int main(int argc, char** argv)
   cout << "duration = " << duration*1e3 << " ms, "
        << "center frequency = " << fc[idx]
        << ", repetitions = " << c.repeat() << endl;
-  
+
   std::for_each(res.begin(),res.end(),[&](const result_type& x)
                 {cout << x.name << ": "          // core type
                       << x.mean[idx]             // computing time
-                      << " ms " << endl;});      // in microsecond		      
+                      << " ms " << endl;});      // in microsecond
 
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
