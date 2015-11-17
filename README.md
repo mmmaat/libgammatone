@@ -18,7 +18,7 @@ implementation**, suitable for research and engineering purpose.
 - Documented and tested
 - Clear and extensible interface
 - Fast and efficient
- 
+
 
 # Installation
 

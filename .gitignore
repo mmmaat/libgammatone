@@ -12,7 +12,6 @@
 CMakeCache.txt
 CMakeFiles/
 Makefile
-TODO
 doc/*.db
 doc/auto/
 doc/exemple/bin
@@ -21,3 +20,4 @@ example/bin
 test/DoxygenLayout.xml
 test/bin
 test/old/
+/.projectile
