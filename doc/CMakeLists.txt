@@ -21,5 +21,4 @@ if(BUILD_DOCUMENTATION)
         VERBATIM)
 endif()
 
-#install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/ DESTINATION share/doc)      
-# add_subdirectory(exemple)
+install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/ DESTINATION share/doc)      
