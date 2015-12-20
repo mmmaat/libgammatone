@@ -23,6 +23,9 @@
 #include <string>
 #include <sstream>
 
+// TODO configure this from CMakeLists
+const std::string GNUPLOT_SETUP = "/home/mathieu/dev/libgammatone/test/share/setup.gp";
+
 typedef double T;
 using namespace gammatone;
 
@@ -61,7 +64,7 @@ void plot(std::vector<T> xaxis,
           const std::string xlabel = "frequency (Hz)")
 {
   Gnuplot gp;
-  gp << std::ifstream("/home/mathieu/dev/libgammatone/test/share/setup.gp").rdbuf() << std::endl
+  gp << std::ifstream(GNUPLOT_SETUP).rdbuf() << std::endl
      << "set xlabel '"<<xlabel<<"'" << std::endl
      << "set ylabel '"<<ylabel<<"'" << std::endl
      << "set key top right" << std::endl

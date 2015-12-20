@@ -26,46 +26,46 @@
 #include <boost/timer/timer.hpp>
 #include <test_setup.hpp>
 #include <vector>
+#include <tuple>
 
 
 // Scalar values are double
-using T = double;
+using scalar = double;
 
 // Bandwidth policy
 template<class X> using bandwidth_policy = gammatone::policy::bandwidth::glasberg1990<X>;
 
-// Store core types in a vector
-using core_types = std::tuple<
-  boost::fusion::pair<gammatone::core::cooke1993<T>,std::string>,
-  boost::fusion::pair<gammatone::core::slaney1993<T>,std::string>,
-  boost::fusion::pair<gammatone::core::convolution<T>,std::string> >;
-const core_types cores("      cooke",
-                       "     slaney",
-                       "convolution");
+// Store core types in a named tuple
+using core1 = gammatone::core::cooke1993<scalar>;
+using core2 = gammatone::core::slaney1993<scalar>;
+using core3 = gammatone::core::convolution<scalar>;
+const auto cores =
+    std::make_tuple(boost::fusion::make_pair<core1>("      cooke"),
+                    boost::fusion::make_pair<core2>("     slaney"),
+                    boost::fusion::make_pair<core3>("convolution"));
 
 // Running at 44.1kHz
-const T fs = 44100;
+const scalar fs = 44100;
 
 // during 100 ms
-const T duration = 0.1;
-
-const T fl = 1e2, fh = 1e4;
+const scalar duration = 0.1;
 
 const std::size_t nbc = 10;
+const scalar fl = 1e2, fh = 1e4;
 
 // Center frequencies tested for the core (Hz)
-const std::vector<T> fc = gammatone::policy::channels::
-    fixed_size<T,bandwidth_policy>::setup(fl,fh,nbc).first;
+const std::vector<scalar> fc = gammatone::policy::channels::
+    fixed_size<scalar,bandwidth_policy>::setup(fl,fh,nbc).first;
 
 // size in sample of the input
-const T size = fs * duration;
+const scalar size = fs * duration;
 
 // core name, mean and variance of core computing time
 struct result_type
 {
   std::string name;
-  std::vector<T> mean;
-  std::vector<T> var;
+  std::vector<scalar> mean;
+  std::vector<scalar> var;
 };
 
 class chrono
@@ -73,37 +73,42 @@ class chrono
 public:
 
   //! Setup the chrono for a given number of repetitions
-  chrono(const std::size_t repeat = 100) : m_repeat(repeat) {}
+  chrono(const std::size_t repeat = 100)
+      : m_repeat(repeat)
+    {}
 
   //! Get the number of repetitions
-  std::size_t repeat() const { return m_repeat; }
+  std::size_t repeat() const
+    {
+        return m_repeat;
+    }
 
   //! Compute repeatedly a given input on a given core
   template<class P>
-  result_type process(const std::vector<T>& input, P& p) const
+  result_type process(const std::vector<scalar>& input, P& p) const
     {
       using core = typename P::first_type;
 
       result_type res;
       res.name = p.second;
 
-      for(const T& f : fc)
+      for(const scalar& f : fc)
       {
         // Bandwidth of the core (Hz)
-        const T bw = bandwidth_policy<T>::bandwidth(f);
+        const scalar bw = bandwidth_policy<scalar>::bandwidth(f);
 
         // Setup the core
         core c(fs,f,bw);
 
         // Get computing time for each repetition
-        std::vector<T> elapsed(m_repeat);
+        std::vector<scalar> elapsed(m_repeat);
         for(std::size_t i=0; i<m_repeat; ++i)
         {
           c.reset();
 
           boost::timer::cpu_timer timer;
-          std::for_each(input.begin(),input.end(),[&](const T& x){c.compute(x);});
-          elapsed[i] = static_cast<T>(timer.elapsed().wall);
+          std::for_each(input.begin(),input.end(),[&](const scalar& x){c.compute(x);});
+          elapsed[i] = static_cast<scalar>(timer.elapsed().wall);
         }
 
         // Return core name, mean and std of computing time (in ms)
@@ -130,8 +135,8 @@ int main(int argc, char** argv)
   chrono c(1000);
 
   // setup test input signal
-  // const std::vector<T> input = utils::pulse<T>(size);
-  const std::vector<T> input = utils::random<T>(-1.0,1.0,size);
+  // const std::vector<scalar> input = utils::pulse<scalar>(size);
+  const std::vector<scalar> input = utils::random<scalar>(-1.0, 1.0, size);
 
   // estimate computing time for each core type
   std::vector<result_type> res;
@@ -157,19 +162,20 @@ int main(int argc, char** argv)
 
 
   // // get faster core
-  // std::vector<T> t(res.size());
+  // std::vector<scalar> t(res.size());
   // std::transform(res.begin(),res.end(),t.begin(),[&](const auto& x){return get<1>(x);});
-  // T min_time = *std::min_element(t.begin(),t.end());
+  // scalar min_time = *std::min_element(t.begin(),t.end());
 
   // // compute relative results
-  // std::vector<T> relative(res.size());
+  // std::vector<scalar> relative(res.size());
   // std::transform(res.begin(),res.end(),relative.begin(),[&](const auto& x){return get<1>(x)/min_time;});
 
   // display results
   std::size_t idx = nbc/2;
   cout << "duration = " << duration*1e3 << " ms, "
        << "center frequency = " << fc[idx]
-       << ", repetitions = " << c.repeat() << endl;
+       << ", repetitions = " << c.repeat()
+       << endl;
 
   std::for_each(res.begin(),res.end(),[&](const result_type& x)
                 {cout << x.name << ": "          // core type
