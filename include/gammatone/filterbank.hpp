@@ -63,9 +63,6 @@ namespace gammatone
     //! Type of the inherited interface
     using base_type = detail::interface<Scalar,std::vector<Scalar> >;
 
-    // Type of scalar values
-    using scalar_type = typename base_type::scalar_type;
-
     //! Type of the output container
     using output_type = typename base_type::output_type;
 
@@ -98,15 +95,14 @@ namespace gammatone
       \param sample_frequency    The sample frequency of the input signal (Hz)
       \param low_frequency       The lowest center frequency in the filterbank (Hz)
       \param high_frequency      The highest center frequency in the filterbank (Hz)
-
-      \param channels_parameter If channels::fixed_size is used,
+      \param channels_parameter  If channels::fixed_size is used,
       channels_parameters is the number of frequency channels in the
       filterbank. If channels::fixed_overlap is used, it corresponds
       to the overlap factor.
     */
-    filterbank(const scalar_type& sample_frequency,
-               const scalar_type& low_frequency,
-               const scalar_type& high_frequency,
+    filterbank(const Scalar& sample_frequency,
+               const Scalar& low_frequency,
+               const Scalar& high_frequency,
                const typename channels::param_type& channels_parameter = channels::default_parameter());
 
     //! Copy constructor
@@ -147,7 +143,7 @@ namespace gammatone
       \return The filterbank overlap factor
       \see policy::channels
     */
-    scalar_type overlap() const;
+    Scalar overlap() const;
 
     //! Const iterator to begin
     const_iterator begin() const;
@@ -207,9 +203,8 @@ namespace gammatone
                  Scalar* output);
 
   private:
-
     //! The filterbank overlap factor
-    scalar_type m_overlap;
+    Scalar m_overlap;
 
     //! The underlying gammatone filter array
     bank_type m_bank;
@@ -226,17 +221,18 @@ template
   class ClippingPolicy
   >
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
-filterbank(const scalar_type& sample_frequency,
-           const scalar_type& low_cf,
-           const scalar_type& high_cf,
+filterbank(const Scalar& sample_frequency,
+           const Scalar& low_cf,
+           const Scalar& high_cf,
            const typename channels::param_type& channels_parameter)
   : base_type(sample_frequency)
 {
-  const auto p = ChannelsPolicy<scalar_type,BandwidthPolicy>::setup(low_cf,high_cf,channels_parameter);
+  const auto p = ChannelsPolicy<Scalar, BandwidthPolicy>
+      ::setup(low_cf,high_cf,channels_parameter);
+  
   m_overlap = p.second;
-
-  const auto& cf = p.first;
-  std::for_each(cf.begin(),cf.end(),[&](const scalar_type& f){m_bank.push_back(filter_type(sample_frequency,f));});
+  std::for_each(p.first.begin(), p.first.end(), [&](const Scalar& f)
+                {m_bank.push_back(filter_type(sample_frequency,f));});
 }
 
 template
@@ -418,7 +414,7 @@ template
   template<class> class BandwidthPolicy,
   class ClippingPolicy
   >
-typename gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::scalar_type
+Scalar
 gammatone::filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>::
 overlap() const
 {
@@ -586,7 +582,7 @@ compute(const InputIterator& first,
         const InputIterator& last,
         const OutputIterator& result)
 {
-  std::transform(first,last,result,[&](const scalar_type& x){return this->compute(x);});
+  std::transform(first,last,result,[&](const Scalar& x){return this->compute(x);});
 }
 
 template

@@ -36,7 +36,8 @@
 #include <gammatone/policy/clipping.hpp>
 
 
-// Above are some general comments on libgammatone for Doxygen doc
+// Above are some general comments on libgammatone for Doxygen based
+// documentation
 
 /*!
   \namespace gammatone

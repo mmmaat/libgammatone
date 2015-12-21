@@ -20,122 +20,125 @@
 #ifndef GAMMATONE_DETAIL_INTERFACE_HPP
 #define GAMMATONE_DETAIL_INTERFACE_HPP
 
-#include <memory> // for std::move
+#include <memory>  // for std::move
 #include <algorithm>
 
 namespace gammatone
 {
-  namespace detail
-  {
-    //! Generic interface for both gammatone filters and filterbanks
-    /*!
-      \class interface gammatone/detail/interface.hpp
-
-      This abstract class provides a common generic interface for both
-      gammatone filters and filterbanks (i.e. single and multi channels
-      filters). Provide a definition of the scalar type, common
-      accessors, a reset() method and a polymorphic compute() method.
-
-      \tparam Scalar  Type of the scalar values (usually double).
-
-      \tparam Output Type of accessors results. Output is either a
-      Scalar for modeling a single channel filter or any container of
-      Scalar for modeling a filterbank.
-    */
-    template<class Scalar,
-             class Output>
-    class interface
+    namespace detail
     {
-      //! Type of this class
-      using type = interface<Scalar,Output>;
+        //! Generic interface for both gammatone filters and filterbanks
+        /*!
+          \class interface gammatone/detail/interface.hpp
 
-    public:
+          This abstract class provides a common generic interface for both
+          gammatone filters and filterbanks (i.e. single and multi channels
+          filters). Provide a definition of the scalar type, common
+          accessors and a reset() method.
 
-      //! Type of scalar input values 
-      using scalar_type = Scalar;
+          The compute() method is not defined here but in child classes as
+          the interface is different for filter and filterbank.
 
-      //! Type of output values
-      using output_type = Output;      
+          \tparam Scalar Type of the scalar values (usually double, be
+          scared of float16).
 
-      //! Constructor
-      explicit interface(const scalar_type& sample_frequency);
+          \tparam Output Type of accessors results. Output is either a
+          Scalar for filter or any container of Scalar for filterbank.
+        */
+        template<class Scalar,
+                 class Output>
+        class interface
+        {
+        public:
+            //! Type of this class
+            using type = interface<Scalar,Output>;
+        
+            //! Type of scalar input values 
+            using scalar_type = Scalar;
 
-      //! Copy constructor
-      interface(const type& other);
+            //! Type of output values
+            // Scalar for filter, vector of Scalar for filterbank
+            using output_type = Output;
 
-      //! Move constructor
-      interface(type&& other) noexcept;
+            //! Constructor
+            explicit interface(const scalar_type& sample_frequency);
 
-      //! Assignment operator
-      type& operator=(const type& other);
+            //! Copy constructor
+            interface(const type& other);
 
-      //! Move operator
-      type& operator=(type&& other);
+            //! Move constructor
+            interface(type&& other) noexcept;
 
-      //! Destructor
-      virtual ~interface();
+            //! Assignment operator
+            type& operator=(const type& other);
 
-      //! Accessor to the sample frequency
-      /*!
-        Accessor to the processing sample frequency (Hz).
-        \return The sample frequency.
-      */
-      scalar_type sample_frequency() const;
+            //! Move operator
+            type& operator=(type&& other);
 
-      //! Accessor to the center frequency
-      /*!
-        Accessor to the center frequencies of each channel in the filterbank (in Hz).
-        \return The center frequencies of each cochlear channel.
-      */
-      virtual output_type center_frequency() const = 0;
+            //! Destructor
+            virtual ~interface();
 
-      //! Accessor to the bandwidth
-      /*!
-        Accessor to the bandwidth of each channel in the filterbank (in Hz).
-        \return The bandwidth of each cochlear channel.
-      */
-      virtual output_type bandwidth() const = 0;
+            //! Accessor to the sample frequency
+            /*!
+              Accessor to the processing sample frequency (Hz).
+              \return The sample frequency.
+            */
+            scalar_type sample_frequency() const;
 
-      //! Accessor to the gain
-      /*!
-        Accessor to the gain of each channel in the filterbank.
-        \return The gain of each cochlear channel.
+            //! Accessor to the center frequency
+            /*!
+              Accessor to the center frequencies of each channel in the filterbank (in Hz).
+              \return The center frequencies of each cochlear channel.
+            */
+            virtual output_type center_frequency() const = 0;
 
-        \todo return it in dB ?
-      */
-      virtual output_type gain() const = 0;
+            //! Accessor to the bandwidth
+            /*!
+              Accessor to the bandwidth of each channel in the filterbank (in Hz).
+              \return The bandwidth of each cochlear channel.
+            */
+            virtual output_type bandwidth() const = 0;
 
-      //! Clean internal buffers
-      /*!
-        Fill internal buffers with zeros and restore the filterbank
-        state as a newly created one.
-      */
-      virtual void reset() = 0;
+            //! Accessor to the gain
+            /*!
+              Accessor to the gain of each channel in the filterbank.
+              \return The gain of each cochlear channel.
+
+              TODO return it in dB ?
+            */
+            virtual output_type gain() const = 0;
+
+            //! Clean internal buffers
+            /*!
+              Fill internal buffers with zeros and restore the filterbank
+              state as a newly created one.
+            */
+            virtual void reset() = 0;
       
-    private:
+        private:
 
-      //! Processing sample frequency (Hz)
-      scalar_type m_sample_frequency;
-    };
-  }
+            //! Processing sample frequency (Hz)
+            scalar_type m_sample_frequency;
+        };
+    }
 }
 
 template<class Scalar, class Output>
 gammatone::detail::interface<Scalar,Output>::
 interface(const scalar_type& sample_frequency)
-  : m_sample_frequency(sample_frequency)
+    : m_sample_frequency(sample_frequency)
 {}
 
 template<class Scalar, class Output>
 gammatone::detail::interface<Scalar,Output>::
 interface(const type& other)
-  : m_sample_frequency(other.m_sample_frequency)
+    : m_sample_frequency(other.m_sample_frequency)
 {}
 
 template<class Scalar, class Output>
 gammatone::detail::interface<Scalar,Output>::
 interface(type&& other) noexcept
-: m_sample_frequency(std::move(other.m_sample_frequency))
+    : m_sample_frequency(std::move(other.m_sample_frequency))
 {}
 
 template<class Scalar, class Output>
@@ -143,9 +146,9 @@ gammatone::detail::interface<Scalar,Output>&
 gammatone::detail::interface<Scalar,Output>::
 operator=(const type& other)
 {
-  type tmp(other);
-  std::swap(m_sample_frequency, tmp.m_sample_frequency);
-  return *this;
+    type tmp(other);
+    std::swap(m_sample_frequency, tmp.m_sample_frequency);
+    return *this;
 }
 
 template<class Scalar, class Output>
@@ -153,8 +156,8 @@ gammatone::detail::interface<Scalar,Output>&
 gammatone::detail::interface<Scalar,Output>::
 operator=(type&& other)
 {
-  m_sample_frequency = std::move(other.m_sample_frequency);
-  return *this;
+    m_sample_frequency = std::move(other.m_sample_frequency);
+    return *this;
 }
 
 template<class Scalar, class Output>
@@ -167,7 +170,7 @@ typename gammatone::detail::interface<Scalar,Output>::scalar_type
 gammatone::detail::interface<Scalar,Output>::
 sample_frequency() const
 {
-  return m_sample_frequency;
+    return m_sample_frequency;
 }
 
 #endif // GAMMATONE_DETAIL_INTERFACE_HPP

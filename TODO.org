@@ -1,0 +1,13 @@
+* cochlea code
+** TODO no allocation in compute()
+** TODO implement gain policy
+** TODO ensure no memory leaks with valgrind
+   for a valgrind based test framework see [[https://github.com/kaldi-asr/kaldi][kaldi]]
+* simple binding to Python
+* merge with cochleo (becomes renderer)
+* in cochleo: get real time signal and plot it
+
+doc
+===
+
+* INPUT line in Doxyfile.in 
