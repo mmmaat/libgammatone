@@ -61,29 +61,50 @@ namespace gammatone
             using output_type = Output;
 
             //! Constructor
-            explicit interface(const scalar_type& sample_frequency);
+            explicit interface(const scalar_type& sample_frequency)
+                : m_sample_frequency(sample_frequency)
+                {}
+
 
             //! Copy constructor
-            interface(const type& other);
+            interface(const type& other)
+                : m_sample_frequency(other.m_sample_frequency)
+                {}
+
 
             //! Move constructor
-            interface(type&& other) noexcept;
+            interface(type&& other) noexcept
+                : m_sample_frequency(std::move(other.m_sample_frequency))
+                {}
+
 
             //! Assignment operator
-            type& operator=(const type& other);
+            type& operator=(const type& other){
+                type tmp(other);
+                std::swap(m_sample_frequency, tmp.m_sample_frequency);
+                return *this;
+            }
+
 
             //! Move operator
-            type& operator=(type&& other);
+            type& operator=(type&& other){
+                m_sample_frequency = std::move(other.m_sample_frequency);
+                return *this;
+            }
+
 
             //! Destructor
-            virtual ~interface();
+            virtual ~interface(){}
 
             //! Accessor to the sample frequency
             /*!
               Accessor to the processing sample frequency (Hz).
               \return The sample frequency.
             */
-            scalar_type sample_frequency() const;
+            scalar_type sample_frequency() const{
+                return m_sample_frequency;
+            }
+
 
             //! Accessor to the center frequency
             /*!
@@ -121,56 +142,6 @@ namespace gammatone
             scalar_type m_sample_frequency;
         };
     }
-}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>::
-interface(const scalar_type& sample_frequency)
-    : m_sample_frequency(sample_frequency)
-{}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>::
-interface(const type& other)
-    : m_sample_frequency(other.m_sample_frequency)
-{}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>::
-interface(type&& other) noexcept
-    : m_sample_frequency(std::move(other.m_sample_frequency))
-{}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>&
-gammatone::detail::interface<Scalar,Output>::
-operator=(const type& other)
-{
-    type tmp(other);
-    std::swap(m_sample_frequency, tmp.m_sample_frequency);
-    return *this;
-}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>&
-gammatone::detail::interface<Scalar,Output>::
-operator=(type&& other)
-{
-    m_sample_frequency = std::move(other.m_sample_frequency);
-    return *this;
-}
-
-template<class Scalar, class Output>
-gammatone::detail::interface<Scalar,Output>::
-~interface()
-{}
-
-template<class Scalar, class Output>
-typename gammatone::detail::interface<Scalar,Output>::scalar_type
-gammatone::detail::interface<Scalar,Output>::
-sample_frequency() const
-{
-    return m_sample_frequency;
 }
 
 #endif // GAMMATONE_DETAIL_INTERFACE_HPP

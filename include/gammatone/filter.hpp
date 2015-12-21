@@ -21,7 +21,7 @@
 #define GAMMATONE_FILTER_HPP
 
 #include <gammatone/detail/interface.hpp>
-#include <gammatone/core/cooke1993.hpp>
+#include <gammatone/core/cooke1993.hpp>  // default core
 #include <gammatone/policy/gain.hpp>
 #include <gammatone/policy/bandwidth.hpp>
 #include <gammatone/policy/clipping.hpp>
@@ -67,35 +67,89 @@ namespace gammatone
           \param center_frequency The filter center frequency (Hz).
         */
         filter(const Scalar& sample_frequency,
-               const Scalar& center_frequency);
+               const Scalar& center_frequency)
+            : base(sample_frequency),
+              m_center_frequency(center_frequency),
+              m_bandwidth(BandwidthPolicy<Scalar>::bandwidth(center_frequency)),
+              m_core(base::sample_frequency(), m_center_frequency, m_bandwidth)
+            {}
 
         //! Copy constructor
-        filter(const type& other);
+        filter(const type& other)
+            : base(other),
+              m_center_frequency(other.m_center_frequency),
+              m_bandwidth(other.m_bandwidth),
+              m_core(other.m_core)
+            {}
+
 
         //! Move constructor
-        filter(type&& other) noexcept;
+        filter(type&& other) noexcept
+            : base(std::move(other)),
+              m_center_frequency(std::move(other.m_center_frequency)),
+              m_bandwidth(std::move(other.m_bandwidth)),
+              m_core(std::move(other.m_core))
+            {}
+
 
         //! Assignment operator
-        type& operator=(const type& other);
+        type& operator=(const type& other){
+            base::operator=(other);
+
+            type tmp(other);
+            std::swap(m_core, tmp.m_core);
+            std::swap(m_center_frequency, tmp.m_center_frequency);
+            std::swap(m_bandwidth, tmp.m_bandwidth);
+
+            return *this;
+        }
+
 
         //! Move operator
-        type& operator=(type&& other);
+        type& operator=(type&& other){
+            base::operator=(std::move(other));
+            
+            m_center_frequency = std::move(other.m_center_frequency);
+            m_bandwidth = std::move(other.m_bandwidth);
+            m_core = std::move(other.m_core);
+            
+            return *this;
+        }
+
 
         //! Destructor
-        virtual ~filter();
+        virtual ~filter(){}
 
         //! Inherited from interface
-        inline Scalar center_frequency() const;
-        inline Scalar bandwidth() const;
-        inline Scalar gain() const;
-        inline void reset();
+        inline Scalar center_frequency() const{
+            return m_center_frequency;
+        }
+        
+        inline Scalar bandwidth() const{
+            return m_bandwidth;
+        }
+
+        inline Scalar gain() const{
+            return m_core.gain();
+        }
+
+        inline void reset(){
+            m_core.reset();
+        }
+
 
         //! Compute a scalar output from a scalar input
         /*!
           \param input  The scalar value to be processed.
           \return       The computed output value.
+
+          This method allocate memory for the output scalar.
         */
-        inline Scalar compute(const Scalar& input);
+        inline Scalar compute(const Scalar& input)
+            {
+                return m_core.compute(input);
+            }
+
 
         //! Compute an input iterator range
         /*!
@@ -116,7 +170,12 @@ namespace gammatone
         template<class InputIterator, class OutputIterator>
         inline void compute(const InputIterator& first,
                             const InputIterator& last,
-                            const OutputIterator& result);
+                            const OutputIterator& result){
+            using T = typename InputIterator::value_type;
+            std::transform(first, last, result,
+                           [&](const T& x){return this->compute(x);});
+        }
+
 
         //! Compute scalar values from/to pointers
         /*!
@@ -134,7 +193,11 @@ namespace gammatone
          */
         void compute(const std::size_t& size,
                      const Scalar* input,
-                     Scalar* output);
+                     Scalar* output){
+            for(std::size_t i=0; i < size; ++i)
+                output[i] = compute(input[i]);
+        }
+
 
     private:
         //! Filter center frequency (Hz)
@@ -146,203 +209,6 @@ namespace gammatone
         //! The underlying processing core
         core m_core;
     };
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-filter(const Scalar& sample_frequency,
-       const Scalar& center_frequency)
-    : base(sample_frequency),
-      m_center_frequency(center_frequency),
-      m_bandwidth(BandwidthPolicy<Scalar>::bandwidth(center_frequency)),
-      m_core(base::sample_frequency(), m_center_frequency, m_bandwidth)
-{}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-filter(const type& other)
-    : base(other),
-      m_center_frequency(other.m_center_frequency),
-      m_bandwidth(other.m_bandwidth),
-      m_core(other.m_core)
-{}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-filter(type&& other) noexcept
-    : base(std::move(other)),
-      m_center_frequency(std::move(other.m_center_frequency)),
-      m_bandwidth(std::move(other.m_bandwidth)),
-      m_core(std::move(other.m_core))
-{}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>&
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-operator=(const type& other)
-{
-    base::operator=(other);
-
-    type tmp(other);
-    std::swap(m_core, tmp.m_core);
-    std::swap(m_center_frequency, tmp.m_center_frequency);
-    std::swap(m_bandwidth, tmp.m_bandwidth);
-
-    return *this;
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>&
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-operator=(type&& other)
-{
-    base::operator=(std::move(other));
-
-    m_center_frequency = std::move(other.m_center_frequency);
-    m_bandwidth = std::move(other.m_bandwidth);
-    m_core = std::move(other.m_core);
-
-    return *this;
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-~filter()
-{}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-Scalar gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-center_frequency() const
-{
-    return m_center_frequency;
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-Scalar gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-bandwidth() const
-{
-    return m_bandwidth;
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-Scalar gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-gain() const
-{
-    return m_core.gain();
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-void gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-reset()
-{
-    m_core.reset();
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-Scalar gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-compute(const Scalar& input)
-{
-    return m_core.compute(input);
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-template<class InputIterator, class OutputIterator>
-void gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-compute(const InputIterator& first,
-        const InputIterator& last,
-        const OutputIterator& result)
-{
-    using T = typename InputIterator::value_type;
-    std::transform(first, last, result,
-                   [&](const T& x){return this->compute(x);});
-}
-
-template
-<
-    class Scalar,
-    template<class...> class Core,
-    template<class> class BandwidthPolicy,
-    class ClippingPolicy
-    >
-void gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>::
-compute(const std::size_t& size,
-        const Scalar* input,
-        Scalar* output)
-{
-    for(std::size_t i=0; i < size; ++i)
-        output[i] = compute(input[i]);
 }
 
 #endif // GAMMATONE_FILTER_HPP
