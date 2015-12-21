@@ -34,7 +34,7 @@ namespace gammatone
       but leave reset() and compute() abstracts.
 
       \tparam Scalar         Type of scalar values
-      \tparam GainPolicy     Policy for gain computation, see policy::gain .
+      \tparam GainPolicy     Policy for gain computation, see policy::gain
     */
     template<class Scalar,
              class GainPolicy>
@@ -68,7 +68,7 @@ namespace gammatone
       //! Destructor
       virtual ~base();
 
-            
+           
       //! Return the core internal gain, as specified by GainPolicy
       inline Scalar gain() const;
 
@@ -77,7 +77,7 @@ namespace gammatone
       virtual inline void reset() = 0;
 
       //! Compute an output from an input value
-      virtual inline Scalar compute(const Scalar& input) = 0;
+        virtual inline void compute(const Scalar& input, Scalar& output) = 0;
 
     protected:
 
@@ -166,26 +166,11 @@ find_factor(const Scalar& sample_frequency,
   
   const Scalar a = this->m_tau*bandwidth;
   const Complex b(0.0, this->m_tau*center_frequency);
-  const Scalar g = 2.0*std::abs(std::exp(static_cast<Scalar>(2)*(a+b)) -
-				(static_cast<Scalar>(1) + std::exp(static_cast<Scalar>(2)*b))* std::exp(a) -
-				static_cast<Scalar>(1));
+  const Scalar g = 2.0*std::abs(
+      std::exp(static_cast<Scalar>(2)*(a+b)) -
+      std::exp(a)*(static_cast<Scalar>(1) + std::exp(static_cast<Scalar>(2)*b)) -
+      static_cast<Scalar>(1));
   return 1.0 / GainPolicy::gain(g, sample_frequency, center_frequency, 4);
 }
 
 #endif // GAMMATONE_CORE_BASE_HPP
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -105,7 +105,6 @@ namespace gammatone
                 return m_sample_frequency;
             }
 
-
             //! Accessor to the center frequency
             /*!
               Accessor to the center frequencies of each channel in the filterbank (in Hz).

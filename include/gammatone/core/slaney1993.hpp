@@ -64,7 +64,7 @@ namespace gammatone
       operator=(slaney1993<Scalar,GainPolicy,ClippingPolicy>&& other);
 
       inline void reset();
-      inline Scalar compute(const Scalar& input);
+        inline void compute(const Scalar& input, Scalar& output);
 
     private:
 
@@ -158,9 +158,14 @@ void gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::reset()
 }
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-Scalar gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::compute(const Scalar& input)
+void gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::compute(const Scalar& input, Scalar& output)
 {
-  return m_filter[3].compute(m_filter[2].compute(m_filter[1].compute(m_filter[0].compute(input,this->factor()))));
+    output =
+        m_filter[3].compute(
+            m_filter[2].compute(
+                m_filter[1].compute(
+                    m_filter[0].compute(
+                        input, this->factor()))));
 }
 
 

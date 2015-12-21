@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
     {
       vector<double> out_ref(in.size());
       std::transform(in.begin(),in.end(),out_ref.begin(),
-                     [&](double x){return c.compute(x);});
+                     [&](double x){double y; c.compute(x,y);return y;});
       double m_ref = mean(out_ref.rbegin(),out_ref.rbegin()+1000);
       vector<double> m;
 
@@ -88,10 +88,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
           c.reset();
 
           vector<double> ink(in.size());
-          std::transform(in.begin(),in.end(),ink.begin(),[&](double x){return k*x;});
+          std::transform(in.begin(),in.end(),ink.begin(),
+                         [&](double x){return k*x;});
 
           vector<double> out(in.size());
-          std::transform(ink.begin(),ink.end(),out.begin(),[&](double x){return c.compute(x);});
+          std::transform(ink.begin(),ink.end(),out.begin(),
+                         [&](double x){double y; c.compute(x,y);return y;});
 	  
           m.push_back(mean(out.rbegin(),out.rbegin()+1000));
         }

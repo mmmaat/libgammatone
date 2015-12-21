@@ -26,124 +26,110 @@
 
 namespace gammatone
 {
-  namespace detail
-  {
-
-    //! Convert values in the range [first,last) in a decibel scale
-    /*!  
-
-      Given \f$ X=(x_i) \f$ the values in [first,last) and its
-      absolute max \f$ M = max_i(|x_i|) \f$, this function converts the
-      range \f$X\f$ in its decibel representation: \f$ \forall x_i \in X,
-      x_i \leftarrow 20log\frac{x_i}{M}\f$.
-
-      \attention the values in \f$X\f$ must be positive. Else an error
-      occurs (see std::log).
-
-      \tparam Iterator  An iterator to the range to convert.
-
-      \param first  Iterator to the first position in range
-      \param last  Iterator to the last position in range      
-     */
-    template<class Iterator>
-    inline void decibel(const Iterator& first, const Iterator& last);
-
-    //! Find the position in a signal where it reaches a given attenuation (in dB)
-    /*!
-
-      Given a signal \f$X=(x_i)\f$ and its absolute max \f$ M =
-      max_i(|x_i|)\f$, this function returns the index \f$I_\alpha\f$
-      where the signal envelope reach the attenuation level \f$ \alpha
-      \f$ such as \f$I_\alpha = min_i(\{i|\alpha <
-      20log\frac{|x_i|}{M}\})\f$
-
-      \tparam Container The type of the signal container. Must have
-      bidirectional iterator.
-
-      \param signal  The processed input signal \f$ X=\{x_i\} \f$
-      \param level The attenuation level \f$ \alpha \f$ to search for
-      (dB). No effect if positive.
-
-      \return A const iterator where the signal attenuation reach the
-      given level. If the attenuation is not reached, return signal.cend()
-    */
-    template<class Container>
-    typename Container::const_iterator find_attenuation(const Container& signal,
-                                                        const typename Container::value_type& level);
-
-    //! Shrink a signal up to a given attenuation (in dB)
-    /*!
-
-      Reduce the signal up to the position returned by
-      find_attenuation(signal,level)
-      
-      \tparam Container Type of container to be processed
-
-      \param signal  The processed input signal \f$ X=\{x_t\} \f$
-      \param level The attenuation level \f$ \alpha \f$ to search for
-      (dB). No effect if positive.
-
-     */
-    template<class Container>
-    void shrink_to_attenuation(Container& signal,
-                               const typename Container::value_type& level);
-  }
-}
-
-template<class Iterator>
-inline void gammatone::detail::
-decibel(const Iterator& first, const Iterator& last)
-{
-  using T = typename Iterator::value_type;
-  
-  gammatone::detail::normalize(first,last);
-  std::for_each(first, last, [&](T& x){x = 20*std::log(x);});
-}
-
-template<class Container>
-typename Container::const_iterator gammatone::detail::
-find_attenuation(const Container& signal,
-                 const typename Container::value_type& level)
-{
-  typedef typename Container::value_type T;
-
-  // deal with silly cases
-  if(level>0) return signal.cend();
-
-  // compute partial max from end to beginning of the IR
-  std::vector<T> partial_max(signal.size());
-  T max = 0.0;
-  std::transform(signal.rbegin(),signal.rend(),partial_max.rbegin(),
-                 [&](const T& x){if(std::abs(x)>max) max = std::abs(x); return max;});
-
-  // normalize the max
-  std::for_each(partial_max.begin(),partial_max.end(),[&](T& x){x/=max;});
-
-  // find cutoff position in partial_max
-  const T cutoff = std::pow(10,level/20.0);
-  const auto cutoff_it = std::find_if(partial_max.begin(),partial_max.end(),
-                                      [&](const T& x){return x <= cutoff;});
-
-  // convert it to an iterator on signal
-  auto res_it = signal.cbegin() + std::distance(partial_max.begin(),cutoff_it);
-
-  // If the attenuation level is not reached, return signal.cend()
-  if(res_it == signal.cbegin())
-    return signal.cend();
-  return res_it;
-}
-
-template<class Container>
-void gammatone::detail::
-shrink_to_attenuation(Container& signal,
-                      const typename Container::value_type& level)
-{
-  const auto it = gammatone::detail::find_attenuation(signal, level);
-
-  if(it != signal.cbegin())
+    namespace detail
     {
-      signal.assign(signal.cbegin(),it);
-      signal.shrink_to_fit( );
+
+        //! Convert values in the range [first,last) in a decibel scale
+        /*!  
+
+          Given \f$ X=(x_i) \f$ the values in [first,last) and its
+          absolute max \f$ M = max_i(|x_i|) \f$, this function converts the
+          range \f$X\f$ in its decibel representation: \f$ \forall x_i \in X,
+          x_i \leftarrow 20log\frac{x_i}{M}\f$.
+
+          \attention the values in \f$X\f$ must be positive. Else an error
+          occurs (see std::log).
+
+          \tparam Iterator  An iterator to the range to convert.
+
+          \param first  Iterator to the first position in range
+          \param last  Iterator to the last position in range      
+        */
+        template<class Iterator>
+        inline void decibel(const Iterator& first, const Iterator& last){
+            using T = typename Iterator::value_type;
+  
+            gammatone::detail::normalize(first,last);
+            std::for_each(first, last, [&](T& x){x = 20*std::log(x);});
+        }
+
+
+        //! Find the position in a signal where it reaches a given attenuation (in dB)
+        /*!
+
+          Given a signal \f$X=(x_i)\f$ and its absolute max \f$ M =
+          max_i(|x_i|)\f$, this function returns the index \f$I_\alpha\f$
+          where the signal envelope reach the attenuation level \f$ \alpha
+          \f$ such as \f$I_\alpha = min_i(\{i|\alpha <
+          20log\frac{|x_i|}{M}\})\f$
+
+          \tparam Container The type of the signal container. Must have
+          bidirectional iterator.
+
+          \param signal  The processed input signal \f$ X=\{x_i\} \f$
+          \param level The attenuation level \f$ \alpha \f$ to search for
+          (dB). No effect if positive.
+
+          \return A const iterator where the signal attenuation reach the
+          given level. If the attenuation is not reached, return signal.cend()
+        */
+        template<class Container>
+        typename Container::const_iterator find_attenuation(const Container& signal,
+                                                            const typename Container::value_type& level){
+            using T = typename Container::value_type;
+
+            // deal with silly cases
+            if(level>0) return signal.cend();
+
+            // compute partial max from end to beginning of the IR
+            std::vector<T> partial_max(signal.size());
+            T max = 0.0;
+            std::transform(signal.rbegin(),signal.rend(),partial_max.rbegin(),
+                           [&](const T& x){if(std::abs(x)>max) max = std::abs(x); return max;});
+
+            // normalize the max
+            std::for_each(partial_max.begin(),partial_max.end(),[&](T& x){x/=max;});
+
+            // find cutoff position in partial_max
+            const T cutoff = std::pow(10,level/20.0);
+            const auto cutoff_it = std::find_if(partial_max.begin(),partial_max.end(),
+                                                [&](const T& x){return x <= cutoff;});
+
+            // convert it to an iterator on signal
+            auto res_it = signal.cbegin() + std::distance(partial_max.begin(),cutoff_it);
+
+            // If the attenuation level is not reached, return signal.cend()
+            if(res_it == signal.cbegin())
+                return signal.cend();
+            return res_it;
+        }
+
+
+        //! Shrink a signal up to a given attenuation (in dB)
+        /*!
+
+          Reduce the signal up to the position returned by
+          find_attenuation(signal,level)
+      
+          \tparam Container Type of container to be processed
+
+          \param signal  The processed input signal \f$ X=\{x_t\} \f$
+          \param level The attenuation level \f$ \alpha \f$ to search for
+          (dB). No effect if positive.
+
+        */
+        template<class Container>
+        void shrink_to_attenuation(Container& signal,
+                                   const typename Container::value_type& level){
+            const auto it = gammatone::detail::find_attenuation(signal, level);
+
+            if(it != signal.cbegin())
+            {
+                signal.assign(signal.cbegin(),it);
+                signal.shrink_to_fit( );
+            }
+        }
+
     }
 }
 

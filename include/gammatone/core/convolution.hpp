@@ -62,7 +62,7 @@ namespace gammatone
 
       inline void reset();
 
-      inline Scalar compute(const Scalar& input);
+        inline void compute(const Scalar& input, Scalar& output);
 
     private:
       //! Find impulse response cutoff at a given dB
@@ -153,14 +153,13 @@ reset()
 
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-Scalar
+void
 gammatone::core::convolution<Scalar, GainPolicy, ClippingPolicy>::
-compute(const Scalar& input)
+compute(const Scalar& input, Scalar& output)
 {
   m_input.pop_front();
   m_input.push_back(input);
-
-  return std::inner_product(m_input.begin(), m_input.end(), m_ir.rbegin(), 0.0);
+  output = std::inner_product(m_input.begin(), m_input.end(), m_ir.rbegin(), 0.0);
 }
 
 #endif // GAMMATONE_CORE_CONVOLUTION_HPP

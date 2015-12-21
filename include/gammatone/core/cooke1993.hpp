@@ -72,7 +72,7 @@ namespace gammatone
       virtual ~cooke1993();
 
       inline void reset();
-      inline Scalar compute(const Scalar& input);
+        inline void compute(const Scalar& input, Scalar& output);
 
     private:
 
@@ -181,8 +181,8 @@ reset()
 
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
-Scalar gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
-compute(const Scalar& input)
+void gammatone::core::cooke1993<Scalar,GainPolicy,ClippingPolicy>::
+compute(const Scalar& input, Scalar& output)
 {
   // update p and u
   p[0] = ClippingPolicy::clip(q*input + a[0]*p[1] + a[1]*p[2] + a[2]*p[3] + a[3]*p[4]);
@@ -190,14 +190,12 @@ compute(const Scalar& input)
   p[4] = p[3]; p[3] = p[2]; p[2] = p[1]; p[1] = p[0];
 
   // compute result
-  Scalar output = this->factor() * ( u.real()*q.real() + u.imag()*q.imag() );
+  output = this->factor() * ( u.real()*q.real() + u.imag()*q.imag() );
 
   // update q
   std::complex<Scalar> tmp(c.real()*q.real() + c.imag()*q.imag(),
                            c.real()*q.imag() - c.imag()*q.real() );
   std::swap(q,tmp);
-
-  return std::move(output);
 }
 
 #endif // GAMMATONE_CORE_COOKE1993_HPP

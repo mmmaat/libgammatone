@@ -140,14 +140,26 @@ namespace gammatone
 
         //! Compute a scalar output from a scalar input
         /*!
-          \param input  The scalar value to be processed.
-          \return       The computed output value.
+          \param input   The scalar value to be processed
+          \param output  The computed output value
+        */
+        inline void compute(const Scalar& input, Scalar& output){
+            m_core.compute(input, output);
+        }
+
+
+        //! Compute a scalar output from a scalar input
+        /*!
+          \param input  The scalar value to be processed
+          \return       The computed output value
 
           This method allocate memory for the output scalar.
         */
         inline Scalar compute(const Scalar& input)
             {
-                return m_core.compute(input);
+                Scalar output;
+                this->compute(input, output);
+                return output;               
             }
 
 
