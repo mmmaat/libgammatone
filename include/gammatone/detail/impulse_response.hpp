@@ -400,10 +400,10 @@ implemented(Filter& filter,
 
   // compute the first sample (= 1)
   auto it = ir.begin();
-  *it++ = filter.compute(1.0);
+  filter.compute(1.0, *it++);
 
   // compute other samples (= 0)
-  std::for_each(it,ir.end(),[&](T& x){x = filter.compute(0.0);});
+  std::for_each(it,ir.end(),[&](T& x){filter.compute(0.0, x);});
 
   return ir;
 }

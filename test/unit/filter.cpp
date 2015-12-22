@@ -76,9 +76,9 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_works, F, filter_types<double>, fixture<F>
       std::vector<typename F::scalar_type> out(x.size());
       auto out1 = out;
       auto out2 = out;
-      f.compute(x.begin(),x.end(),out.begin());
-      f1.compute(x.begin(),x.end(),out1.begin());
-      f2.compute(x.begin(),x.end(),out2.begin());
+      f.compute_range(x.begin(),x.end(),out.begin());
+      f1.compute_range(x.begin(),x.end(),out1.begin());
+      f2.compute_range(x.begin(),x.end(),out2.begin());
       
       for(size_t i=0;i<x.size();i++)
         {
@@ -103,15 +103,16 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types<double>, fixture
 
       f.reset();
       std::vector<T> c2(x.size());
-      f.compute(x.begin(),x.end(),c2.begin());
+      f.compute_range(x.begin(),x.end(),c2.begin());
 
       f.reset();
       std::vector<T> c3(x.size());
-      std::transform(x.begin(),x.end(),c3.begin(),[&](const T& xx){return f.compute(xx);});
+      auto it = c3.begin();
+      std::for_each(x.begin(),x.end(),[&](const T& xx){f.compute(xx, *it++);});
 
       f.reset();
       std::vector<T> c4(x.size());
-      f.compute(x.size(),x.data(),c4.data());
+      f.compute_ptr(x.size(),x.data(),c4.data());
       
       for(std::size_t i=0;i<x.size();i++)
         {
@@ -135,8 +136,8 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types<double>, fixture<F
   
   for(auto& f:this->filters)
     {
-      f.compute(x.begin(),x.end(),c.begin());
-      f.compute(x.begin(),x.end(),c1.begin());
+      f.compute_range(x.begin(),x.end(),c.begin());
+      f.compute_range(x.begin(),x.end(),c1.begin());
 
       std::vector<T> d1(x.size());
       std::transform(c.begin(),c.end(),c1.begin(),d1.begin(),
@@ -147,7 +148,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types<double>, fixture<F
       BOOST_CHECK_EQUAL(false,b1);
 
       f.reset();
-      f.compute(x.begin(),x.end(),c2.begin());
+      f.compute_range(x.begin(),x.end(),c2.begin());
       std::vector<T> d2(x.size());
       std::transform(c.begin(),c.end(),c2.begin(),d2.begin(),
                      [&](const T& x,const T& y){return x-y;});

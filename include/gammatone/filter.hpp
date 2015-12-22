@@ -60,6 +60,12 @@ namespace gammatone
         //! Type of the filter core
         using core = Core<Scalar, policy::gain::forall_0dB, ClippingPolicy>;
 
+        //! Type of the scalars
+        using scalar_type = typename base::scalar_type;
+
+        //! Type of the output is also scalar
+        using output_type = typename base::output_type;
+
         
         //! Creates a gammatone filter from explicit parameters.
         /*!
@@ -143,71 +149,16 @@ namespace gammatone
           \param input   The scalar value to be processed
           \param output  The computed output value
         */
-        inline void compute(const Scalar& input, Scalar& output){
+        inline void compute(const scalar_type& input, output_type& output){
             m_core.compute(input, output);
         }
 
-
-        //! Compute a scalar output from a scalar input
-        /*!
-          \param input  The scalar value to be processed
-          \return       The computed output value
-
-          This method allocate memory for the output scalar.
-        */
-        inline Scalar compute(const Scalar& input)
-            {
-                Scalar output;
-                this->compute(input, output);
-                return output;               
+        inline void compute_ptr(const std::size_t& size,
+                                const Scalar* input,
+                                Scalar* output){
+            for(std::size_t i=0; i < size; ++i){
+                compute(input[i], output[i]);
             }
-
-
-        //! Compute an input iterator range
-        /*!
-          
-          Sequentially computes an input range of scalars and
-          stores the result in the given output range.
-
-          \tparam InputIterator   Iterator on the input range
-          \tparam OutputIterator  Iterator on the output range
-
-          \param first  Iterator to the initial position of the input range
-          \param last   Iterator to the final position of the input range
-          \param result Iterator to the initial position of the output range
-
-          \attention This method does not allocate any data. The range
-          must include at least as many elements as [first,last).
-        */
-        template<class InputIterator, class OutputIterator>
-        inline void compute(const InputIterator& first,
-                            const InputIterator& last,
-                            const OutputIterator& result){
-            using T = typename InputIterator::value_type;
-            std::transform(first, last, result,
-                           [&](const T& x){return this->compute(x);});
-        }
-
-
-        //! Compute scalar values from/to pointers
-        /*!
-          
-          This is a legacy C style compute function.
-
-          \param size    Number of scalars to read/write in input and
-                         output ranges.
-          \param input   A pointer to the input range
-          \param output  A pointer to the output range
-
-          \attention This method does not allocate any data, input and
-          output must point to some memory allocated for at least
-          `size` scalars.
-         */
-        void compute(const std::size_t& size,
-                     const Scalar* input,
-                     Scalar* output){
-            for(std::size_t i=0; i < size; ++i)
-                output[i] = compute(input[i]);
         }
 
 

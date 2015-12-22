@@ -1,13 +1,19 @@
 * cochlea code
-** TODO no allocation in compute()
+** DONE no allocation in compute()
+   CLOSED: [2015-12-22 mar. 23:27]
+*** DONE no allocation in cores
+*** DONE no allocation in filter
+    CLOSED: [2015-12-22 mar. 23:16]
+*** DONE no allocation in filterbank
+    CLOSED: [2015-12-22 mar. 23:16]
+** TODO make a utils::reserve_output(filter, input_size)
+   See a tentative commented in interface.hpp
 ** TODO implement gain policy
 ** TODO ensure no memory leaks with valgrind
    for a valgrind based test framework see [[https://github.com/kaldi-asr/kaldi][kaldi]]
 * simple binding to Python
-* merge with cochleo (becomes renderer)
-* in cochleo: get real time signal and plot it
-
-doc
-===
-
-* INPUT line in Doxyfile.in 
+* real time renderer
+** merge from cochleo (becomes renderer subdir)
+** get real time signal and plot it
+* doc
+** INPUT line in Doxyfile.in 

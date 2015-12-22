@@ -44,9 +44,12 @@ int main()
   // Generation of bandwidths in function of frequency (first plot)
   using namespace gammatone::policy::bandwidth;
   std::vector<Scalar> b1(n), b2(n), b3(n);
-  std::transform(freq.begin(),freq.end(),b1.begin(),[&](const Scalar& x){return glasberg1990<Scalar>::bandwidth(x);});
-  std::transform(freq.begin(),freq.end(),b2.begin(),[&](const Scalar& x){return slaney1988<Scalar>::bandwidth(x);});
-  std::transform(freq.begin(),freq.end(),b3.begin(),[&](const Scalar& x){return greenwood1990<Scalar>::bandwidth(x);});
+  std::transform(freq.begin(),freq.end(),b1.begin(),
+                 [&](const Scalar& x){return glasberg1990<Scalar>::bandwidth(x);});
+  std::transform(freq.begin(),freq.end(),b2.begin(),
+                 [&](const Scalar& x){return slaney1988<Scalar>::bandwidth(x);});
+  std::transform(freq.begin(),freq.end(),b3.begin(),
+                 [&](const Scalar& x){return greenwood1990<Scalar>::bandwidth(x);});
 
   std::stringstream s1;
   s1 << std::ifstream(gpsetup).rdbuf() << std::endl

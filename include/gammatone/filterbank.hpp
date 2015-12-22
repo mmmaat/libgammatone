@@ -27,6 +27,8 @@
 #include <gammatone/policy/gain.hpp>
 #include <gammatone/policy/bandwidth.hpp>
 #include <gammatone/policy/clipping.hpp>
+
+#include <algorithm>
 #include <vector>
 
 namespace gammatone
@@ -58,22 +60,26 @@ namespace gammatone
     public:
 
         //! Type of *this
-        using type = filterbank<Scalar,Core,ChannelsPolicy,GainPolicy,BandwidthPolicy,ClippingPolicy>;
+        using type = filterbank<Scalar, Core, ChannelsPolicy, GainPolicy,
+                                BandwidthPolicy, ClippingPolicy>;
 
         //! Type of the inherited interface
-        using base_type = detail::interface<Scalar,std::vector<Scalar> >;
+        using base_type = detail::interface<Scalar, std::vector<Scalar>>;
 
+        //! Type of the scalars
+        using scalar_type = Scalar;
+        
         //! Type of the output container
         using output_type = typename base_type::output_type;
 
         //! Type of the filter core
-        using core_type = Core<Scalar,GainPolicy,ClippingPolicy>;
+        using core_type = Core<Scalar, GainPolicy, ClippingPolicy>;
 
         //! Type of the channels policy
-        using channels = ChannelsPolicy<Scalar,BandwidthPolicy>;
+        using channels = ChannelsPolicy<Scalar, BandwidthPolicy>;
 
         //! Type of the underlying gammatone filters
-        using filter_type = gammatone::filter<Scalar,Core,BandwidthPolicy,ClippingPolicy>;
+        using filter_type = gammatone::filter<Scalar, Core, BandwidthPolicy, ClippingPolicy>;
 
         //! Type of the underlying bank of filters
         using bank_type = std::vector<filter_type>;
@@ -154,7 +160,6 @@ namespace gammatone
         //! Destructor.
         virtual ~filterbank(){}
 
-      
         // Inherited accessor to center frequencies. It actually allocate
         // the output and access to each filter's own center_frequency()
         // method. This implemetation assumes that the method is not used
@@ -162,7 +167,7 @@ namespace gammatone
         output_type center_frequency() const {        
             output_type out(nb_channels());
             std::transform(this->begin(), this->end(), out.begin(),
-                           [&](const filter_type& f){return f.center_frequency();});
+                           [](const filter_type& f){return f.center_frequency();});
             return out;
         }
 
@@ -170,7 +175,7 @@ namespace gammatone
         output_type bandwidth() const{
             output_type out(nb_channels());
             std::transform(this->begin(), this->end(),out.begin(),
-                           [&](const filter_type& f){return f.bandwidth();});
+                           [](const filter_type& f){return f.bandwidth();});
             return out;
         }
 
@@ -178,14 +183,15 @@ namespace gammatone
         output_type gain() const{
             output_type out(nb_channels());
             std::transform(this->begin(), this->end(),
-                           out.begin(),[&](const filter_type& f){return f.gain();});
+                           out.begin(),[](const filter_type& f){return f.gain();});
             return out;
         }
 
 
+        // Inherited reset method. Simple delegation to each filter.
         void reset(){
-            // TODO replace by std::foreach
-            for(auto& filter : this->m_bank) filter.reset();
+            std::for_each(this->begin(), this->end(),
+                          [](filter_type& f){f.reset();});
         }
 
 
@@ -264,55 +270,30 @@ namespace gammatone
 
         //! Compute an output from a scalar input
         /*!
-          \param input  The scalar value to be processed.
-          \return       The computed output value.
+          \param input   The scalar value to be processed.
+          \param output  The computed output value.
+
+          \attention This method suppose that the output is allocated
+          for at least *nb_channels()* elements.
         */
-        inline output_type compute(const Scalar& input){
-            output_type out(nb_channels());
-            std::transform(begin(),end(),out.begin(),[&](filter_type& f){return f.compute(input);});
-            return out;
+        inline void compute(const scalar_type& input, output_type& output){
+            for(std::size_t i=0; i<nb_channels(); ++i){
+                m_bank[i].compute(input, output[i]);
+            }
         }
 
-
-        //! Compute an input iterator range
-        /*!
-          Sequentially computes an input range of values and stores the
-          result in an output range of values.
-
-          \tparam InputIterator   Iterator on the input range.
-          \tparam OutputIterator  Iterator on the output range.
-
-          \param first  Iterator to the initial position of the input range.
-          \param last   Iterator to the final position of the input range.
-          \param result Iterator to the initial position of the output range.
-
-          \attention This method does not allocate any data. The range
-          must include at least as many elements as [first,last).
-        */
-        template<class InputIterator, class OutputIterator>
-        inline void compute(const InputIterator& first,
-                            const InputIterator& last,
-                            const OutputIterator& result)
-            {
-                std::transform(first, last, result,
-                               [&](const Scalar& x){return this->compute(x);});
-            }
-
-
         //! Compute scalar values from pointer
-        void compute(const std::size_t& size,
-                     const Scalar* input,
-                     Scalar* output)
-            {
-                for(std::size_t i=0;i<size;++i)
-                {
-                    const std::size_t k = i*nb_channels();
-                    for(std::size_t j=0;j<nb_channels();++j)
-                    {
-                        output[j+k] = m_bank[j].compute(input[i]);
-                    }
+        // TODO comment and add a row='frequency' or row='time' option.
+        inline void compute_ptr(const std::size_t& size,
+                                const Scalar* input,
+                                Scalar* output){
+            for(std::size_t i=0;i<size;++i){
+                const std::size_t k = i*nb_channels();
+                for(std::size_t j=0;j<nb_channels();++j){
+                    m_bank[j].compute(input[i], output[j+k]);
                 }
             }
+        }
 
 
     private:

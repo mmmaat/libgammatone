@@ -21,16 +21,18 @@
 #include <boost/test/unit_test.hpp>
 
 template<class Scalar>
-class child : public gammatone::detail::interface<Scalar,void>
+class child : public gammatone::detail::interface<Scalar,Scalar>
 {
 public:
-  child(const Scalar& s) : gammatone::detail::interface<Scalar,void>(s) {}
+    child(const Scalar& s) : gammatone::detail::interface<Scalar,Scalar>(s) {}
 
 private:
-  void center_frequency() const {}
-  void bandwidth() const {}
-  void gain() const {}
-  void reset(){}
+    Scalar center_frequency() const {return Scalar();}
+    Scalar bandwidth() const {return Scalar();}
+    Scalar gain() const {return Scalar();}
+    void reset(){}
+    void compute(const Scalar& x, Scalar& y){}
+    void compute_ptr(const std::size_t& s, const Scalar* x, Scalar* y){}
 };
 
 BOOST_AUTO_TEST_SUITE(interface_test)

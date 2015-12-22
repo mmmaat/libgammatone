@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
 
           vector<double> out(in.size());
           std::transform(ink.begin(),ink.end(),out.begin(),
-                         [&](double x){double y; c.compute(x,y);return y;});
+                         [&](double x){double y; c.compute(x,y); return y;});
 	  
           m.push_back(mean(out.rbegin(),out.rbegin()+1000));
         }

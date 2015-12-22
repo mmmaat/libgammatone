@@ -78,36 +78,42 @@ BOOST_AUTO_TEST_CASE(center_frequencies_works)
 
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types<double>, fixture<F>)
 {
-  using T = typename F::scalar_type;
-  
-  const auto x = utils::random<double>(-1.0,1.0,1000);
-  F f(this->m_sample_frequency,this->m_low,this->m_high);
+    // this is double
+    using T = typename F::scalar_type;
 
-  const auto xsize = x.size();
-  const auto ysize = f.nb_channels();
+    // random input signal
+    const auto x = utils::random<T>(-1.0, 1.0, 1000);
 
-  // f.reset();
-  // std::vector<std::vector<T> > c1 = f.compute(x);
-
-  f.reset();
-  std::vector<std::vector<T> > c2(xsize,std::vector<double>(ysize));
-  f.compute(x.begin(),x.end(),c2.begin());
-
-  f.reset();
-  std::vector<std::vector<T> > c3(xsize,std::vector<double>(ysize));
-  std::transform(x.begin(),x.end(),c3.begin(),[&](const T& xx){return f.compute(xx);});
-
-  f.reset();
-  std::vector<T> c4(xsize*ysize);
-  f.compute(xsize,x.data(),c4.data());
-
-  for(std::size_t i=0;i<xsize;i++)
-    for(std::size_t j=0;j<ysize;j++)
-      {
-	// BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
-        BOOST_CHECK_EQUAL(c2[i][j],c3[i][j]);
-	BOOST_CHECK_EQUAL(c2[i][j],c4[i*ysize+j]);
-      }
+    // initialize filterbank
+    F f(this->m_sample_frequency, this->m_low, this->m_high);
+    
+    const auto xsize = x.size();
+    const auto ysize = f.nb_channels();
+    
+    // f.reset();
+    // std::vector<std::vector<T> > c1 = f.compute(x);
+    
+    f.reset();
+    std::vector<std::vector<T> > c2(xsize,std::vector<double>(ysize));
+    f.compute_range(x.begin(), x.end(), c2.begin());
+    
+    f.reset();
+    std::vector<std::vector<T> > c3(xsize,std::vector<double>(ysize));
+    auto out = c3.begin();
+    std::for_each(x.begin(), x.end(),
+                  [&](const T& xx){f.compute(xx, *out++);});
+    
+    f.reset();
+    std::vector<T> c4(xsize*ysize);
+    f.compute_ptr(xsize, x.data(), c4.data());
+    
+    for(std::size_t i=0; i < xsize; i++)
+        for(std::size_t j=0; j < ysize; j++)
+        {
+            // BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
+            BOOST_CHECK_EQUAL(c2[i][j], c3[i][j]);
+            BOOST_CHECK_EQUAL(c2[i][j], c4[i*ysize+j]);
+        }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
