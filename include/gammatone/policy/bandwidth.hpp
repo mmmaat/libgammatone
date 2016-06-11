@@ -42,7 +42,7 @@
   low frequencies (refered as minbw) and \f$ n \f$ is the
   bandwidth order (refered as order).
 
-  \TODO Update this documentation
+  TODO Update this documentation
 */
 
 

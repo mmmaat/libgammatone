@@ -25,6 +25,6 @@
 #include <string>
 
 //! TODO Avoid absolute path -> configure from CMakelists
-const std::string gpsetup = "/home/mathieu/dev/libgammatone/test/share/setup.gp";
+const std::string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
 
 #endif // LIBGAMMATONE_TEST_SETUP_HPP

@@ -38,6 +38,7 @@ if(BUILD_DOCUMENTATION)
         VERBATIM)   
 endif()
 
-
-
-install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/ DESTINATION share/doc)      
+# install documentation
+install(
+  DIRECTORY    ${PROJECT_BINARY_DIR}/doc/html/
+  DESTINATION  share/doc/gammatone)

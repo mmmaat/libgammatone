@@ -30,29 +30,26 @@ add_definitions(${CMAKE_CXX_FLAGS} -Wall -std=c++11)
 # Configure version.hpp in source
 configure_file(
   "${PROJECT_SOURCE_DIR}/include/gammatone/version.hpp.in"
-  "${PROJECT_BINARY_DIR}/include/gammatone/version.hpp"
-  )
+  "${PROJECT_BINARY_DIR}/include/gammatone/version.hpp")
 
 # add the binary tree to the search path for include files
 # so that we will find version.hpp
-include_directories("${PROJECT_BINARY_DIR}/include")
-include_directories(include)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${PROJECT_BINARY_DIR}/include)
 
 # build the tests
 add_subdirectory(test)
 
-# build documentation
+# build documentation and examples
 add_subdirectory(doc)
+
+# build python wrapper
+add_subdirectory(python)
 
 # install header files from source and build directory
 install(
-  DIRECTORY include/ ${PROJECT_BINARY_DIR}/include/
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include
   DESTINATION include
   PATTERN "*.in" EXCLUDE
-  )
-
-# install documentation
-install(
-  DIRECTORY ${PROJECT_BINARY_DIR}/doc/html/
-  DESTINATION share/doc/gammatone
   )

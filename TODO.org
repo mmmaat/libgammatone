@@ -9,11 +9,13 @@
 ** TODO make a utils::reserve_output(filter, input_size)
    See a tentative commented in interface.hpp
 ** TODO implement gain policy
-** TODO ensure no memory leaks with valgrind
-   for a valgrind based test framework see [[https://github.com/kaldi-asr/kaldi][kaldi]]
-* simple binding to Python
+* TODO simple binding to Python
+* CMakeLists
+** TODO configure all absolute paths in code from here
+   test/test_setup.hpp
 * real time renderer
 ** merge from cochleo (becomes renderer subdir)
 ** get real time signal and plot it
 * doc
-** INPUT line in Doxyfile.in 
+** TODO INPUT line in Doxyfile.in 
+** TODO move standalone tests in doc/exemple

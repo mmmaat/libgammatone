@@ -3,8 +3,8 @@ add_custom_target(tests)
 # test specific headers in test/include
 include_directories(include)
 
-# build in test/bin
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+# build in test
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/test)
 
 ###################
 # unit tests
@@ -35,6 +35,7 @@ set_property(
 
 ###################
 # standalone tests
+# TODO move that in doc/exemple
 ###################
 
 # configure boost for use with gnuplot-iostream

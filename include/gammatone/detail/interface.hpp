@@ -147,13 +147,34 @@ namespace gammatone
             //   \param size  The number of output samples to store
             // */
             // virtual output_type reserve_output(const std::size_t& size = 1) = 0;
+
             
             //! Compute a scalar output from a scalar input
             /*!
+              Output must be preallocated.
+
               \param input   The scalar value to be processed
               \param output  The computed output value
             */
             virtual void compute(const scalar_type& input, output_type& output) = 0;
+
+            //! Compute a scalar output from a scalar input
+            /*!
+
+              Memory allocation for output. Do not use this method
+              on intensive computation and prefer compute_range.
+
+              \note This method is used in th python wrappers because
+              scalars are immutable in Python.
+
+              \param input   The scalar value to be processed
+              \param output  The computed output value
+            */
+            inline output_type compute_allocate(const scalar_type& input){
+                output_type output;
+                compute(input, output);
+                return output;
+            }
 
             
             //! Compute an input iterator range
