@@ -1,26 +1,31 @@
+# cmake
 *.cmake
-*.pdf
-*.wav
-.#*
+CMakeCache.txt
+CMakeFiles/
+Makefile
 
+# built files
+/build
+/install
+example/bin
 
-
+# gtags
 /GPATH
 /GRTAGS
 /GSYMS
 /GTAGS
-/share/alternatives
-/build
-/install
-CMakeCache.txt
-CMakeFiles/
-Makefile
+
+# built documention
 doc/*.db
 doc/auto/
 doc/exemple/bin
 doc/html/
-example/bin
-test/DoxygenLayout.xml
-test/bin
-test/old/
+
+# emacs
 /.projectile
+.#*
+
+# excluded files
+*.pdf
+*.wav
+/share/alternatives
