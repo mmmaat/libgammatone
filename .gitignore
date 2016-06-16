@@ -8,6 +8,7 @@ Makefile
 /build
 /install
 example/bin
+*.pyc
 
 # gtags
 /GPATH
