@@ -15,16 +15,13 @@ def pulse(size):
 
 fs = 44100
 cf = 1000
-f = gammatone.Filter(fs, cf)
 
+f = gammatone.Filter(fs, cf)
 out = f.compute(pulse(1000))
 plt.plot(out)
-#plt.show()
-
 
 fb = gammatone.Filterbank(fs, 300, 8000, 10)
-print fb.nb_channels
-for c in fb.center_frequency:
-    print c
-
 out = fb.compute(pulse(1000))
+plt.plot(out)
+
+plt.show()

@@ -1,8 +1,12 @@
 from _gammatone import *
 import numpy
 
-def _filter_compute(self, input_array):
+def _check(input_array):
     assert len(input_array.shape) == 1, 'input array must be 1D'
+
+
+def _filter_compute(self, input_array):
+    _check(input_array)
 
     # allocate the output array
     output_array = numpy.zeros(input_array.shape)
@@ -13,11 +17,9 @@ def _filter_compute(self, input_array):
 
     return output_array
 
-Filter.compute = _filter_compute
-
 
 def _filterbank_compute(self, input_array):
-    assert len(input_array.shape) == 1, 'input array must be 1D'
+    _check(input_array)
 
     # allocate the output array
     output_array = numpy.zeros((input_array.shape[0], self.nb_channels))
@@ -29,4 +31,6 @@ def _filterbank_compute(self, input_array):
 
     return output_array
 
+
+Filter.compute = _filter_compute
 Filterbank.compute = _filterbank_compute
