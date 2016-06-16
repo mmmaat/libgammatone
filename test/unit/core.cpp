@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
       // check mean ratio close to k... (clipping introduces little nonlinearities)
       for(size_t i=0;i<coef.size();i++)
         {
-          BOOST_CHECK_CLOSE(coef[i],m[i]/m_ref, 1e-5);
+          BOOST_CHECK_CLOSE(coef[i],m[i]/m_ref, 1e-3);
         }
     }
 }

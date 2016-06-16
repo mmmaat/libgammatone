@@ -170,11 +170,12 @@ namespace gammatone
               \param input   The scalar value to be processed
               \param output  The computed output value
             */
-            inline output_type compute_allocate(const scalar_type& input){
-                output_type output;
-                compute(input, output);
-                return output;
-            }
+            virtual output_type compute_allocate(const scalar_type& input)
+                {
+                    output_type output;
+                    compute(input, output);
+                    return output;
+                }
 
 
             //! Compute an input iterator range

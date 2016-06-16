@@ -297,6 +297,13 @@ namespace gammatone
             }
         }
 
+        inline output_type compute_allocate(const scalar_type& input)
+            {
+                output_type output(this->nb_channels());
+                this->compute(input, output);
+                return output;
+            }
+
 
     private:
         //! The filterbank overlap factor

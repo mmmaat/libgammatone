@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -64,11 +64,13 @@ BOOST_AUTO_TEST_CASE(center_frequencies_works)
   using T = double;
   using namespace gammatone;
   using namespace gammatone::policy;
-  
+
   const T m_sample_frequency = 44100;
   const T m_low = 500, m_high = 8000;
-  
-  filterbank<T, gammatone::core::cooke1993,channels::fixed_size> fi(m_sample_frequency,m_low,m_high);
+
+  filterbank<T, gammatone::core::cooke1993, channels::fixed_size> fi(
+      m_sample_frequency, m_low, m_high);
+
   BOOST_CHECK_LE( m_low, fi.begin()->center_frequency() );
   BOOST_CHECK_EQUAL( m_high, fi.rbegin()->center_frequency() );
 }
@@ -86,49 +88,36 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filterbank_types<double>, fix
 
     // initialize filterbank
     F f(this->m_sample_frequency, this->m_low, this->m_high);
-    
+
     const auto xsize = x.size();
     const auto ysize = f.nb_channels();
-    
-    // f.reset();
-    // std::vector<std::vector<T> > c1 = f.compute(x);
-    
+
+    f.reset();
+    std::vector<std::vector<T> > c1;
+    std::for_each(x.begin(), x.end(),
+                  [&](const T& xx){c1.push_back(f.compute_allocate(xx));});
+
     f.reset();
     std::vector<std::vector<T> > c2(xsize,std::vector<double>(ysize));
     f.compute_range(x.begin(), x.end(), c2.begin());
-    
+
     f.reset();
     std::vector<std::vector<T> > c3(xsize,std::vector<double>(ysize));
     auto out = c3.begin();
     std::for_each(x.begin(), x.end(),
                   [&](const T& xx){f.compute(xx, *out++);});
-    
+
     f.reset();
     std::vector<T> c4(xsize*ysize);
     f.compute_ptr(xsize, x.data(), c4.data());
-    
+
     for(std::size_t i=0; i < xsize; i++)
         for(std::size_t j=0; j < ysize; j++)
         {
-            // BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
+            BOOST_CHECK_EQUAL(c1[i][j],c2[i][j]);
             BOOST_CHECK_EQUAL(c2[i][j], c3[i][j]);
             BOOST_CHECK_EQUAL(c2[i][j], c4[i*ysize+j]);
         }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
