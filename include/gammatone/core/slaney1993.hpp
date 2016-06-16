@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -50,11 +50,11 @@ namespace gammatone
       slaney1993(const Scalar& sample_frequency,
 		 const Scalar& center_frequency,
 		 const Scalar& bandwidth);
-      
+
       slaney1993(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other);
 
       slaney1993(slaney1993<Scalar,GainPolicy,ClippingPolicy>&& other) noexcept;
-      
+
       virtual ~slaney1993();
 
       slaney1993<Scalar,GainPolicy,ClippingPolicy>&
@@ -92,7 +92,7 @@ template<class Scalar, class GainPolicy, class ClippingPolicy>
 gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
 slaney1993(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other)
   : base<Scalar,GainPolicy>(other),
-    m_filter({other.m_filter[0],other.m_filter[1],other.m_filter[2],other.m_filter[3]})
+    m_filter({{other.m_filter[0],other.m_filter[1],other.m_filter[2],other.m_filter[3]}})
 {}
 
 template<class Scalar, class GainPolicy, class ClippingPolicy>
@@ -108,7 +108,7 @@ gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
 operator=(const slaney1993<Scalar,GainPolicy,ClippingPolicy>& other)
 {
   gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy> tmp(other);
-  
+
   base<Scalar,GainPolicy>::operator=(tmp);
   std::swap(m_filter, tmp.m_filter);
 
@@ -119,7 +119,7 @@ template<class Scalar, class GainPolicy, class ClippingPolicy>
 gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>&
 gammatone::core::slaney1993<Scalar,GainPolicy,ClippingPolicy>::
 operator=(slaney1993<Scalar,GainPolicy,ClippingPolicy>&& other)
-{  
+{
   base<Scalar,GainPolicy>::operator=(other);
   m_filter = std::move(other.m_filter);
 
@@ -186,24 +186,24 @@ find_filters(const Scalar& sample_frequency,
   // filters coefficients
   const Scalar A0 = 1.0 / sample_frequency;
   const std::array<Scalar,4> A1 =
-    {-std::sqrt(3.0 + b)*c - d,
-     std::sqrt( 3.0 + b)*c - d,
-     -std::sqrt(3.0 - b)*c - d,
-     std::sqrt( 3.0 - b)*c - d};
+      {{-std::sqrt(3.0 + b)*c - d,
+        std::sqrt( 3.0 + b)*c - d,
+        -std::sqrt(3.0 - b)*c - d,
+        std::sqrt( 3.0 - b)*c - d}};
   const Scalar A2 = 0.0;
 
   const Scalar B0 = 1.0;
   const Scalar B1 = -2.0*cos(a)/exp(tptbw);
   const Scalar B2 = exp(-2.0*tptbw);
-  const std::array<Scalar,3> B = {B0,B1,B2};
+  const std::array<Scalar,3> B = {{B0, B1, B2}};
 
   // filters initialisation
   typedef slaney1993_iir<Scalar> iir;
-  const std::array<Scalar,3> a0 = {A0,A1[0],A2};
-  const std::array<Scalar,3> a1 = {A0,A1[1],A2};
-  const std::array<Scalar,3> a2 = {A0,A1[2],A2};
-  const std::array<Scalar,3> a3 = {A0,A1[3],A2};
-  std::array<iir,4> filter = {iir(a0,B),iir(a1,B),iir(a2,B),iir(a3,B)};
+  const std::array<Scalar,3> a0 = {{A0, A1[0], A2}};
+  const std::array<Scalar,3> a1 = {{A0, A1[1], A2}};
+  const std::array<Scalar,3> a2 = {{A0, A1[2], A2}};
+  const std::array<Scalar,3> a3 = {{A0, A1[3], A2}};
+  std::array<iir,4> filter = {{iir(a0,B),iir(a1,B),iir(a2,B),iir(a3,B)}};
 
   return std::move(filter);
 }
