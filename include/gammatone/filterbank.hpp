@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -68,7 +68,7 @@ namespace gammatone
 
         //! Type of the scalars
         using scalar_type = Scalar;
-        
+
         //! Type of the output container
         using output_type = typename base_type::output_type;
 
@@ -83,7 +83,7 @@ namespace gammatone
 
         //! Type of the underlying bank of filters
         using bank_type = std::vector<filter_type>;
-    
+
         //! Const iterator on filters
         using const_iterator = typename bank_type::const_iterator;
 
@@ -114,7 +114,7 @@ namespace gammatone
             {
                 const auto p = ChannelsPolicy<Scalar, BandwidthPolicy>
                     ::setup(low_frequency, high_frequency, channels_parameter);
-  
+
                 m_overlap = p.second;
                 std::for_each(p.first.begin(), p.first.end(), [&](const Scalar& f)
                               {m_bank.push_back(filter_type(sample_frequency,f));});
@@ -123,14 +123,16 @@ namespace gammatone
 
         //! Copy constructor
         filterbank(const type& other)
-            : m_overlap(other.m_overlap),
+            : base_type(other.sample_frequency()),
+              m_overlap(other.m_overlap),
               m_bank(other.m_bank)
             {}
 
 
         //! Move constructor
         filterbank(type&& other)
-            : m_overlap(std::move(other.m_overlap)),
+            : base_type(other.sample_frequency()),
+              m_overlap(std::move(other.m_overlap)),
               m_bank(std::move(other.m_bank))
             {}
 
@@ -164,7 +166,7 @@ namespace gammatone
         // the output and access to each filter's own center_frequency()
         // method. This implemetation assumes that the method is not used
         // often. Else it would be more efficient to store it as attribute.
-        output_type center_frequency() const {        
+        output_type center_frequency() const {
             output_type out(nb_channels());
             std::transform(this->begin(), this->end(), out.begin(),
                            [](const filter_type& f){return f.center_frequency();});

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -52,8 +52,8 @@ namespace gammatone
         public:
             //! Type of this class
             using type = interface<Scalar, Output>;
-        
-            //! Type of scalar input values 
+
+            //! Type of scalar input values
             using scalar_type = Scalar;
 
             //! Type of output values
@@ -137,7 +137,7 @@ namespace gammatone
 
 
             // //! Allocate memory for storing an output of the given size
-            // /*!  
+            // /*!
 
             //   Because the compute functions declared in this class do
             //   not allocate any data, output is writed on preallocated
@@ -148,7 +148,7 @@ namespace gammatone
             // */
             // virtual output_type reserve_output(const std::size_t& size = 1) = 0;
 
-            
+
             //! Compute a scalar output from a scalar input
             /*!
               Output must be preallocated.
@@ -176,12 +176,12 @@ namespace gammatone
                 return output;
             }
 
-            
+
             //! Compute an input iterator range
             /*!
               Sequentially computes an input range of values and stores the
               result in an output range of values.
-              
+
               \tparam InputIterator   Iterator on the input range.
               \tparam OutputIterator  Iterator on the output range.
 
@@ -198,13 +198,13 @@ namespace gammatone
                                       const InputIterator& last,
                                       const OutputIterator& result){
                 auto it = result;
-                std::for_each(first, last,
-                              [&](const scalar_type& x){compute(x, *it++);});
+                std::for_each(
+                    first, last, [&](const scalar_type& x){compute(x, *it++);});
             }
 
             //! Compute scalar values from/to pointers
             /*!
-          
+
               This is a legacy C style compute function.
 
               \param size    Number of scalars to read/write in input and
@@ -219,7 +219,7 @@ namespace gammatone
             virtual void compute_ptr(const std::size_t& size,
                                      const scalar_type* input,
                                      scalar_type* output) = 0;
-            
+
         private:
             //! Processing sample frequency (Hz)
             scalar_type m_sample_frequency;

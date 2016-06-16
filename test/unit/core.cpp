@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -70,7 +70,6 @@ BOOST_AUTO_TEST_SUITE(core_test)
 // input signal. That's what we are looking to in this test.
 // input duration = 10000 samples, but mean computation only on the last
 // 1000 (we are sure filter state is stable).
-
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
 {
   C c(44100,1000,100);
@@ -94,7 +93,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
           vector<double> out(in.size());
           std::transform(ink.begin(),ink.end(),out.begin(),
                          [&](double x){double y; c.compute(x,y); return y;});
-	  
+
           m.push_back(mean(out.rbegin(),out.rbegin()+1000));
         }
 
@@ -123,7 +122,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear, C, core_types)
 //       std::transform(in.end()-1000,in.end(),out2.begin(),[&](T x){return c2.compute(x);});
 //       detail::normalize(out1.begin(),out1.end());
 //       detail::normalize(out2.begin(),out2.end());
-//       for(size_t i=0;i<1000;i++)	
+//       for(size_t i=0;i<1000;i++)
 // 	BOOST_CHECK_CLOSE(out1[i],out2[i],1);
 //     }
 // }
