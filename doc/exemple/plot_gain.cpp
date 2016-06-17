@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -22,9 +22,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <test_setup.hpp>
 
-// TODO configure this from CMakeLists
-const std::string GNUPLOT_SETUP = "/home/mathieu/dev/libgammatone/test/share/setup.gp";
 
 typedef double T;
 using namespace gammatone;
@@ -64,7 +63,7 @@ void plot(std::vector<T> xaxis,
           const std::string xlabel = "frequency (Hz)")
 {
   Gnuplot gp;
-  gp << std::ifstream(GNUPLOT_SETUP).rdbuf() << std::endl
+  gp << std::ifstream(gpsetup).rdbuf() << std::endl
      << "set xlabel '"<<xlabel<<"'" << std::endl
      << "set ylabel '"<<ylabel<<"'" << std::endl
      << "set key top right" << std::endl

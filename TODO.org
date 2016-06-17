@@ -1,21 +1,10 @@
 * cochlea code
-** DONE no allocation in compute()
-   CLOSED: [2015-12-22 mar. 23:27]
-*** DONE no allocation in cores
-*** DONE no allocation in filter
-    CLOSED: [2015-12-22 mar. 23:16]
-*** DONE no allocation in filterbank
-    CLOSED: [2015-12-22 mar. 23:16]
 ** TODO make a utils::reserve_output(filter, input_size)
    See a tentative commented in interface.hpp
 ** TODO implement gain policy
-* TODO simple binding to Python
-* CMakeLists
-** TODO configure all absolute paths in code from here
-   test/test_setup.hpp
 * real time renderer
 ** merge from cochleo (becomes renderer subdir)
 ** get real time signal and plot it
 * doc
-** TODO INPUT line in Doxyfile.in 
+** TODO INPUT line in Doxyfile.in
 ** TODO move standalone tests in doc/exemple

@@ -35,7 +35,6 @@ set_property(
 
 ###################
 # standalone tests
-# TODO move that in doc/exemple
 ###################
 
 # configure boost for use with gnuplot-iostream
@@ -47,6 +46,11 @@ find_package(Boost 1.55 REQUIRED COMPONENTS
 link_directories(${DEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 add_definitions(${DEPS_CFLAGS_OTHER})
 include_directories(${Boost_INCLUDE_DIR})
+
+include_directories(
+  ${PROJECT_SOURCE_DIR}/test/include
+  ${PROJECT_BINARY_DIR}/test/include)
+
 
 # build standalone tests
 file( GLOB_RECURSE TESTS_SOURCE src/*.cpp )

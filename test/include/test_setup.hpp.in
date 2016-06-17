@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -24,7 +24,6 @@
 #include <gnuplot-iostream.h>
 #include <string>
 
-//! TODO Avoid absolute path -> configure from CMakelists
-const std::string gpsetup = "/home/mathieu/dev/libgammatone/share/setup.gp";
+const std::string gpsetup = "@LIBGAMMATONE_SHARE@/setup.gp";
 
 #endif // LIBGAMMATONE_TEST_SETUP_HPP

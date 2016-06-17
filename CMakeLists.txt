@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+# Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 #
 # This file is part of libgammatone
 #
@@ -32,11 +32,20 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/gammatone/version.hpp.in"
   "${PROJECT_BINARY_DIR}/include/gammatone/version.hpp")
 
+# Configure path to share directory in test setup
+set(LIBGAMMATONE_SHARE ${PROJECT_BINARY_DIR}/share})
+configure_file(
+  "${PROJECT_SOURCE_DIR}/test/include/test_setup.hpp.in"
+  "${PROJECT_BINARY_DIR}/test/include/test_setup.hpp")
+
 # add the binary tree to the search path for include files
-# so that we will find version.hpp
+# so that we will find the configured version.hpp
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${PROJECT_BINARY_DIR}/include)
+
+# copy files in share
+add_subdirectory(share)
 
 # build the tests
 add_subdirectory(test)

@@ -1,3 +1,7 @@
+##############
+# build documentation
+##############
+
 # from https://www.tty1.net/blog/2014/cmake-doxygen_en.html
 
 # add a target to generate API documentation with Doxygen
@@ -12,19 +16,6 @@ if(BUILD_DOCUMENTATION)
         message(FATAL_ERROR "Doxygen is needed to build the documentation.")
     endif()
 
-    # Build the exemples
-    add_custom_target(example)
-    file(GLOB_RECURSE EXAMPLES ./example/*.cpp)
-
-    # build each source and add it in example target
-    foreach(src ${EXAMPLES})
-      string(CONCAT bin "example-" ${src})
-      string(REPLACE ".cpp" "" bin ${bin})
-      string(REGEX REPLACE ".*/" "" bin ${bin})
-      add_executable(${bin} ${src})
-      add_dependencies(example ${bin})
-    endforeach(src)
-    
     # Configure Doxyfile.in
     set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
     set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
@@ -35,10 +26,42 @@ if(BUILD_DOCUMENTATION)
         COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating API documentation with Doxygen"
-        VERBATIM)   
+        VERBATIM)
 endif()
 
 # install documentation
 install(
   DIRECTORY    ${PROJECT_BINARY_DIR}/doc/html/
   DESTINATION  share/doc/gammatone)
+
+
+################
+# build exemples
+################
+
+add_custom_target(exemple)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/exemple)
+
+# configure boost for use with gnuplot-iostream
+find_package(Boost 1.55 REQUIRED COMPONENTS
+  system
+  filesystem
+  iostreams
+  timer)
+link_directories(${DEPS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
+add_definitions(${DEPS_CFLAGS_OTHER})
+include_directories(${Boost_INCLUDE_DIR})
+include_directories(
+  ${PROJECT_SOURCE_DIR}/test/include
+  ${PROJECT_BINARY_DIR}/test/include)
+
+
+# build standalone exemples
+file( GLOB_RECURSE EXEMPLE_SOURCE exemple/*.cpp )
+foreach( src ${EXEMPLE_SOURCE} )
+  string( REPLACE ".cpp" "" bin ${src} )
+  string( REGEX REPLACE ".*/" "" bin ${bin} )
+  add_executable( ${bin} ${src} )
+  target_link_libraries( ${bin} ${Boost_LIBRARIES} )
+  add_dependencies(exemple ${bin})
+endforeach(src)
