@@ -32,11 +32,14 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/include/gammatone/version.hpp.in"
   "${PROJECT_BINARY_DIR}/include/gammatone/version.hpp")
 
-# Configure path to share directory in test setup
-set(LIBGAMMATONE_SHARE ${PROJECT_BINARY_DIR}/share})
+# Configure path to share directory in test setup and setup.gp
+set(LIBGAMMATONE_SHARE ${PROJECT_BINARY_DIR}/share)
 configure_file(
   "${PROJECT_SOURCE_DIR}/test/include/test_setup.hpp.in"
   "${PROJECT_BINARY_DIR}/test/include/test_setup.hpp")
+configure_file(
+  "${PROJECT_SOURCE_DIR}/share/setup.gp.in"
+  "${PROJECT_BINARY_DIR}/share/setup.gp")
 
 # add the binary tree to the search path for include files
 # so that we will find the configured version.hpp

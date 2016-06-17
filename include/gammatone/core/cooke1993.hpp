@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -59,7 +59,7 @@ namespace gammatone
       cooke1993(const Scalar& sample_frequency,
 		const Scalar& center_frequency,
 		const Scalar& bandwidth);
-      
+
       cooke1993(const cooke1993<Scalar, GainPolicy, ClippingPolicy>& other);
       cooke1993(cooke1993<Scalar, GainPolicy, ClippingPolicy>&& other) noexcept;
 
@@ -68,7 +68,7 @@ namespace gammatone
 
       cooke1993<Scalar, GainPolicy, ClippingPolicy>& operator=
       (cooke1993<Scalar, GainPolicy, ClippingPolicy>&& other);
-      
+
       virtual ~cooke1993();
 
       inline void reset();

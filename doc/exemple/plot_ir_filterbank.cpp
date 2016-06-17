@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
   gammatone::filterbank<T> bank(sample_frequency, low_cf, high_cf, nb_channels);
   for(auto& f:bank.center_frequency()) cout << f << " "; cout << endl;
 
-  
+
   using ir = gammatone::detail::impulse_response;
   auto t = ir::time(bank.begin()->sample_frequency(), duration);
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
   using filter_type = typename decltype(bank)::filter_type;
   transform(bank.begin(),bank.end(),ir_base.begin(),
    	    [&](filter_type& x){return ir::implemented(x, t.begin(),t.end());});
- 
+
   // initialize gnuplot
   Gnuplot gp;
   gp << ifstream(gpsetup).rdbuf() << endl
@@ -64,6 +64,6 @@ int main(int argc, char** argv)
   gp << cmd << endl;
   for(size_t i=0;i<bank.nb_channels();i++)
     gp.send1d(make_pair(t,ir_base[i]));
-  
+
   return 0;
 }

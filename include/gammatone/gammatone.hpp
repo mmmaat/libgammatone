@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -46,7 +46,7 @@
   The gammatone namespace is the root namespace of libgammatone. The
   main classes of this namespace are gammatone::filter and
   gammatone::filterbank, wich define respectively single and multi
-  channels gammatone filters. 
+  channels gammatone filters.
 
   In order to be instanciated, a filter (or filterbank) must be
   associated to one of the proposed processing cores. A
@@ -57,13 +57,13 @@
 
 /*!
   \namespace gammatone::core
-  
+
   \brief Gammatone core processing implementations
 */
 
-/*!  
-  \namespace gammatone::policy 
-  
+/*!
+  \namespace gammatone::policy
+
   \brief Policy classes for filter and filterbank
   customization
 */

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -46,10 +46,10 @@ BOOST_AUTO_TEST_CASE(glasberg1990_works)
 {
   using namespace gammatone::policy::bandwidth;
 
-  // test on a lot of frequencies from 1Hz to 100kHz...  
+  // test on a lot of frequencies from 1Hz to 100kHz...
   auto f = gammatone::detail::linspace<T>(1,100000,10000);
   typedef glasberg1990<T> g;
-  
+
   for_each(f.begin(),f.end(), [&](const T& x)
            {BOOST_CHECK_CLOSE(g::bandwidth(x),g::bw_correction(g::order)*24.7*(4.37*x/1000 + 1),1e-2);});
   for_each(f.begin(),f.end(), [&](const T& x)
@@ -57,13 +57,3 @@ BOOST_AUTO_TEST_CASE(glasberg1990_works)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
-
-
-
-
-
-
-
-
-

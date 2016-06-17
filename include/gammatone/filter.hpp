@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -31,10 +31,10 @@ namespace gammatone
     //! Gammatone filter implementation
     /*!
       \class filter gammatone/filter.hpp
-      
+
       This class models a single gammatone filter. Processing core as
       well as bandwidth and clipping policies are templates.
-      
+
       \tparam Scalar                Type of the scalars.
       \tparam Core                  Type of the processing core.
       \tparam BandwidthPolicy       Policy for computing filter bandwidth.
@@ -50,10 +50,10 @@ namespace gammatone
     class filter : public detail::interface<Scalar,Scalar>
     {
     public:
-        
+
         //! Type of this filter
         using type = filter<Scalar, Core, BandwidthPolicy, ClippingPolicy>;
-        
+
         //! Type of the inherited interface
         using base = detail::interface<Scalar, Scalar>;
 
@@ -66,7 +66,7 @@ namespace gammatone
         //! Type of the output is also scalar
         using output_type = typename base::output_type;
 
-        
+
         //! Creates a gammatone filter from explicit parameters.
         /*!
           \param sample_frequency The input signal sample frequency (Hz).
@@ -114,11 +114,11 @@ namespace gammatone
         //! Move operator
         type& operator=(type&& other){
             base::operator=(std::move(other));
-            
+
             m_center_frequency = std::move(other.m_center_frequency);
             m_bandwidth = std::move(other.m_bandwidth);
             m_core = std::move(other.m_core);
-            
+
             return *this;
         }
 
@@ -130,7 +130,7 @@ namespace gammatone
         inline Scalar center_frequency() const{
             return m_center_frequency;
         }
-        
+
         inline Scalar bandwidth() const{
             return m_bandwidth;
         }

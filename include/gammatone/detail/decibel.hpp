@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -30,7 +30,7 @@ namespace gammatone
     {
 
         //! Convert values in the range [first,last) in a decibel scale
-        /*!  
+        /*!
 
           Given \f$ X=(x_i) \f$ the values in [first,last) and its
           absolute max \f$ M = max_i(|x_i|) \f$, this function converts the
@@ -43,12 +43,12 @@ namespace gammatone
           \tparam Iterator  An iterator to the range to convert.
 
           \param first  Iterator to the first position in range
-          \param last  Iterator to the last position in range      
+          \param last  Iterator to the last position in range
         */
         template<class Iterator>
         inline void decibel(const Iterator& first, const Iterator& last){
             using T = typename Iterator::value_type;
-  
+
             gammatone::detail::normalize(first,last);
             std::for_each(first, last, [&](T& x){x = 20*std::log(x);});
         }
@@ -110,7 +110,7 @@ namespace gammatone
 
           Reduce the signal up to the position returned by
           find_attenuation(signal,level)
-      
+
           \tparam Container Type of container to be processed
 
           \param signal  The processed input signal \f$ X=\{x_t\} \f$

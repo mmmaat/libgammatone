@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -86,6 +86,6 @@ int main()
   gp_phase.send1d(std::make_pair(freq,tf_aprox));
 
   std::cout << freq.size() << " " << tf.size() << std::endl;
-  
+
   return 0;
 }

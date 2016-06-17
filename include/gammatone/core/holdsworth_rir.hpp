@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -34,7 +34,7 @@ namespace gammatone
     {
     public:
       typedef T scalar_type;
-      
+
       void init(const T& sample_frequency, const T& center_frequency, const T& bandwidth)
       {
         alpha = find_alpha(sample_frequency,bandwidth);
@@ -55,7 +55,7 @@ namespace gammatone
       virtual inline T compute(const T& x)
       {
 	std::cout << std::exp(-omega*t) << "  " << x << "  " << std::exp(-omega*t) * x << std::endl;
-	
+
         z.push( std::exp(-omega*t) * x ); z.pop();
         w.push( w.front() + alpha*w.front()*z.front()); w.pop();
 	auto y = std::real( std::exp(omega*t) * w.back() );

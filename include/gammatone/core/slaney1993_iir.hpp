@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
   Copyright (C) 1999 Matt R. Flax <https://tracker.debian.org/pkg/libgtfb>
 
   This file is part of libgammatone
@@ -37,7 +37,7 @@ namespace gammatone
 
       slaney1993_iir(const slaney1993_iir<Scalar>& other);
       slaney1993_iir(slaney1993_iir<Scalar>&& other) noexcept;
-      
+
       slaney1993_iir<Scalar>& operator=(const slaney1993_iir<Scalar>& other);
       slaney1993_iir<Scalar>& operator=(slaney1993_iir<Scalar>&& other);
 

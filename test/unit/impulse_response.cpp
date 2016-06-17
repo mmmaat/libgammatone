@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -32,7 +32,7 @@ protected:
   ~fixture2(){}
 
   using T = typename Filter::scalar_type;
-  
+
   const T fs = 44100;
   const T fc = 3000;
   const T duration = 0.01;

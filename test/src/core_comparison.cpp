@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -119,7 +119,7 @@ public:
             res.var.push_back(std::sqrt(stat.second)/1e6);
         }
         std::cout << " Done" << std::endl;
-        
+
         return res;
     }
 

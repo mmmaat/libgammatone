@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -45,7 +45,7 @@ int main()
   //test_convolution(sample_frequency,center_frequency,duration);
   test_slaney1993(sample_frequency, center_frequency, duration);
   //test_holdsworth_rir(sample_frequency, center_frequency, duration);
-  
+
   return 0;
 }
 
@@ -76,7 +76,7 @@ void test_slaney1993(const T& fs, const T& fc, const T& d)
 
 //   const std::vector<T>& time() const
 //   { return m_time; }
-  
+
 // private:
 //   vector<T> m_time;
 // };
@@ -88,7 +88,7 @@ void test_slaney1993(const T& fs, const T& fc, const T& d)
 //   cout << "gain = " << core.gain() << endl
 //        << "size = " << core.ir().size() << endl
 //        << "time = " << core.time().size() << endl;
-  
+
 //   plot(make_pair(core.time(), core.ir()), "convolution the");
 
 //   gammatone::filter<T,gammatone::core::convolution<T> > f(fs, fc);

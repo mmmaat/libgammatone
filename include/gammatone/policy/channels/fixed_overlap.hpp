@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -108,7 +108,7 @@ gammatone::policy::channels::fixed_overlap<Scalar,BandwidthPolicy>::
 setup(const Scalar& fl, const Scalar& fh, const Scalar& overlap_factor)
 {
   using base = base<Scalar,BandwidthPolicy>;
-  
+
   const Scalar b = -overlap_factor / BandwidthPolicy<Scalar>::earq;
   const std::size_t nbc = base::beta(fl,fh) / b;
 

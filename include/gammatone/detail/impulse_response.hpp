@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -354,7 +354,7 @@ theorical(const Scalar& center_frequency,
           const Iterator& last)
 {
   using T = typename Iterator::value_type;
-  
+
   Container<Scalar> ir(std::distance(first,last));
   std::transform(first,last,ir.begin(),
                  [&](const T& t){return formula_ir(center_frequency,bandwidth,t);});
@@ -392,7 +392,7 @@ implemented(Filter& filter,
             const Iterator& last)
 {
   using T = typename Filter::scalar_type;
-  
+
   filter.reset();
 
   // allocation for output

@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 
-file(
-  COPY ${CMAKE_CURRENT_SOURCE_DIR}/parula.pal
-  DESTINATION ${PROJECT_BINARY_DIR}/share)
+load '@LIBGAMMATONE_SHARE@/parula.pal'
+set style line 101 lc rgb '#808080' lt 1
+set border 3 back ls 101
+set tics nomirror out scale 0.75
+set style line 102 lc rgb'#808080' lt 0 lw 1
+set grid back ls 102
+set tics textcolor rgb 'black'

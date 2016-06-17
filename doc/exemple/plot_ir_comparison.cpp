@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 
   // impulse responses computation
   using ir = gammatone::detail::impulse_response;
-  
+
   const auto t = ir::time(f1.sample_frequency(),duration);
 
   vector<pair<vector<T>,string> > ir_data;

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -45,19 +45,19 @@ namespace gammatone
     class convolution : public base<Scalar,GainPolicy>
     {
       using this_type = convolution<Scalar,GainPolicy,ClippingPolicy>;
-      
+
     public:
-      
+
       convolution(const Scalar& sample_frequency,
 		  const Scalar& center_frequency,
 		  const Scalar& bandwidth);
-      
+
       convolution(const this_type& other);
       convolution(this_type&& other) noexcept;
-      
+
       this_type& operator=(const this_type& other);
       this_type& operator=(this_type&& other);
-      
+
       virtual ~convolution();
 
       inline void reset();

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This file is part of libgammatone
 
@@ -29,7 +29,7 @@ template<class Filter>
 class fixture
 {
   using T = typename Filter::scalar_type;
-  
+
 protected:
   fixture() : signal(utils::random<T>(-1.0,1.0,1000))
   {
@@ -79,7 +79,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_works, F, filter_types<double>, fixture<F>
       f.compute_range(x.begin(),x.end(),out.begin());
       f1.compute_range(x.begin(),x.end(),out1.begin());
       f2.compute_range(x.begin(),x.end(),out2.begin());
-      
+
       for(size_t i=0;i<x.size();i++)
         {
           BOOST_CHECK_EQUAL(out[i],out1[i]);
@@ -94,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(copy_works, F, filter_types<double>, fixture<F>
 BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types<double>, fixture<F>)
 {
   using T = typename F::scalar_type;
-  
+
   const auto& x = this->signal;
   for(auto& f:this->filters)
     {
@@ -113,7 +113,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(compute_works, F, filter_types<double>, fixture
       f.reset();
       std::vector<T> c4(x.size());
       f.compute_ptr(x.size(),x.data(),c4.data());
-      
+
       for(std::size_t i=0;i<x.size();i++)
         {
 	  //BOOST_CHECK_EQUAL(c1[i],c2[i]);
@@ -133,7 +133,7 @@ BOOST_FIXTURE_TEST_CASE_TEMPLATE(reset_works, F, filter_types<double>, fixture<F
   std::vector<T> c(x.size());
   std::vector<T> c1(x.size());
   std::vector<T> c2(x.size());
-  
+
   for(auto& f:this->filters)
     {
       f.compute_range(x.begin(),x.end(),c.begin());

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015 Mathieu Bernard <mathieu_bernard@laposte.net>
+  Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,21 +58,21 @@ namespace gammatone
 
       //! Move constructor
       base(base<Scalar,GainPolicy>&& other) noexcept;
-      
+
       //! Assignment operator
       base<Scalar,GainPolicy>& operator=(const base<Scalar,GainPolicy>& other);
 
       //! Move operator
       base<Scalar,GainPolicy>& operator=(base<Scalar,GainPolicy>&& other);
-      
+
       //! Destructor
       virtual ~base();
 
-           
+
       //! Return the core internal gain, as specified by GainPolicy
       inline Scalar gain() const;
 
-      
+
       //! Set the core at its initial state
       virtual inline void reset() = 0;
 
@@ -87,7 +87,7 @@ namespace gammatone
 
       Scalar tau() const {return m_tau;}
       Scalar factor() const {return m_factor;}
-      
+
     private:
 
       //! \f$ 2\pi / f_s \f$
@@ -128,7 +128,7 @@ template<class Scalar, class GainPolicy>
 gammatone::core::base<Scalar, GainPolicy>&
 gammatone::core::base<Scalar, GainPolicy>::
 operator=(const base<Scalar, GainPolicy>& other)
-{  
+{
   m_tau = other.m_tau;
   m_factor = other.m_factor;
 
@@ -142,7 +142,7 @@ operator=(base<Scalar, GainPolicy>&& other)
 {
   m_tau = std::move(other.m_tau);
   m_factor = std::move(other.m_factor);
-  
+
   return *this;
 }
 
@@ -163,7 +163,7 @@ find_factor(const Scalar& sample_frequency,
             const Scalar& bandwidth)
 {
   using Complex = std::complex<Scalar>;
-  
+
   const Scalar a = this->m_tau*bandwidth;
   const Complex b(0.0, this->m_tau*center_frequency);
   const Scalar g = 2.0*std::abs(
