@@ -1,3 +1,5 @@
+#!/usr/env/bin python
+#
 # Copyright (C) 2015, 2016 Mathieu Bernard <mathieu_bernard@laposte.net>
 #
 # This file is part of libgammatone
@@ -15,21 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with libgammatone. If not, see <http://www.gnu.org/licenses/>.
 
-# use setuptools to build the extension module
-add_custom_target(_gammatone.so ALL
-  COMMAND python setup.py build_ext --inplace
-  DEPENDS gammatone/gammatone.cpp
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+from setuptools import setup, Extension
 
-# move the built extension module into the correct location (this is a total hack)
-add_custom_target(python ALL
-  COMMAND mkdir -p ${PROJECT_BINARY_DIR}/python/gammatone/
-  COMMAND cp _gammatone.so ${PROJECT_BINARY_DIR}/python/gammatone/
-  COMMAND cp gammatone/__init__.py ${PROJECT_BINARY_DIR}/python/gammatone/
-  COMMAND cp test_wrapper.py ${PROJECT_BINARY_DIR}/python/
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  )
+# TODO version should be configured from cmake
+setup(
+    name='gammatone',
+    version='0.2',
+    license='GPLv3',
+    description='gammatone filterbanks wrapped from libgammatone C++ library',
+    url='https://github.com/mmmaat/libgammatone',
+    author='Mathieu Bernard',
 
-# make sure the above commands run in the correct order
-add_dependencies(python _gammatone.so)
+    include_package_data=True,
+    zip_safe=False,
+
+    ext_modules=[Extension(
+        '_gammatone',
+        ['gammatone/gammatone.cpp'],
+        include_dirs=['../include'],
+        libraries=['boost_python'],
+        extra_compile_args=['-std=c++11']  # -O2 -std=c++11
+             )])
