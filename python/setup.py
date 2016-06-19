@@ -31,6 +31,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
+    packages=['gammatone'],
     ext_modules=[Extension(
         '_gammatone',
         ['gammatone/gammatone.cpp'],

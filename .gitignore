@@ -30,3 +30,8 @@ doc/html/
 *.pdf
 *.wav
 /share/alternatives
+
+# python
+/python/build/*
+/python/dist/*
+/python/gammatone.egg-info/*
